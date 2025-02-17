@@ -11,9 +11,9 @@ const ExerciseItems = () => {
         <TouchableOpacity>
             <ImageBackground source={exerciseImage}
             className='h-44 w-40 rounded-2xl overflow-hidden mx-2'>
-                <View>
-                    <Text>{item.category}</Text>
-                    <Text>{item.title}</Text>
+                <View className='justify-between flex-1 m-3'>
+                    <Text className='text-white font-medium tracking-widest'>{item.category}</Text>
+                    <Text className='text-white font-medium tracking-widest'>{item.title}</Text>
                 </View>
             </ImageBackground>
         </TouchableOpacity>
@@ -23,7 +23,7 @@ const ExerciseItems = () => {
         if(index%2==0){
             const nextItem = workoutData[index+1]
             return (
-                <View>
+                <View className='flex-row justify-around m-3'>
                     {renderWorkoutItem({item})}
                      {nextItem && renderWorkoutItem({item:nextItem})}
                 </View>
@@ -32,12 +32,13 @@ const ExerciseItems = () => {
 
     }
   return (
-    <View>
+    <View className='min-h-screen'>
       <FlashList 
       data={workoutData}
       renderItem= {RenderRow}
       keyExtractor={(item)=> item.id}
       showsVerticalScrollIndicator={false}
+      estimatedItemSize={200}
       />
     </View>
   )
