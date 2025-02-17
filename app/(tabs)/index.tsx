@@ -1,31 +1,63 @@
-import { StyleSheet } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import React from 'react';
+import { Text, View } from 'react-native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { NavigationContainer } from '@react-navigation/native';
+import WorkoutScreen from "../../src/screens/WorkoutScreen";
+import CalculationScreen from "../../src/screens/CalculationScreen";
+import TimerScreen from "../../src/screens/TimerScreen";
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
+const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
 
-export default function TabOneScreen() {
+
+export default function App() {
+  function TabNavigator(){
+    return(
+      <Tab.Navigator
+      screenOptions={({route})=>({
+        tabBarHideOnKeyboard:true,
+        tabBarIcon:({color,size})=>{
+          let iconName;
+          switch(route.name){
+            case "Workout":
+              iconName="dumbbell";
+              return(<FontAwesome6 name={iconName} size={size} color={color} />);
+              case "Timer":
+              iconName="timer-outline";
+              return(<Ionicons name="timer-outline" size={size} color={color} />);
+              case "Calculation":
+              iconName="calculator-outline";
+              return(<Ionicons name="calculator-outline" size={size} color={color} />);
+          }
+        },
+        tabBarShowLabel:false,
+        headerShown:false,
+        tabBarStyle:{
+          backgroundColor:"black",
+          borderTopRightRadius:20,
+          borderTopLeftRadius:20,
+          paddingVertical:5,
+        },
+        tabBarActiveTintColor:"aqua",
+        tabBarInactiveTintColor:"gray"
+
+        })}>
+        <Tab.Screen name="Workout" component={WorkoutScreen}></Tab.Screen>
+        <Tab.Screen name="Timer" component={TimerScreen}></Tab.Screen>
+        <Tab.Screen name="Calculation" component={CalculationScreen}></Tab.Screen>
+      </Tab.Navigator>
+    )
+  }
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
-    </View>
+  
+    <Stack.Navigator screenOptions={{headerShown:false}}>
+      <Stack.Screen name='TabNav' component={TabNavigator}></Stack.Screen>
+    </Stack.Navigator>
+  
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-});

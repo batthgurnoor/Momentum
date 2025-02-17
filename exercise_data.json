@@ -1,0 +1,2748 @@
+[
+  {
+    "id": 1,
+    "category": "Beginner, Stability",
+    "title": "Russian twist",
+    "intensity": "Gentle",
+    "gif_url": "russian_twist.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Sit on floor, knees bent and feet on the floor"
+      },
+      {
+        "step": 2,
+        "text": "Keep your back at a 45-degree angle, arms extended with palms together"
+      },
+      {
+        "step": 3,
+        "text": "Move the arms from one side to another in a twisting motion"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "category": "Beginner",
+    "title": "Advanced jumping jacks",
+    "intensity": "Gentle",
+    "gif_url": "advanced_jumping_jacks.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Stand with your feet together, knees slightly bent, and arms at your sides."
+      },
+      {
+        "step": 2,
+        "text": "Jump while raising your arms and separating legs to sides"
+      },
+      {
+        "step": 3,
+        "text": "Land on your forefoot with legs apart and arms overhead"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "category": "Beginner, Stability",
+    "title": "Chair leg squats",
+    "intensity": "Gentle",
+    "gif_url": "chair_leg_squats.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Stand in front of chair"
+      },
+      {
+        "step": 2,
+        "text": "Slowly squat to sit down onto chair"
+      },
+      {
+        "step": 3,
+        "text": "Make sure that your knees stay aligned and do not drop or bow either side"
+      },
+      {
+        "step": 4,
+        "text": "Your knee should not pass over your toe"
+      },
+      {
+        "step": 5,
+        "text": "Stand back up again"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "category": "Beginner",
+    "title": "Plank push-ups",
+    "intensity": "Gentle",
+    "gif_url": "plank_push-ups.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Start in a plank position with knees on the ground"
+      },
+      {
+        "step": 2,
+        "text": "Place down one hand at a time to lift up into a push\u00adup position"
+      },
+      {
+        "step": 3,
+        "text": "Keep back straight and core tight"
+      },
+      {
+        "step": 4,
+        "text": "Move one arm at a time back into the plank position"
+      },
+      {
+        "step": 5,
+        "text": "Repeat, alternating arms"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "category": "Beginner, Stability",
+    "title": "Press and plank",
+    "intensity": "Moderate",
+    "gif_url": "press_and_plank.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Start in a modified side\u00adplank, knees bent"
+      },
+      {
+        "step": 2,
+        "text": "Hold a filled water bottle in your right hand, right elbow bent \nand weight resting against your forearm"
+      },
+      {
+        "step": 3,
+        "text": "Lift your hips so your body is straight from knees to shoulders, \npressing water bottle up to the ceiling"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "category": "Strength, Cardio, Beginner",
+    "title": "Superman",
+    "intensity": "Moderate",
+    "gif_url": "superman.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Start on your hands and knees, with your back straight and core \nmuscles tight"
+      },
+      {
+        "step": 2,
+        "text": "Keeping your hips low, simultaneously raise your right arm and left \nleg straightening at your elbow and knee"
+      },
+      {
+        "step": 3,
+        "text": "Pause then lower to the starting position before alternating \nsides"
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "category": "Beginner",
+    "title": "Shoulder push-up",
+    "intensity": "Gentle",
+    "gif_url": "shoulder_push-up.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Kneel with feet hip width"
+      },
+      {
+        "step": 2,
+        "text": "Tip forward at hips, until you can place both hands on floor in\nfront of knees"
+      },
+      {
+        "step": 3,
+        "text": "Keep your back straight"
+      },
+      {
+        "step": 4,
+        "text": "Bending both elbows, bring your head toward the ground \n(keeping chin into your chest)"
+      },
+      {
+        "step": 5,
+        "text": "Press away from the floor and straighten your arms"
+      }
+    ]
+  },
+
+  {
+    "id": 14,
+    "category": "Beginner, Stability",
+    "title": "Russian twist",
+    "intensity": "Gentle",
+    "gif_url": "russian_twist.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Sit on floor, knees bent and feet on the floor"
+      },
+      {
+        "step": 2,
+        "text": "Keep your back at a 45-degree angle, arms extended with palms together"
+      },
+      {
+        "step": 3,
+        "text": "Move the arms from one side to another in a twisting motion"
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "category": "Beginner",
+    "title": "Advanced jumping jacks",
+    "intensity": "Gentle",
+    "gif_url": "advanced_jumping_jacks.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Stand with your feet together, knees slightly bent, and arms at your sides."
+      },
+      {
+        "step": 2,
+        "text": "Jump while raising your arms and separating legs to sides"
+      },
+      {
+        "step": 3,
+        "text": "Land on your forefoot with legs apart and arms overhead"
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "category": "Beginner, Stability",
+    "title": "Chair leg squats",
+    "intensity": "Gentle",
+    "gif_url": "chair_leg_squats.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Stand in front of chair"
+      },
+      {
+        "step": 2,
+        "text": "Slowly squat to sit down onto chair"
+      },
+      {
+        "step": 3,
+        "text": "Make sure that your knees stay aligned and do not drop or bow either side"
+      },
+      {
+        "step": 4,
+        "text": "Your knee should not pass over your toe"
+      },
+      {
+        "step": 5,
+        "text": "Stand back up again"
+      }
+    ]
+  },
+  {
+    "id": 17,
+    "category": "Beginner",
+    "title": "Plank push-ups",
+    "intensity": "Gentle",
+    "gif_url": "plank_push-ups.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Start in a plank position with knees on the ground"
+      },
+      {
+        "step": 2,
+        "text": "Place down one hand at a time to lift up into a push\u00adup position"
+      },
+      {
+        "step": 3,
+        "text": "Keep back straight and core tight"
+      },
+      {
+        "step": 4,
+        "text": "Move one arm at a time back into the plank position"
+      },
+      {
+        "step": 5,
+        "text": "Repeat, alternating arms"
+      }
+    ]
+  },
+  {
+    "id": 18,
+    "category": "Beginner",
+    "title": "Shoulder push-up",
+    "intensity": "Gentle",
+    "gif_url": "shoulder_push-up.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Kneel with feet hip width"
+      },
+      {
+        "step": 2,
+        "text": "Tip forward at hips, until you can place both hands on floor in\nfront of knees"
+      },
+      {
+        "step": 3,
+        "text": "Keep your back straight"
+      },
+      {
+        "step": 4,
+        "text": "Bending both elbows, bring your head toward the ground \n(keeping chin into your chest)"
+      },
+      {
+        "step": 5,
+        "text": "Press away from the floor and straighten your arms"
+      }
+    ]
+  },
+
+  {
+    "id": 24,
+    "category": "Strength, Toning, Core",
+    "title": "Sprinter sit-up",
+    "intensity": "Moderate",
+    "gif_url": "sprinter_sit-up.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Lie on back with the legs straight and arms by your side, elbows bent at a 90-degree angle"
+      },
+      {
+        "step": 2,
+        "text": "Sit up, bringing the left knee toward the right elbow"
+      },
+      {
+        "step": 3,
+        "text": "Lower back down to starting position"
+      }
+    ]
+  },
+  {
+    "id": 25,
+    "category": "Toning, Core",
+    "title": "Sprinter sit-up",
+    "intensity": "Moderate",
+    "gif_url": "sprinter_sit-up.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Lie on back with the legs straight and arms by your side, elbows bent at a 90-degree angle"
+      },
+      {
+        "step": 2,
+        "text": "Sit up, bringing the left knee toward the right elbow"
+      },
+      {
+        "step": 3,
+        "text": "Lower back down to starting position"
+      }
+    ]
+  },
+  {
+    "id": 26,
+    "category": "Core",
+    "title": "Dead bugs",
+    "intensity": "Moderate",
+    "gif_url": "dead_bugs.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Lie on back with arms extended upwards and knees bent at 90degrees with feet in the air"
+      },
+      {
+        "step": 2,
+        "text": "Drop your arm and leg on the opposite side and make sure your leg doesn\u2019t touch the floor"
+      },
+      {
+        "step": 3,
+        "text": "Bring them slowly back up to starting position and repeat with opposite side"
+      }
+    ]
+  },
+  {
+    "id": 27,
+    "category": "Core",
+    "title": "Dead bugs",
+    "intensity": "Moderate",
+    "gif_url": "dead_bugs.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Lie on back with arms extended upwards and knees bent at 90degrees with feet in the air"
+      },
+      {
+        "step": 2,
+        "text": "Drop your arm and leg on the opposite side and make sure your leg doesn\u2019t touch the floor"
+      },
+      {
+        "step": 3,
+        "text": "Bring them slowly back up to starting position and repeat with opposite side"
+      }
+    ]
+  },
+  {
+    "id": 28,
+    "category": "Strength, Core",
+    "title": "Three way crunches",
+    "intensity": "Moderate",
+    "gif_url": "three_way_crunches.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Lie on back, knees bent and feet hooked over each other"
+      },
+      {
+        "step": 2,
+        "text": "Perform a sequence of 3 crunches: firstly crunch to bring right elbow toward left knee, secondly crunch straight upwards, finally crunch to bring left elbow toward right knee"
+      },
+      {
+        "step": 3,
+        "text": "Repeat this sequence"
+      }
+    ]
+  },
+  {
+    "id": 29,
+    "category": "Strength, Core",
+    "title": "Three way crunches",
+    "intensity": "Moderate",
+    "gif_url": "three_way_crunches.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Lie on back, knees bent and feet hooked over each other"
+      },
+      {
+        "step": 2,
+        "text": "Perform a sequence of 3 crunches: firstly crunch to bring right elbow toward left knee, secondly crunch straight upwards, finally crunch to bring left elbow toward right knee"
+      },
+      {
+        "step": 3,
+        "text": "Repeat this sequence"
+      }
+    ]
+  },
+  {
+    "id": 30,
+    "category": "Core",
+    "title": "Mountain climber twists",
+    "intensity": "Moderate",
+    "gif_url": "mountain_climber_twists.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Start on your hands and toes"
+      },
+      {
+        "step": 2,
+        "text": "Bending at the knee, bring your left knee forward directly under your chest while keeping your right leg straight"
+      },
+      {
+        "step": 3,
+        "text": "Quickly alternate legs while keeping your core muscles tight"
+      }
+    ]
+  },
+  {
+    "id": 31,
+    "category": "Core",
+    "title": "Mountain climber twists",
+    "intensity": "Moderate",
+    "gif_url": "mountain_climber_twists.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Start on your hands and toes"
+      },
+      {
+        "step": 2,
+        "text": "Bending at the knee, bring your left knee forward directly under your chest while keeping your right leg straight"
+      },
+      {
+        "step": 3,
+        "text": "Quickly alternate legs while keeping your core muscles tight"
+      }
+    ]
+  },
+  {
+    "id": 32,
+    "category": "Core",
+    "title": "Contralateral limb raises",
+    "intensity": "Moderate",
+    "gif_url": "contralateral_limb_raises.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Lie on your stomach with the arms outstretched and palms facing one another"
+      },
+      {
+        "step": 2,
+        "text": "Slowly lift one arm a few inches off the floor, keeping it straight without rotating the shoulders"
+      },
+      {
+        "step": 3,
+        "text": "Simultaneously lift the leg of the other side"
+      },
+      {
+        "step": 4,
+        "text": "Hold the position, then lower the arm and leg back down"
+      }
+    ]
+  },
+  {
+    "id": 33,
+    "category": "Core",
+    "title": "Contralateral limb raises",
+    "intensity": "Moderate",
+    "gif_url": "contralateral_limb_raises.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Lie on your stomach with the arms outstretched and palms facing one another"
+      },
+      {
+        "step": 2,
+        "text": "Slowly lift one arm a few inches off the floor, keeping it straight without rotating the shoulders"
+      },
+      {
+        "step": 3,
+        "text": "Simultaneously lift the leg of the other side"
+      },
+      {
+        "step": 4,
+        "text": "Hold the position, then lower the arm and leg back down"
+      }
+    ]
+  },
+  {
+    "id": 34,
+    "category": "Core",
+    "title": "Supine bridge with leg extension",
+    "intensity": "Moderate",
+    "gif_url": "supine_bridge_with_leg_extension.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Lie on back, knees bent and feet on floor, arms elevated above your head"
+      },
+      {
+        "step": 2,
+        "text": "Lift hips up off the ground so that your knees, hips and shoulders are in a straight diagonal line"
+      },
+      {
+        "step": 3,
+        "text": "Holding hips level, lift one foot off the ground 1-2 inches and slowly place down again and repeat with alternate leg"
+      },
+      {
+        "step": 4,
+        "text": "Keep core muscles tight throughout the entire movement"
+      }
+    ]
+  },
+  {
+    "id": 35,
+    "category": "Core",
+    "title": "Supine bridge with leg extension",
+    "intensity": "Moderate",
+    "gif_url": "supine_bridge_with_leg_extension.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Lie on back, knees bent and feet on floor, arms elevated above your head"
+      },
+      {
+        "step": 2,
+        "text": "Lift hips up off the ground so that your knees, hips and shoulders are in a straight diagonal line"
+      },
+      {
+        "step": 3,
+        "text": "Holding hips level, lift one foot off the ground 1-2 inches and slowly place down again and repeat with alternate leg"
+      },
+      {
+        "step": 4,
+        "text": "Keep core muscles tight throughout the entire movement"
+      }
+    ]
+  },
+  {
+    "id": 36,
+    "category": "Cardio",
+    "title": "Side to side lunge with punches",
+    "intensity": "Moderate",
+    "gif_url": "side_to_side_lunge_with_punches.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Begin facing forward and pivot to the right"
+      },
+      {
+        "step": 2,
+        "text": "Step your right leg back as you bend your right knee into a lunge"
+      },
+      {
+        "step": 3,
+        "text": "Punch forward with your left arm then your right arm"
+      },
+      {
+        "step": 4,
+        "text": "Step back to the middle and turn to the left, taking your left leg back and your right arm forward in a punch followed by your left arm"
+      },
+      {
+        "step": 5,
+        "text": "Continue alternating sides, moving quickly"
+      },
+      {
+        "step": 6,
+        "text": "To make harder, lunge deeper or add a jump in the middle"
+      }
+    ]
+  },
+  {
+    "id": 37,
+    "category": "Cardio",
+    "title": "Side to side lunge with punches",
+    "intensity": "Moderate",
+    "gif_url": "side_to_side_lunge_with_punches.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Begin facing forward and pivot to the right"
+      },
+      {
+        "step": 2,
+        "text": "Step your right leg back as you bend your right knee into a lunge"
+      },
+      {
+        "step": 3,
+        "text": "Punch forward with your left arm then your right arm"
+      },
+      {
+        "step": 4,
+        "text": "Step back to the middle and turn to the left, taking your left leg back and your right arm forward in a punch followed by your left arm"
+      },
+      {
+        "step": 5,
+        "text": "Continue alternating sides, moving quickly"
+      },
+      {
+        "step": 6,
+        "text": "To make harder, lunge deeper or add a jump in the middle"
+      }
+    ]
+  },
+  {
+    "id": 38,
+    "category": "Cardio",
+    "title": "Front kick plank",
+    "intensity": "Moderate",
+    "gif_url": "front_kick_plank.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Begin with feet together and the arms up in a defensive position"
+      },
+      {
+        "step": 2,
+        "text": "Bring the right knee up and kick outwards"
+      },
+      {
+        "step": 3,
+        "text": "Balancing on the left leg, bring the right leg back behind you, hands to the floor"
+      },
+      {
+        "step": 4,
+        "text": "Bring the left foot next to the right into a plank, holding briefly"
+      },
+      {
+        "step": 5,
+        "text": "Step the left foot forward into a lunge, stand up and again kick with the right leg"
+      },
+      {
+        "step": 6,
+        "text": "Continue with your front kick planks on the same leg"
+      }
+    ]
+  },
+  {
+    "id": 39,
+    "category": "Cardio",
+    "title": "Front kick plank",
+    "intensity": "Moderate",
+    "gif_url": "front_kick_plank.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Begin with feet together and the arms up in a defensive position"
+      },
+      {
+        "step": 2,
+        "text": "Bring the right knee up and kick outwards"
+      },
+      {
+        "step": 3,
+        "text": "Balancing on the left leg, bring the right leg back behind you, hands to the floor"
+      },
+      {
+        "step": 4,
+        "text": "Bring the left foot next to the right into a plank, holding briefly"
+      },
+      {
+        "step": 5,
+        "text": "Step the left foot forward into a lunge, stand up and again kick with the right leg"
+      },
+      {
+        "step": 6,
+        "text": "Continue with your front kick planks on the same leg"
+      }
+    ]
+  },
+  {
+    "id": 40,
+    "category": "Cardio, Stability",
+    "title": "Fast step ups",
+    "intensity": "Moderate",
+    "gif_url": "fast_step_ups.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Complete quick step-ups, alternating legs with each step up"
+      },
+      {
+        "step": 2,
+        "text": "Choose a higher step to make this more difficult"
+      }
+    ]
+  },
+  {
+    "id": 41,
+    "category": "Cardio, Stability",
+    "title": "Fast step ups",
+    "intensity": "Moderate",
+    "gif_url": "fast_step_ups.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Complete quick step-ups, alternating legs with each step up"
+      },
+      {
+        "step": 2,
+        "text": "Choose a higher step to make this more difficult"
+      }
+    ]
+  },
+  {
+    "id": 42,
+    "category": "Cardio",
+    "title": "Lateral hops",
+    "intensity": "Moderate",
+    "gif_url": "lateral_hops.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Keeping your legs together, jump from side to side, jumping over an imaginary obstacle"
+      },
+      {
+        "step": 2,
+        "text": "Land with soft knees"
+      },
+      {
+        "step": 3,
+        "text": "Try to remain on the balls of your feet"
+      }
+    ]
+  },
+  {
+    "id": 43,
+    "category": "Cardio",
+    "title": "Lateral hops",
+    "intensity": "Moderate",
+    "gif_url": "lateral_hops.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Keeping your legs together, jump from side to side, jumping over an imaginary obstacle"
+      },
+      {
+        "step": 2,
+        "text": "Land with soft knees"
+      },
+      {
+        "step": 3,
+        "text": "Try to remain on the balls of your feet"
+      }
+    ]
+  },
+  {
+    "id": 44,
+    "category": "Cardio, Stability",
+    "title": "Step up knee lifts",
+    "intensity": "Moderate",
+    "gif_url": "step_up_knee_lifts.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Position left foot on a step and keep here throughout the entire movement"
+      },
+      {
+        "step": 2,
+        "text": "Step up with right leg and without touching the step with your right foot, bend your knee to bring up towards chest"
+      },
+      {
+        "step": 3,
+        "text": "Step straight back down again with your right foot and then your left foot"
+      }
+    ]
+  },
+  {
+    "id": 45,
+    "category": "Cardio, Stability",
+    "title": "Step up knee lifts",
+    "intensity": "Moderate",
+    "gif_url": "step_up_knee_lifts.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Position left foot on a step"
+      },
+      {
+        "step": 2,
+        "text": "Step up with right leg and without touching the step with your right foot, bend your knee to bring up towards chest"
+      },
+      {
+        "step": 3,
+        "text": "Step straight back down again with your right foot and then your left foot"
+      }
+    ]
+  },
+  {
+    "id": 46,
+    "category": "Stability, Strength",
+    "title": "Lunge with bicep curl",
+    "intensity": "Moderate",
+    "gif_url": "lunge_with_bicep_curl.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Hold a weight/water bottle in each hand"
+      },
+      {
+        "step": 2,
+        "text": "Step forward to complete a lunge, bending at your knees to lower downward"
+      },
+      {
+        "step": 3,
+        "text": "Do not let your knees pass over your toes"
+      },
+      {
+        "step": 4,
+        "text": "When in the downward lunge complete a bicep curl with both arms (bending at your elbows to lift weight toward shoulders)"
+      },
+      {
+        "step": 5,
+        "text": "Lower weights back down again and step back to the starting position"
+      },
+      {
+        "step": 6,
+        "text": "Repeat alternating legs"
+      }
+    ]
+  },
+  {
+    "id": 47,
+    "category": "Stability",
+    "title": "Lunge with bicep curl",
+    "intensity": "Moderate",
+    "gif_url": "lunge_with_bicep_curl.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Hold a weight/water bottle in each hand"
+      },
+      {
+        "step": 2,
+        "text": "Step forward to complete a lunge, bending at your knees to lower downward"
+      },
+      {
+        "step": 3,
+        "text": "Do not let your knees pass over your toes"
+      },
+      {
+        "step": 4,
+        "text": "When in the downward lunge complete a bicep curl with both arms (bending at your elbows to lift weight toward shoulders)"
+      },
+      {
+        "step": 5,
+        "text": "Lower weights back down again and step back to the starting position"
+      },
+      {
+        "step": 6,
+        "text": "Repeat alternating legs"
+      }
+    ]
+  },
+  {
+    "id": 48,
+    "category": "Stability, Toning",
+    "title": "Side lunges",
+    "intensity": "Moderate",
+    "gif_url": "side_lunges.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Step out to the side, keeping toes pointing forward"
+      },
+      {
+        "step": 2,
+        "text": "Complete a lunge, bending at both knees to lower downwards"
+      },
+      {
+        "step": 3,
+        "text": "Your knees should not pass over your toes"
+      },
+      {
+        "step": 4,
+        "text": "Step back to starting position to repeat to the opposite side"
+      }
+    ]
+  },
+  {
+    "id": 49,
+    "category": "Toning, Stability",
+    "title": "Side lunges",
+    "intensity": "Moderate",
+    "gif_url": "side_lunges.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Step out to the side, keeping toes pointing forward"
+      },
+      {
+        "step": 2,
+        "text": "Complete a lunge, bending at the knee to lower downwards"
+      },
+      {
+        "step": 3,
+        "text": "Your knees should not pass over your toes"
+      },
+      {
+        "step": 4,
+        "text": "Step back to starting position to repeat to the opposite side"
+      }
+    ]
+  },
+  {
+    "id": 50,
+    "category": "Core",
+    "title": "Donkey kicks",
+    "intensity": "Moderate",
+    "gif_url": "donkey_kicks.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Position self on forearms and knees"
+      },
+      {
+        "step": 2,
+        "text": "Keeping core tight, kick 1 leg backwards into the air"
+      },
+      {
+        "step": 3,
+        "text": "Bend knee to bring leg back down and the knee toward your chest"
+      }
+    ]
+  },
+  {
+    "id": 51,
+    "category": "Core",
+    "title": "Donkey kicks",
+    "intensity": "Moderate",
+    "gif_url": "donkey_kicks.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Position self on forearms and knees"
+      },
+      {
+        "step": 2,
+        "text": "Keeping core tight, kick 1 leg backwards into the air"
+      },
+      {
+        "step": 3,
+        "text": "Bend knee to bring leg back down and the knee toward your chest"
+      }
+    ]
+  },
+  {
+    "id": 52,
+    "category": "Strength",
+    "title": "Single leg deadlift",
+    "intensity": "Moderate",
+    "gif_url": "single_leg_deadlift.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Stand with feet together"
+      },
+      {
+        "step": 2,
+        "text": "Lift the right leg, and lower the arms and torso while raising the right leg behind the body"
+      },
+      {
+        "step": 3,
+        "text": "Keep the left knee slightly bent"
+      },
+      {
+        "step": 4,
+        "text": "Raise the torso while lowering the right leg"
+      }
+    ]
+  },
+  {
+    "id": 53,
+    "category": "Strength",
+    "title": "Single leg deadlift",
+    "intensity": "Moderate",
+    "gif_url": "single_leg_deadlift.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Stand with feet together"
+      },
+      {
+        "step": 2,
+        "text": "Lift the right leg, and lower the arms and torso while raising the right leg behind the body"
+      },
+      {
+        "step": 3,
+        "text": "Keep the left knee slightly bent"
+      },
+      {
+        "step": 4,
+        "text": "Raise the torso while lowering the right leg"
+      }
+    ]
+  },
+  {
+    "id": 54,
+    "category": "Strength",
+    "title": "Lunge with twist",
+    "intensity": "Moderate",
+    "gif_url": "lunge_with_twist.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Complete a lunge, bending at both knees to lower downwards"
+      },
+      {
+        "step": 2,
+        "text": "Your knees should not pass over your toes"
+      },
+      {
+        "step": 3,
+        "text": "Whilst in the downward lunge and with abdominal muscles tightened, complete a gentle twist to either side (optional: holding a weight in hands)"
+      },
+      {
+        "step": 4,
+        "text": "Keep knees bent at 90 degrees, before returning to the starting position"
+      }
+    ]
+  },
+  {
+    "id": 55,
+    "category": "Strength",
+    "title": "Lunge with twist",
+    "intensity": "Moderate",
+    "gif_url": "lunge_with_twist.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Complete a lunge, bending at both knees to lower downwards"
+      },
+      {
+        "step": 2,
+        "text": "Your knees should not pass over your toes"
+      },
+      {
+        "step": 3,
+        "text": "Instead of bringing the forward leg back to the starting position, raise it up off the floor while lifting the arms overhead"
+      },
+      {
+        "step": 4,
+        "text": "Keep the knee bent at 90 degrees"
+      }
+    ]
+  },
+  {
+    "id": 56,
+    "category": "Toning",
+    "title": "Backward lunge with front kick",
+    "intensity": "Moderate",
+    "gif_url": "backward_lunge_with_front_kick.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Start with feet together"
+      },
+      {
+        "step": 2,
+        "text": "Step back with one foot to complete a lunge"
+      },
+      {
+        "step": 3,
+        "text": "Step back toward starting position, swinging your leg through to complete a kick"
+      },
+      {
+        "step": 4,
+        "text": "Return to starting position and repeat"
+      }
+    ]
+  },
+  {
+    "id": 57,
+    "category": "Toning, Cardio, Stability",
+    "title": "Squat reach and jump",
+    "intensity": "Moderate",
+    "gif_url": "squat_reach_and_jump.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Keep your feet shoulder-width apart and perform a squat by bending at the knees to lower yourself downwards"
+      },
+      {
+        "step": 2,
+        "text": "Your knees should not pass over your toes"
+      },
+      {
+        "step": 3,
+        "text": "From the squat position, straighten and jump upwards, reaching both arms forward"
+      }
+    ]
+  },
+  {
+    "id": 58,
+    "category": "Toning, Cardio, Stability",
+    "title": "Squat reach and jump",
+    "intensity": "Moderate",
+    "gif_url": "squat_reach_and_jump.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Keep your feet shoulder-width apart and perform a squat by bending at the knees to lower yourself downwards"
+      },
+      {
+        "step": 2,
+        "text": "Your knees should not pass over your toes"
+      },
+      {
+        "step": 3,
+        "text": "From the squat position, straighten and jump upwards, reaching both arms forward"
+      }
+    ]
+  },
+  {
+    "id": 59,
+    "category": "Stability, Toning",
+    "title": "Squat floor reach",
+    "intensity": "Moderate",
+    "gif_url": "squat_floor_reach.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Stand feet hip-width apart and arms by sides"
+      },
+      {
+        "step": 2,
+        "text": "Bend left knee, lifting foot behind you"
+      },
+      {
+        "step": 3,
+        "text": "Squat down and raise right arm out to the side at shoulder height"
+      },
+      {
+        "step": 4,
+        "text": "Reach left hand down across body, touching the floor outside your right foot"
+      }
+    ]
+  },
+  {
+    "id": 60,
+    "category": "Strength",
+    "title": "Rows",
+    "intensity": "Moderate",
+    "gif_url": "rows.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Hold a water bottle or weight in each hand"
+      },
+      {
+        "step": 2,
+        "text": "Tip forward at hips, keeping back straight and core muscles tight"
+      },
+      {
+        "step": 3,
+        "text": "Bend at elbows to squeeze shoulder blades backwards, tensing your mid back muscles as you do so"
+      },
+      {
+        "step": 4,
+        "text": "To progress this exercise, aim to complete standing on one leg"
+      }
+    ]
+  },
+  {
+    "id": 61,
+    "category": "Stability, Toning",
+    "title": "Rows",
+    "intensity": "Moderate",
+    "gif_url": "rows.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Hold a water bottle or weight in each hand"
+      },
+      {
+        "step": 2,
+        "text": "Tip forward at hips, keeping back straight and core muscles tight"
+      },
+      {
+        "step": 3,
+        "text": "Bend at elbows to squeeze shoulder blades backwards, tensing your mid back muscles as you do so"
+      },
+      {
+        "step": 4,
+        "text": "To progress this exercise, aim to complete standing on one leg"
+      }
+    ]
+  },
+  {
+    "id": 62,
+    "category": "Toning",
+    "title": "Three way arms",
+    "intensity": "Moderate",
+    "gif_url": "three_way_arms.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Hold a water bottle or weight in each hand"
+      },
+      {
+        "step": 2,
+        "text": "Perform a front raise, keeping elbows straight to lift wrists to shoulder height in front of your body"
+      },
+      {
+        "step": 3,
+        "text": "Perform a lateral raise, keeping elbows straight to lift wrists to shoulder height to the side of your body"
+      },
+      {
+        "step": 4,
+        "text": "Perform a shoulder press, extending elbows to push weights above head"
+      }
+    ]
+  },
+  {
+    "id": 63,
+    "category": "Core, Strength",
+    "title": "Press and plank",
+    "intensity": "Moderate",
+    "gif_url": "press_and_plank.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Start in a modified side\u00adplank, knees bent"
+      },
+      {
+        "step": 2,
+        "text": "Hold a filled water bottle in your right hand, right elbow bent \nand weight resting against your forearm"
+      },
+      {
+        "step": 3,
+        "text": "Lift your hips so your body is straight from knees to shoulders, \npressing water bottle up to the ceiling"
+      }
+    ]
+  },
+  {
+    "id": 64,
+    "category": "Beginner, Stability",
+    "title": "Press and plank",
+    "intensity": "Moderate",
+    "gif_url": "press_and_plank.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Start in a modified side\u00adplank, knees bent"
+      },
+      {
+        "step": 2,
+        "text": "Hold a filled water bottle in your right hand, right elbow bent \nand weight resting against your forearm"
+      },
+      {
+        "step": 3,
+        "text": "Lift your hips so your body is straight from knees to shoulders, \npressing water bottle up to the ceiling"
+      }
+    ]
+  },
+  {
+    "id": 65,
+    "category": "Strength, Cardio, Advanced",
+    "title": "Superman",
+    "intensity": "Moderate",
+    "gif_url": "superman.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Start on your hands and knees, with your back straight and core \nmuscles tight"
+      },
+      {
+        "step": 2,
+        "text": "Keeping your hips low, simultaneously raise your right arm and left \nleg straightening at your elbow and knee"
+      },
+      {
+        "step": 3,
+        "text": "Pause then lower to the starting position before alternating \nsides"
+      }
+    ]
+  },
+  {
+    "id": 66,
+    "category": "Strength, Cardio, Beginner",
+    "title": "Superman",
+    "intensity": "Moderate",
+    "gif_url": "superman.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Start on your hands and knees, with your back straight and core \nmuscles tight"
+      },
+      {
+        "step": 2,
+        "text": "Keeping your hips low, simultaneously raise your right arm and left \nleg straightening at your elbow and knee"
+      },
+      {
+        "step": 3,
+        "text": "Pause then lower to the starting position before alternating \nsides"
+      }
+    ]
+  },
+
+  {
+    "id": 70,
+    "category": "Strength, Toning, Core",
+    "title": "Sprinter sit-up",
+    "intensity": "Moderate",
+    "gif_url": "sprinter_sit-up.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Lie on back with the legs straight and arms by your side, elbows bent at a 90-degree angle"
+      },
+      {
+        "step": 2,
+        "text": "Sit up, bringing the left knee toward the right elbow"
+      },
+      {
+        "step": 3,
+        "text": "Lower back down to starting position"
+      }
+    ]
+  },
+  {
+    "id": 71,
+    "category": "Strength, Core",
+    "title": "Three way crunches",
+    "intensity": "Moderate",
+    "gif_url": "three_way_crunches.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Lie on back, knees bent and feet hooked over each other"
+      },
+      {
+        "step": 2,
+        "text": "Perform a sequence of 3 crunches: firstly crunch to bring right elbow toward left knee, secondly crunch straight upwards, finally crunch to bring left elbow toward right knee"
+      },
+      {
+        "step": 3,
+        "text": "Repeat this sequence"
+      }
+    ]
+  },
+  {
+    "id": 72,
+    "category": "Strength, Core",
+    "title": "Three way crunches",
+    "intensity": "Moderate",
+    "gif_url": "three_way_crunches.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Lie on back, knees bent and feet hooked over each other"
+      },
+      {
+        "step": 2,
+        "text": "Perform a sequence of 3 crunches: firstly crunch to bring right elbow toward left knee, secondly crunch straight upwards, finally crunch to bring left elbow toward right knee"
+      },
+      {
+        "step": 3,
+        "text": "Repeat this sequence"
+      }
+    ]
+  },
+  {
+    "id": 73,
+    "category": "Stability, Strength",
+    "title": "Lunge with bicep curl",
+    "intensity": "Moderate",
+    "gif_url": "lunge_with_bicep_curl.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Hold a weight/water bottle in each hand"
+      },
+      {
+        "step": 2,
+        "text": "Step forward to complete a lunge, bending at your knees to lower downward"
+      },
+      {
+        "step": 3,
+        "text": "Do not let your knees pass over your toes"
+      },
+      {
+        "step": 4,
+        "text": "When in the downward lunge complete a bicep curl with both arms (bending at your elbows to lift weight toward shoulders)"
+      },
+      {
+        "step": 5,
+        "text": "Lower weights back down again and step back to the starting position"
+      },
+      {
+        "step": 6,
+        "text": "Repeat alternating legs"
+      }
+    ]
+  },
+  {
+    "id": 74,
+    "category": "Stability",
+    "title": "Lunge with bicep curl",
+    "intensity": "Moderate",
+    "gif_url": "lunge_with_bicep_curl.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Hold a weight/water bottle in each hand"
+      },
+      {
+        "step": 2,
+        "text": "Step forward to complete a lunge, bending at your knees to lower downward"
+      },
+      {
+        "step": 3,
+        "text": "Do not let your knees pass over your toes"
+      },
+      {
+        "step": 4,
+        "text": "When in the downward lunge complete a bicep curl with both arms (bending at your elbows to lift weight toward shoulders)"
+      },
+      {
+        "step": 5,
+        "text": "Lower weights back down again and step back to the starting position"
+      },
+      {
+        "step": 6,
+        "text": "Repeat alternating legs"
+      }
+    ]
+  },
+  {
+    "id": 75,
+    "category": "Strength",
+    "title": "Single leg deadlift",
+    "intensity": "Moderate",
+    "gif_url": "single_leg_deadlift.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Stand with feet together"
+      },
+      {
+        "step": 2,
+        "text": "Lift the right leg, and lower the arms and torso while raising the right leg behind the body"
+      },
+      {
+        "step": 3,
+        "text": "Keep the left knee slightly bent"
+      },
+      {
+        "step": 4,
+        "text": "Raise the torso while lowering the right leg"
+      }
+    ]
+  },
+  {
+    "id": 76,
+    "category": "Strength",
+    "title": "Lunge with twist",
+    "intensity": "Moderate",
+    "gif_url": "lunge_with_twist.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Complete a lunge, bending at both knees to lower downwards"
+      },
+      {
+        "step": 2,
+        "text": "Your knees should not pass over your toes"
+      },
+      {
+        "step": 3,
+        "text": "Whilst in the downward lunge and with abdominal muscles tightened, complete a gentle twist to either side (optional: holding a weight in hands)"
+      },
+      {
+        "step": 4,
+        "text": "Keep knees bent at 90 degrees, before returning to the starting position"
+      }
+    ]
+  },
+  {
+    "id": 77,
+    "category": "Strength",
+    "title": "Rows",
+    "intensity": "Moderate",
+    "gif_url": "rows.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Hold a water bottle or weight in each hand"
+      },
+      {
+        "step": 2,
+        "text": "Tip forward at hips, keeping back straight and core muscles tight"
+      },
+      {
+        "step": 3,
+        "text": "Bend at elbows to squeeze shoulder blades backwards, tensing your mid back muscles as you do so"
+      },
+      {
+        "step": 4,
+        "text": "To progress this exercise, aim to complete standing on one leg"
+      }
+    ]
+  },
+  {
+    "id": 78,
+    "category": "Advanced",
+    "title": "Three way arms",
+    "intensity": "Intense",
+    "gif_url": "three_way_arms.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Hold a water bottle or weight in each hand"
+      },
+      {
+        "step": 2,
+        "text": "Perform a front raise, keeping elbows straight to lift wrists to shoulder height in front of your body"
+      },
+      {
+        "step": 3,
+        "text": "Perform a lateral raise, keeping elbows straight to lift wrists to shoulder height to the side of your body"
+      },
+      {
+        "step": 4,
+        "text": "Perform a shoulder press, extending elbows to push weights above head"
+      }
+    ]
+  },
+  {
+    "id": 79,
+    "category": "Toning",
+    "title": "Three way arms",
+    "intensity": "Moderate",
+    "gif_url": "three_way_arms.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Hold a water bottle or weight in each hand"
+      },
+      {
+        "step": 2,
+        "text": "Perform a front raise, keeping elbows straight to lift wrists to shoulder height in front of your body"
+      },
+      {
+        "step": 3,
+        "text": "Perform a lateral raise, keeping elbows straight to lift wrists to shoulder height to the side of your body"
+      },
+      {
+        "step": 4,
+        "text": "Perform a shoulder press, extending elbows to push weights above head"
+      }
+    ]
+  },
+  {
+    "id": 80,
+    "category": "Advanced, Strength",
+    "title": "Plank push-ups",
+    "intensity": "Intense",
+    "gif_url": "plank_push-ups.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Start in a plank position"
+      },
+      {
+        "step": 2,
+        "text": "Place down one hand at a time to lift up into a push\u00adup position"
+      },
+      {
+        "step": 3,
+        "text": "Keep back straight and core tight"
+      },
+      {
+        "step": 4,
+        "text": "Move one arm at a time back into the plank position"
+      },
+      {
+        "step": 5,
+        "text": "Repeat, alternating arms"
+      }
+    ]
+  },
+  {
+    "id": 81,
+    "category": "Core, Strength",
+    "title": "Press and plank",
+    "intensity": "Moderate",
+    "gif_url": "press_and_plank.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Start in a modified side\u00adplank, knees bent"
+      },
+      {
+        "step": 2,
+        "text": "Hold a filled water bottle in your right hand, right elbow bent \nand weight resting against your forearm"
+      },
+      {
+        "step": 3,
+        "text": "Lift your hips so your body is straight from knees to shoulders, \npressing water bottle up to the ceiling"
+      }
+    ]
+  },
+  {
+    "id": 82,
+    "category": "Beginner, Stability",
+    "title": "Press and plank",
+    "intensity": "Moderate",
+    "gif_url": "press_and_plank.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Start in a modified side\u00adplank, knees bent"
+      },
+      {
+        "step": 2,
+        "text": "Hold a filled water bottle in your right hand, right elbow bent \nand weight resting against your forearm"
+      },
+      {
+        "step": 3,
+        "text": "Lift your hips so your body is straight from knees to shoulders, \npressing water bottle up to the ceiling"
+      }
+    ]
+  },
+  {
+    "id": 83,
+    "category": "Strength, Cardio, Advanced",
+    "title": "Superman",
+    "intensity": "Moderate",
+    "gif_url": "superman.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Start on your hands and knees, with your back straight and core \nmuscles tight"
+      },
+      {
+        "step": 2,
+        "text": "Keeping your hips low, simultaneously raise your right arm and left \nleg straightening at your elbow and knee"
+      },
+      {
+        "step": 3,
+        "text": "Pause then lower to the starting position before alternating \nsides"
+      }
+    ]
+  },
+  {
+    "id": 84,
+    "category": "Strength, Cardio, Beginner",
+    "title": "Superman",
+    "intensity": "Moderate",
+    "gif_url": "superman.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Start on your hands and knees, with your back straight and core \nmuscles tight"
+      },
+      {
+        "step": 2,
+        "text": "Keeping your hips low, simultaneously raise your right arm and left \nleg straightening at your elbow and knee"
+      },
+      {
+        "step": 3,
+        "text": "Pause then lower to the starting position before alternating \nsides"
+      }
+    ]
+  },
+  {
+    "id": 85,
+    "category": "Advanced, Strength",
+    "title": "Shoulder push-up",
+    "intensity": "Intense",
+    "gif_url": "shoulder_push-up.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Stand with feet hip width"
+      },
+      {
+        "step": 2,
+        "text": "Tip forward at hips, bending at knees until you can place both \nhands on floor in front of feet"
+      },
+      {
+        "step": 3,
+        "text": "Walk your hands out and away from your feet until your body \nis in an upside\u00addown 'V' position"
+      },
+      {
+        "step": 4,
+        "text": "Press your chest back towards your thighs"
+      },
+      {
+        "step": 5,
+        "text": "Extend your left leg straight up towards the ceiling"
+      },
+      {
+        "step": 6,
+        "text": "Bending both elbows, bring your head toward the ground \n(keeping chin into your chest)"
+      },
+      {
+        "step": 7,
+        "text": "Press away from the floor and straighten your arms"
+      }
+    ]
+  },
+  {
+    "id": 86,
+    "category": "Beginner",
+    "title": "Shoulder push-up",
+    "intensity": "Gentle",
+    "gif_url": "shoulder_push-up.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Kneel with feet hip width"
+      },
+      {
+        "step": 2,
+        "text": "Tip forward at hips, until you can place both hands on floor in\nfront of knees"
+      },
+      {
+        "step": 3,
+        "text": "Keep your back straight"
+      },
+      {
+        "step": 4,
+        "text": "Bending both elbows, bring your head toward the ground \n(keeping chin into your chest)"
+      },
+      {
+        "step": 5,
+        "text": "Press away from the floor and straighten your arms"
+      }
+    ]
+  },
+
+  {
+    "id": 91,
+    "category": "Core, Advanced, Stability",
+    "title": "Russian twist",
+    "intensity": "Intense",
+    "gif_url": "russian_twist.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Sit on floor, knees bent and feet on the floor"
+      },
+      {
+        "step": 2,
+        "text": "Keep your back at a 45-degree angle, arms extended with palms together"
+      },
+      {
+        "step": 3,
+        "text": "Move the arms from one side to another in a twisting motion"
+      }
+    ]
+  },
+  {
+    "id": 92,
+    "category": "Advanced",
+    "title": "Advanced jumping jacks",
+    "intensity": "Intense",
+    "gif_url": "advanced_jumping_jacks.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "With your feet wide, lower into squat"
+      },
+      {
+        "step": 2,
+        "text": "Extend your arms out to the sides of your shoulders, palms facing up"
+      },
+      {
+        "step": 3,
+        "text": "Jump out of squat, bringing your feet together and clap your hands overhead"
+      }
+    ]
+  },
+  {
+    "id": 93,
+    "category": "Strength",
+    "title": "Backward lunge with front kick",
+    "intensity": "Intense",
+    "gif_url": "backward_lunge_with_front_kick.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Start with feet together"
+      },
+      {
+        "step": 2,
+        "text": "Step back with one foot to complete a lunge"
+      },
+      {
+        "step": 3,
+        "text": "Step back toward starting position, swinging your leg through to complete a kick"
+      },
+      {
+        "step": 4,
+        "text": "Return to starting position and repeat"
+      }
+    ]
+  },
+  {
+    "id": 94,
+    "category": "Advanced, Stability",
+    "title": "Chair single leg squats",
+    "intensity": "Intense",
+    "gif_url": "chair_single_leg_squats.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Stand on one leg, in front of chair"
+      },
+      {
+        "step": 2,
+        "text": "Slowly squat to sit down onto chair"
+      },
+      {
+        "step": 3,
+        "text": "You can use your other foot to guide you and balance (by tapping on the ground as needed)"
+      },
+      {
+        "step": 4,
+        "text": "Make sure that your knees stay aligned and do not drop or bow either side"
+      },
+      {
+        "step": 5,
+        "text": "Your knee should not pass over your toe"
+      },
+      {
+        "step": 6,
+        "text": "Stand back up again"
+      }
+    ]
+  },
+  {
+    "id": 95,
+    "category": "Stability, Toning",
+    "title": "Squat floor reach",
+    "intensity": "Intense",
+    "gif_url": "squat_floor_reach.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Stand feet hip-width apart and arms by sides"
+      },
+      {
+        "step": 2,
+        "text": "Bend left knee, lifting foot behind you"
+      },
+      {
+        "step": 3,
+        "text": "Squat down and raise right arm out to the side at shoulder height"
+      },
+      {
+        "step": 4,
+        "text": "Reach left hand down across body, touching the floor outside your right foot"
+      }
+    ]
+  },
+  {
+    "id": 96,
+    "category": "Advanced",
+    "title": "Three way arms",
+    "intensity": "Intense",
+    "gif_url": "three_way_arms.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Hold a water bottle or weight in each hand"
+      },
+      {
+        "step": 2,
+        "text": "Perform a front raise, keeping elbows straight to lift wrists to shoulder height in front of your body"
+      },
+      {
+        "step": 3,
+        "text": "Perform a lateral raise, keeping elbows straight to lift wrists to shoulder height to the side of your body"
+      },
+      {
+        "step": 4,
+        "text": "Perform a shoulder press, extending elbows to push weights above head"
+      }
+    ]
+  },
+  {
+    "id": 97,
+    "category": "Advanced, Strength",
+    "title": "Plank push-ups",
+    "intensity": "Intense",
+    "gif_url": "plank_push-ups.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Start in a plank position"
+      },
+      {
+        "step": 2,
+        "text": "Place down one hand at a time to lift up into a push\u00adup position"
+      },
+      {
+        "step": 3,
+        "text": "Keep back straight and core tight"
+      },
+      {
+        "step": 4,
+        "text": "Move one arm at a time back into the plank position"
+      },
+      {
+        "step": 5,
+        "text": "Repeat, alternating arms"
+      }
+    ]
+  },
+  {
+    "id": 98,
+    "category": "Advanced, Strength",
+    "title": "Shoulder push-up",
+    "intensity": "Intense",
+    "gif_url": "shoulder_push-up.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Stand with feet hip width"
+      },
+      {
+        "step": 2,
+        "text": "Tip forward at hips, bending at knees until you can place both \nhands on floor in front of feet"
+      },
+      {
+        "step": 3,
+        "text": "Walk your hands out and away from your feet until your body \nis in an upside\u00addown 'V' position"
+      },
+      {
+        "step": 4,
+        "text": "Press your chest back towards your thighs"
+      },
+      {
+        "step": 5,
+        "text": "Extend your left leg straight up towards the ceiling"
+      },
+      {
+        "step": 6,
+        "text": "Bending both elbows, bring your head toward the ground \n(keeping chin into your chest)"
+      },
+      {
+        "step": 7,
+        "text": "Press away from the floor and straighten your arms"
+      }
+    ]
+  },
+  {
+    "id": 99,
+    "category": "Strength, Toning, Core",
+    "title": "Sprinter sit-up",
+    "intensity": "Moderate",
+    "gif_url": "sprinter_sit-up.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Lie on back with the legs straight and arms by your side, elbows bent at a 90-degree angle"
+      },
+      {
+        "step": 2,
+        "text": "Sit up, bringing the left knee toward the right elbow"
+      },
+      {
+        "step": 3,
+        "text": "Lower back down to starting position"
+      }
+    ]
+  },
+  {
+    "id": 100,
+    "category": "Toning, Core",
+    "title": "Sprinter sit-up",
+    "intensity": "Moderate",
+    "gif_url": "sprinter_sit-up.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Lie on back with the legs straight and arms by your side, elbows bent at a 90-degree angle"
+      },
+      {
+        "step": 2,
+        "text": "Sit up, bringing the left knee toward the right elbow"
+      },
+      {
+        "step": 3,
+        "text": "Lower back down to starting position"
+      }
+    ]
+  },
+  {
+    "id": 101,
+    "category": "Stability, Toning",
+    "title": "Side lunges",
+    "intensity": "Moderate",
+    "gif_url": "side_lunges.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Step out to the side, keeping toes pointing forward"
+      },
+      {
+        "step": 2,
+        "text": "Complete a lunge, bending at both knees to lower downwards"
+      },
+      {
+        "step": 3,
+        "text": "Your knees should not pass over your toes"
+      },
+      {
+        "step": 4,
+        "text": "Step back to starting position to repeat to the opposite side"
+      }
+    ]
+  },
+  {
+    "id": 102,
+    "category": "Toning, Stability",
+    "title": "Side lunges",
+    "intensity": "Moderate",
+    "gif_url": "side_lunges.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Step out to the side, keeping toes pointing forward"
+      },
+      {
+        "step": 2,
+        "text": "Complete a lunge, bending at the knee to lower downwards"
+      },
+      {
+        "step": 3,
+        "text": "Your knees should not pass over your toes"
+      },
+      {
+        "step": 4,
+        "text": "Step back to starting position to repeat to the opposite side"
+      }
+    ]
+  },
+  {
+    "id": 103,
+    "category": "Strength",
+    "title": "Single leg deadlift",
+    "intensity": "Moderate",
+    "gif_url": "single_leg_deadlift.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Stand with feet together"
+      },
+      {
+        "step": 2,
+        "text": "Lift the right leg, and lower the arms and torso while raising the right leg behind the body"
+      },
+      {
+        "step": 3,
+        "text": "Keep the left knee slightly bent"
+      },
+      {
+        "step": 4,
+        "text": "Raise the torso while lowering the right leg"
+      }
+    ]
+  },
+  {
+    "id": 104,
+    "category": "Strength",
+    "title": "Lunge with twist",
+    "intensity": "Moderate",
+    "gif_url": "lunge_with_twist.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Complete a lunge, bending at both knees to lower downwards"
+      },
+      {
+        "step": 2,
+        "text": "Your knees should not pass over your toes"
+      },
+      {
+        "step": 3,
+        "text": "Instead of bringing the forward leg back to the starting position, raise it up off the floor while lifting the arms overhead"
+      },
+      {
+        "step": 4,
+        "text": "Keep the knee bent at 90 degrees"
+      }
+    ]
+  },
+  {
+    "id": 105,
+    "category": "Strength",
+    "title": "Backward lunge with front kick",
+    "intensity": "Intense",
+    "gif_url": "backward_lunge_with_front_kick.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Start with feet together"
+      },
+      {
+        "step": 2,
+        "text": "Step back with one foot to complete a lunge"
+      },
+      {
+        "step": 3,
+        "text": "Step back toward starting position, swinging your leg through to complete a kick"
+      },
+      {
+        "step": 4,
+        "text": "Return to starting position and repeat"
+      }
+    ]
+  },
+  {
+    "id": 106,
+    "category": "Toning",
+    "title": "Backward lunge with front kick",
+    "intensity": "Moderate",
+    "gif_url": "backward_lunge_with_front_kick.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Start with feet together"
+      },
+      {
+        "step": 2,
+        "text": "Step back with one foot to complete a lunge"
+      },
+      {
+        "step": 3,
+        "text": "Step back toward starting position, swinging your leg through to complete a kick"
+      },
+      {
+        "step": 4,
+        "text": "Return to starting position and repeat"
+      }
+    ]
+  },
+  {
+    "id": 107,
+    "category": "Toning, Cardio, Stability",
+    "title": "Squat reach and jump",
+    "intensity": "Moderate",
+    "gif_url": "squat_reach_and_jump.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Keep your feet shoulder-width apart and perform a squat by bending at the knees to lower yourself downwards"
+      },
+      {
+        "step": 2,
+        "text": "Your knees should not pass over your toes"
+      },
+      {
+        "step": 3,
+        "text": "From the squat position, straighten and jump upwards, reaching both arms forward"
+      }
+    ]
+  },
+  {
+    "id": 108,
+    "category": "Toning, Cardio, Stability",
+    "title": "Squat reach and jump",
+    "intensity": "Moderate",
+    "gif_url": "squat_reach_and_jump.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Keep your feet shoulder-width apart and perform a squat by bending at the knees to lower yourself downwards"
+      },
+      {
+        "step": 2,
+        "text": "Your knees should not pass over your toes"
+      },
+      {
+        "step": 3,
+        "text": "From the squat position, straighten and jump upwards, reaching both arms forward"
+      }
+    ]
+  },
+  {
+    "id": 109,
+    "category": "Stability, Toning",
+    "title": "Squat floor reach",
+    "intensity": "Intense",
+    "gif_url": "squat_floor_reach.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Stand feet hip-width apart and arms by sides"
+      },
+      {
+        "step": 2,
+        "text": "Bend left knee, lifting foot behind you"
+      },
+      {
+        "step": 3,
+        "text": "Squat down and raise right arm out to the side at shoulder height"
+      },
+      {
+        "step": 4,
+        "text": "Reach left hand down across body, touching the floor outside your right foot"
+      }
+    ]
+  },
+  {
+    "id": 110,
+    "category": "Stability, Toning",
+    "title": "Squat floor reach",
+    "intensity": "Moderate",
+    "gif_url": "squat_floor_reach.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Stand feet hip-width apart and arms by sides"
+      },
+      {
+        "step": 2,
+        "text": "Bend left knee, lifting foot behind you"
+      },
+      {
+        "step": 3,
+        "text": "Squat down and raise right arm out to the side at shoulder height"
+      },
+      {
+        "step": 4,
+        "text": "Reach left hand down across body, touching the floor outside your right foot"
+      }
+    ]
+  },
+  {
+    "id": 111,
+    "category": "Stability, Toning",
+    "title": "Rows",
+    "intensity": "Moderate",
+    "gif_url": "rows.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Hold a water bottle or weight in each hand"
+      },
+      {
+        "step": 2,
+        "text": "Tip forward at hips, keeping back straight and core muscles tight"
+      },
+      {
+        "step": 3,
+        "text": "Bend at elbows to squeeze shoulder blades backwards, tensing your mid back muscles as you do so"
+      },
+      {
+        "step": 4,
+        "text": "To progress this exercise, aim to complete standing on one leg"
+      }
+    ]
+  },
+  {
+    "id": 112,
+    "category": "Advanced",
+    "title": "Three way arms",
+    "intensity": "Intense",
+    "gif_url": "three_way_arms.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Hold a water bottle or weight in each hand"
+      },
+      {
+        "step": 2,
+        "text": "Perform a front raise, keeping elbows straight to lift wrists to shoulder height in front of your body"
+      },
+      {
+        "step": 3,
+        "text": "Perform a lateral raise, keeping elbows straight to lift wrists to shoulder height to the side of your body"
+      },
+      {
+        "step": 4,
+        "text": "Perform a shoulder press, extending elbows to push weights above head"
+      }
+    ]
+  },
+  {
+    "id": 113,
+    "category": "Toning",
+    "title": "Three way arms",
+    "intensity": "Moderate",
+    "gif_url": "three_way_arms.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Hold a water bottle or weight in each hand"
+      },
+      {
+        "step": 2,
+        "text": "Perform a front raise, keeping elbows straight to lift wrists to shoulder height in front of your body"
+      },
+      {
+        "step": 3,
+        "text": "Perform a lateral raise, keeping elbows straight to lift wrists to shoulder height to the side of your body"
+      },
+      {
+        "step": 4,
+        "text": "Perform a shoulder press, extending elbows to push weights above head"
+      }
+    ]
+  },
+  {
+    "id": 114,
+    "category": "Beginner",
+    "title": "Shoulder push-up",
+    "intensity": "Gentle",
+    "gif_url": "shoulder_push-up.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Kneel with feet hip width"
+      },
+      {
+        "step": 2,
+        "text": "Tip forward at hips, until you can place both hands on floor in\nfront of knees"
+      },
+      {
+        "step": 3,
+        "text": "Keep your back straight"
+      },
+      {
+        "step": 4,
+        "text": "Bending both elbows, bring your head toward the ground \n(keeping chin into your chest)"
+      },
+      {
+        "step": 5,
+        "text": "Press away from the floor and straighten your arms"
+      }
+    ]
+  },
+  {
+    "id": 123,
+    "category": "Cardio",
+    "title": "Front kick plank",
+    "intensity": "Moderate",
+    "gif_url": "front_kick_plank.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Begin with feet together and the arms up in a defensive position"
+      },
+      {
+        "step": 2,
+        "text": "Bring the right knee up and kick outwards"
+      },
+      {
+        "step": 3,
+        "text": "Balancing on the left leg, bring the right leg back behind you, hands to the floor"
+      },
+      {
+        "step": 4,
+        "text": "Bring the left foot next to the right into a plank, holding briefly"
+      },
+      {
+        "step": 5,
+        "text": "Step the left foot forward into a lunge, stand up and again kick with the right leg"
+      },
+      {
+        "step": 6,
+        "text": "Continue with your front kick planks on the same leg"
+      }
+    ]
+  },
+  {
+    "id": 124,
+    "category": "Stability, Strength",
+    "title": "Lunge with bicep curl",
+    "intensity": "Moderate",
+    "gif_url": "lunge_with_bicep_curl.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Hold a weight/water bottle in each hand"
+      },
+      {
+        "step": 2,
+        "text": "Step forward to complete a lunge, bending at your knees to lower downward"
+      },
+      {
+        "step": 3,
+        "text": "Do not let your knees pass over your toes"
+      },
+      {
+        "step": 4,
+        "text": "When in the downward lunge complete a bicep curl with both arms (bending at your elbows to lift weight toward shoulders)"
+      },
+      {
+        "step": 5,
+        "text": "Lower weights back down again and step back to the starting position"
+      },
+      {
+        "step": 6,
+        "text": "Repeat alternating legs"
+      }
+    ]
+  },
+  {
+    "id": 125,
+    "category": "Stability",
+    "title": "Lunge with bicep curl",
+    "intensity": "Moderate",
+    "gif_url": "lunge_with_bicep_curl.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Hold a weight/water bottle in each hand"
+      },
+      {
+        "step": 2,
+        "text": "Step forward to complete a lunge, bending at your knees to lower downward"
+      },
+      {
+        "step": 3,
+        "text": "Do not let your knees pass over your toes"
+      },
+      {
+        "step": 4,
+        "text": "When in the downward lunge complete a bicep curl with both arms (bending at your elbows to lift weight toward shoulders)"
+      },
+      {
+        "step": 5,
+        "text": "Lower weights back down again and step back to the starting position"
+      },
+      {
+        "step": 6,
+        "text": "Repeat alternating legs"
+      }
+    ]
+  },
+  {
+    "id": 126,
+    "category": "Core",
+    "title": "Donkey kicks",
+    "intensity": "Moderate",
+    "gif_url": "donkey_kicks.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Position self on forearms and knees"
+      },
+      {
+        "step": 2,
+        "text": "Keeping core tight, kick 1 leg backwards into the air"
+      },
+      {
+        "step": 3,
+        "text": "Bend knee to bring leg back down and the knee toward your chest"
+      }
+    ]
+  },
+  {
+    "id": 127,
+    "category": "Core",
+    "title": "Donkey kicks",
+    "intensity": "Moderate",
+    "gif_url": "donkey_kicks.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Position self on forearms and knees"
+      },
+      {
+        "step": 2,
+        "text": "Keeping core tight, kick 1 leg backwards into the air"
+      },
+      {
+        "step": 3,
+        "text": "Bend knee to bring leg back down and the knee toward your chest"
+      }
+    ]
+  },
+  {
+    "id": 128,
+    "category": "Strength",
+    "title": "Single leg deadlift",
+    "intensity": "Moderate",
+    "gif_url": "single_leg_deadlift.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Stand with feet together"
+      },
+      {
+        "step": 2,
+        "text": "Lift the right leg, and lower the arms and torso while raising the right leg behind the body"
+      },
+      {
+        "step": 3,
+        "text": "Keep the left knee slightly bent"
+      },
+      {
+        "step": 4,
+        "text": "Raise the torso while lowering the right leg"
+      }
+    ]
+  },
+  {
+    "id": 129,
+    "category": "Strength",
+    "title": "Single leg deadlift",
+    "intensity": "Moderate",
+    "gif_url": "single_leg_deadlift.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Stand with feet together"
+      },
+      {
+        "step": 2,
+        "text": "Lift the right leg, and lower the arms and torso while raising the right leg behind the body"
+      },
+      {
+        "step": 3,
+        "text": "Keep the left knee slightly bent"
+      },
+      {
+        "step": 4,
+        "text": "Raise the torso while lowering the right leg"
+      }
+    ]
+  },
+  {
+    "id": 130,
+    "category": "Strength",
+    "title": "Lunge with twist",
+    "intensity": "Moderate",
+    "gif_url": "lunge_with_twist.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Complete a lunge, bending at both knees to lower downwards"
+      },
+      {
+        "step": 2,
+        "text": "Your knees should not pass over your toes"
+      },
+      {
+        "step": 3,
+        "text": "Instead of bringing the forward leg back to the starting position, raise it up off the floor while lifting the arms overhead"
+      },
+      {
+        "step": 4,
+        "text": "Keep the knee bent at 90 degrees"
+      }
+    ]
+  },
+  {
+    "id": 131,
+    "category": "Strength",
+    "title": "Backward lunge with front kick",
+    "intensity": "Intense",
+    "gif_url": "backward_lunge_with_front_kick.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Start with feet together"
+      },
+      {
+        "step": 2,
+        "text": "Step back with one foot to complete a lunge"
+      },
+      {
+        "step": 3,
+        "text": "Step back toward starting position, swinging your leg through to complete a kick"
+      },
+      {
+        "step": 4,
+        "text": "Return to starting position and repeat"
+      }
+    ]
+  },
+  {
+    "id": 132,
+    "category": "Toning",
+    "title": "Backward lunge with front kick",
+    "intensity": "Moderate",
+    "gif_url": "backward_lunge_with_front_kick.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Start with feet together"
+      },
+      {
+        "step": 2,
+        "text": "Step back with one foot to complete a lunge"
+      },
+      {
+        "step": 3,
+        "text": "Step back toward starting position, swinging your leg through to complete a kick"
+      },
+      {
+        "step": 4,
+        "text": "Return to starting position and repeat"
+      }
+    ]
+  },
+  {
+    "id": 133,
+    "category": "Advanced, Stability",
+    "title": "Chair single leg squats",
+    "intensity": "Intense",
+    "gif_url": "chair_single_leg_squats.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Stand on one leg, in front of chair"
+      },
+      {
+        "step": 2,
+        "text": "Slowly squat to sit down onto chair"
+      },
+      {
+        "step": 3,
+        "text": "You can use your other foot to guide you and balance (by tapping on the ground as needed)"
+      },
+      {
+        "step": 4,
+        "text": "Make sure that your knees stay aligned and do not drop or bow either side"
+      },
+      {
+        "step": 5,
+        "text": "Your knee should not pass over your toe"
+      },
+      {
+        "step": 6,
+        "text": "Stand back up again"
+      }
+    ]
+  },
+  {
+    "id": 134,
+    "category": "Beginner, Stability",
+    "title": "Chair leg squats",
+    "intensity": "Gentle",
+    "gif_url": "chair_leg_squats.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Stand in front of chair"
+      },
+      {
+        "step": 2,
+        "text": "Slowly squat to sit down onto chair"
+      },
+      {
+        "step": 3,
+        "text": "Make sure that your knees stay aligned and do not drop or bow either side"
+      },
+      {
+        "step": 4,
+        "text": "Your knee should not pass over your toe"
+      },
+      {
+        "step": 5,
+        "text": "Stand back up again"
+      }
+    ]
+  },
+  {
+    "id": 135,
+    "category": "Stability, Toning",
+    "title": "Squat floor reach",
+    "intensity": "Intense",
+    "gif_url": "squat_floor_reach.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Stand feet hip-width apart and arms by sides"
+      },
+      {
+        "step": 2,
+        "text": "Bend left knee, lifting foot behind you"
+      },
+      {
+        "step": 3,
+        "text": "Squat down and raise right arm out to the side at shoulder height"
+      },
+      {
+        "step": 4,
+        "text": "Reach left hand down across body, touching the floor outside your right foot"
+      }
+    ]
+  },
+  {
+    "id": 136,
+    "category": "Stability, Toning",
+    "title": "Squat floor reach",
+    "intensity": "Moderate",
+    "gif_url": "squat_floor_reach.gif",
+    "instructions": [
+      {
+        "step": 1,
+        "text": "Stand feet hip-width apart and arms by sides"
+      },
+      {
+        "step": 2,
+        "text": "Bend left knee, lifting foot behind you"
+      },
+      {
+        "step": 3,
+        "text": "Squat down and raise right arm out to the side at shoulder height"
+      },
+      {
+        "step": 4,
+        "text": "Reach left hand down across body, touching the floor outside your right foot"
+      }
+    ]
+  }
+]
