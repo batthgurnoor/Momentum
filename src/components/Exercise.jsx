@@ -1,7 +1,7 @@
 import { View, Text } from 'react-native'
 import React from 'react'
-import ExerciseItems from '../components/ExerciseItems'
-const Excercise = () => {
+import ExerciseItems from './ExerciseItems'
+const Exercise = () => {
   return (
     <View>
     <View className='flex-row items-center justify-between mx-10 mb-3'>
@@ -12,4 +12,4 @@ const Excercise = () => {
   )
 }
 
-export default Excercise;
+export default Exercise;

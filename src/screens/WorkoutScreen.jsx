@@ -7,7 +7,7 @@ import WorkoutOTD from '../components/WorkoutOTD';
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Separator from '../components/Separator'
 import Category from '../components/Category'
-import Exercise from '../components/Excercise'
+import Exercise from '../components/Exercise'
 const WorkoutScreen = () => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

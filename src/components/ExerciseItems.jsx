@@ -2,13 +2,16 @@ import { View, Text, TouchableOpacity, ImageBackground } from 'react-native'
 import React from 'react'
 import workoutData from '../../exercise_data'
 import { FlashList } from '@shopify/flash-list'
+import { useNavigation } from '@react-navigation/native'
+
 
 const exerciseImage = require('../../assets/images/exercise1.jpg')
 
 const ExerciseItems = () => {
+    const navigation = useNavigation();
 
     const renderWorkoutItem =({item}) => (
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("Exercise", {item})}>
             <ImageBackground source={exerciseImage}
             className='h-44 w-40 rounded-2xl overflow-hidden mx-2'>
                 <View className='justify-between flex-1 m-3'>
