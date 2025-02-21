@@ -14,9 +14,10 @@ const  countDownAudio = require('../../assets/audio/countdownaudio.mp3');
 const ExerciseScreen = () => {
 
   const route = useRoute();
+  
+  const {item} = route.params;
   const initialTime = 60;
   const minTime = 10;
-  const {item} = route.params;
 
   const [gifUrl, setGifUrl] = useState(null);
   const [time, setTime] = useState(initialTime);

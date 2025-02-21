@@ -11,6 +11,9 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import ExerciseScreen from '../../src/screens/ExerciseScreen';
+import Category from '@/src/components/Category';
+import CategoryExerciseScreen from '@/src/screens/CategoryExerciseScreen';
+
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -59,6 +62,7 @@ export default function App() {
     <Stack.Navigator screenOptions={{headerShown:false}}>
       <Stack.Screen name='TabNav' component={TabNavigator}></Stack.Screen>
       <Stack.Screen name='Exercise' component={ExerciseScreen}></Stack.Screen>
+      <Stack.Screen name='CategoryExercise' component={CategoryExerciseScreen}></Stack.Screen>
     </Stack.Navigator>
   
   );
