@@ -10,14 +10,12 @@ const TimerScreen = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [time, setTime] = useState(roundDuration);
   const [isResting, setIsResting] = useState(false);
-  const [resetFlag, setResetFlag] = useState(false);  
-
 
   const countDown = useRef(null);
 
   useEffect(() => {
     setTime(isResting ? restDuration : roundDuration);
-  }, [roundDuration, restDuration, isResting, resetFlag]);
+  }, []);
 
   const startCountDown = () => {
     if (currentRound <= numberOfRounds) {
@@ -61,11 +59,21 @@ const TimerScreen = () => {
     setIsResting(false);
     setIsRunning(false);
     clearInterval(countDown.current);
-    setResetFlag(!resetFlag);
     setTime(roundDuration);
   }
 
   useEffect(() => {
+
+    if(currentRound === numberOfRounds && time === 0){
+      clearInterval(countDown.current);
+      setIsResting(false);
+      setIsRunning(false); 
+      setTime(0);
+      return; 
+    }
+
+
+
     if(isRunning && time === 0){
       if(currentRound<numberOfRounds){
         if(isResting){
@@ -114,7 +122,7 @@ const TimerScreen = () => {
             <Text className='text-lg text-red-500'>PAUSE</Text>
           </TouchableOpacity>
           <TouchableOpacity className='mx-4 bg-white px-4 py-1 rounded-lg' onPress={resetCountDown}
-          disabled={isRunning}>
+          >
             <Text className='text-lg text-blue-500'>RESET</Text>
           </TouchableOpacity>
         </View>
