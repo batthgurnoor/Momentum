@@ -9,6 +9,10 @@ import { Image } from 'react-native';
 import { Audio } from 'expo-av';
 import BackButton from '../components/BackButton';
 import ExerciseData from '../../exercise_data'
+import AntDesign from '@expo/vector-icons/AntDesign';
+
+
+
 
 
 const  countDownAudio = require('../../assets/audio/countdownaudio.mp3');
@@ -156,32 +160,22 @@ const CategoryExerciseScreen = () => {
       }
 
       const currentExercise = categoryExercises[exerciseIndex];
-
-    
-
-
-
-
-
-
+      
 
   return (
     <View className='flex-1'>
-     {currentExercise ? (
-      <Image source={{uri: currentExercise.gif_url}} className='w-full h-80'/>
-    ) :(
-    <View className='justify-center items-center w-full h-80'>
-      <ActivityIndicator size={"large"} color={"gray"}/>
-    </View>)
-      }
+      { currentExercise ? (
+        <>
+         <Image source={{uri: currentExercise.gif_url}} className='w-full h-80'/>
+      
       <BackButton />
       <ScrollView >
         <View className='mt-4 mx-3'>
           <Text className='text-2xl font-bold text-center mb-1'>
-            {currentExercise?.title}
+            {currentExercise.title}
             </Text>
           <Text className='text-gray-500 mt-1'>
-            {currentExercise?.category.split(', ').map((cat, index) => (
+            {currentExercise.category.split(', ').map((cat, index) => (
               <View key={index} className='mr-2'>
                 <View className='mr-2 bg-gray-300 rounded-2xl px-2 '>
                   <Text className='text-fuchsia-500'>{cat}</Text>
@@ -191,11 +185,11 @@ const CategoryExerciseScreen = () => {
           </Text>
           <View className='flex-row items-center space-x-2 mt-2'>
             <Text className='font-semibold text-blue-500'>Itensity:</Text>
-            <Text className='text-cyan-400 italic text-base'>{currentExercise?.intensity}</Text>
+            <Text className='text-cyan-400 italic text-base'>{currentExercise.intensity}</Text>
           </View>
           <Text className='text-xl font-semibold mt-4'>Instructions:</Text>
           <View className='mt-2'>
-            {currentExercise?.instructions.map((instruction) => (
+            {currentExercise.instructions.map((instruction) => (
               <View key={instruction.step} className='flex-row items-center space-x-2 '>
                 <Text className='text-base text-gray-600 mb-2'>{instruction.step}.</Text>
                 <Text className='ml-2 text-base '>{instruction.text}</Text>
@@ -213,6 +207,9 @@ const CategoryExerciseScreen = () => {
           </TouchableOpacity>
         </View>
         <View className='mt-4 flex-row  items-center justify-center space-x-3 mb-10'>
+        <TouchableOpacity>           
+            <AntDesign name="leftcircleo" size={30} color="black" />
+          </TouchableOpacity>
           <TouchableOpacity onPress={isRunning ? handlePause : handleStart} disabled={time === 0}>
             <Text className={`text-blue-500 text-xl py-2 border rounded-lg border-blue-500 px-4 ${time === 0 ? 'opacity-50' : ''}`}>
               {isRunning ? "PAUSE" : "START"}
@@ -221,10 +218,17 @@ const CategoryExerciseScreen = () => {
           <TouchableOpacity onPress={handleReset}>
             <Text className='text-bray-500 text-xl py-2 border rounded-lg border-gray-500 px-4'>RESET</Text>
           </TouchableOpacity>
-        </View>
-      </ScrollView>
-    
-   
+          <TouchableOpacity>           
+            <AntDesign name="rightcircleo" size={30} color="black" />
+          </TouchableOpacity>
+          </View>
+      </ScrollView>  
+        </>
+      ) : <View className='justify-center items-center w-full h-80'>
+      <ActivityIndicator size={"large"} color={"gray"}/>
+    </View>}
+      
+       
       </View>
   )
 }
