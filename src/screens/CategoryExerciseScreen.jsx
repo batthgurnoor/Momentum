@@ -160,7 +160,18 @@ const CategoryExerciseScreen = () => {
       }
 
       const currentExercise = categoryExercises[exerciseIndex];
-      
+
+      const navigateToNextExercise = () => {
+        if(exerciseIndex < categoryExercises.length - 1){
+          setExerciseIndex(exerciseIndex + 1);
+        }
+      }
+
+      const navigateToPreviousExercise = () => {
+        if(exerciseIndex > 0){
+          setExerciseIndex(exerciseIndex - 1);
+        }
+      }
 
   return (
     <View className='flex-1'>
@@ -207,7 +218,7 @@ const CategoryExerciseScreen = () => {
           </TouchableOpacity>
         </View>
         <View className='mt-4 flex-row  items-center justify-center space-x-3 mb-10'>
-        <TouchableOpacity>           
+        <TouchableOpacity onPress={navigateToPreviousExercise}>           
             <AntDesign name="leftcircleo" size={30} color="black" />
           </TouchableOpacity>
           <TouchableOpacity onPress={isRunning ? handlePause : handleStart} disabled={time === 0}>
@@ -218,7 +229,7 @@ const CategoryExerciseScreen = () => {
           <TouchableOpacity onPress={handleReset}>
             <Text className='text-bray-500 text-xl py-2 border rounded-lg border-gray-500 px-4'>RESET</Text>
           </TouchableOpacity>
-          <TouchableOpacity>           
+          <TouchableOpacity onPress={navigateToNextExercise}>           
             <AntDesign name="rightcircleo" size={30} color="black" />
           </TouchableOpacity>
           </View>
