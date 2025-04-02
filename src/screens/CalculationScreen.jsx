@@ -1,5 +1,6 @@
-import { View, Text } from 'react-native'
+import { View, Text, TextInput } from 'react-native'
 import React,{useState}  from 'react'
+import {Picker} from '@react-native-picker/picker';
 
 const CalculationScreen = () => {
 
@@ -35,8 +36,33 @@ const CalculationScreen = () => {
   }
   }
   return (
-    <View>
-      <Text>CalculationScreen</Text>
+    <View className='bg-gray-200'>
+      <Text>BMI Calculator</Text>
+      <View>
+        <Text>Weight Unit</Text> 
+        <Text>Height Unit</Text> 
+      </View>
+      <View>
+        <Picker style={{flex :1, height: 50}}>
+          <Picker.Item label="Kg" value="kg" />
+          <Picker.Item label="Pounds" value="lbs" />
+        </Picker>
+        <Picker>
+          <Picker.Item label="Cm" value="cm" />
+          <Picker.Item label="Inches" value="in" />
+        </Picker>
+      </View>
+
+      <TextInput placeholder={`Enter your weight in ${weightUnit}`} 
+      keyboardType='numeric' 
+      onChangeText={setWeight}
+      value = {weight}
+      className='w-[70%] p-2 rounded-xl bg-white text-base'></TextInput>
+      <TextInput placeholder={`Enter your height in ${heightUnit}`} 
+      keyboardType='numeric' 
+      onChangeText={setHeight}
+      value = {height}
+      className='w-[70%] p-2 rounded-xl bg-white text-base'></TextInput>
     </View>
   )
 }
