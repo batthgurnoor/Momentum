@@ -13,7 +13,7 @@ import { useNavigation } from '@react-navigation/native';
 
 const WorkoutOTD = () => {
   const navigation = useNavigation();
-  const [workoutOTD, setWorkoutOTD] = useState(null);
+  const [workoutOTDUrl, setWorkoutOTDUrl] = useState(null);
   const [workoutName, setWorkoutName] = useState(null);
   let [fontsLoaded] = useFonts({
     Lato_400Regular,
@@ -31,10 +31,11 @@ const getExerciseOTD = async () => {
   listAll(storageRef).then(async (res) => {
     const exerciseUrl = res.items[date%29].fullPath;
     await getDownloadURL(ref(storage, exerciseUrl)).then((url) => {
-      setWorkoutOTD(url);
-      const exerciseName = exerciseUrl.split('/').pop()
+      setWorkoutOTDUrl(url);
+      const exerciseName = exerciseUrl.split('/').pop();
       setWorkoutName(exerciseName);
-      navigation.navigate("Exercise", {workoutName});
+      
+      navigation.navigate("WorkoutOTDScreen",{name:workoutName, url:workoutOTDUrl});
     });
   });
 };

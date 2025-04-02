@@ -1,17 +1,18 @@
-import { StatusBar } from 'expo-status-bar';
+
 import React from 'react';
-import { Text, View } from 'react-native';
+
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { NavigationContainer } from '@react-navigation/native';
+
 import WorkoutScreen from "../../src/screens/WorkoutScreen";
 import CalculationScreen from "../../src/screens/CalculationScreen";
 import TimerScreen from "../../src/screens/TimerScreen";
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import WorkoutOTDScreen from '../../src/screens/WorkoutOTDScreen';
+
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import ExerciseScreen from '../../src/screens/ExerciseScreen';
-import Category from '@/src/components/Category';
+
 import CategoryExerciseScreen from '@/src/screens/CategoryExerciseScreen';
 
 
@@ -63,6 +64,7 @@ export default function App() {
       <Stack.Screen name='TabNav' component={TabNavigator}></Stack.Screen>
       <Stack.Screen name='Exercise' component={ExerciseScreen}></Stack.Screen>
       <Stack.Screen name='CategoryExercise' component={CategoryExerciseScreen}></Stack.Screen>
+      <Stack.Screen name='WorkoutOTDScreen' component={WorkoutOTDScreen}></Stack.Screen>
     </Stack.Navigator>
   
   );
