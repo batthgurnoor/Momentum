@@ -1,11 +1,12 @@
-import { View, Text, TextInput } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity } from 'react-native'
 import React,{useState}  from 'react'
 import {Picker} from '@react-native-picker/picker';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const CalculationScreen = () => {
 
-  const [weight, setWeight] = useState(0);
-  const [height, setHeight] = useState(0);
+  const [weight, setWeight] = useState(null);
+  const [height, setHeight] = useState(null);
   const [bmi, setBmi] = useState(null);
   const [weightUnit, setWeightUnit] = useState('kg');
   const [heightUnit, setHeightUnit] = useState('cm');
@@ -35,19 +36,28 @@ const CalculationScreen = () => {
     }
   }
   }
+
+
+  const bmiMessage = getBmiMeaning();
   return (
-    <View className='bg-gray-200'>
-      <Text>BMI Calculator</Text>
-      <View>
-        <Text>Weight Unit</Text> 
-        <Text>Height Unit</Text> 
+    <SafeAreaView className='bg-gray-200 flex-1 items-center '>
+      <Text className='text-2xl my-4 font-bold '>BMI Calculator</Text>
+      <View className='flex-row'>
+        <Text className='text-center flex-1 text-lg font medium bg-neutral-300 ml-8 mr-8 rounded-lg'>Weight Unit</Text> 
+        <Text className='text-center flex-1 text-lg font medium bg-neutral-300 ml-8 mr-8 rounded-lg' >Height Unit</Text> 
       </View>
-      <View>
-        <Picker style={{flex :1, height: 50}}>
+      <View className='flex-row space-y mb-5'>
+        <Picker style={{flex :1, height: 50}} 
+      selectedValue={weightUnit}
+      onValueChange={setWeightUnit}
+     
+      >
           <Picker.Item label="Kg" value="kg" />
           <Picker.Item label="Pounds" value="lbs" />
         </Picker>
-        <Picker>
+        <Picker style={{flex :1, height: 50}}
+         selectedValue={heightUnit}
+         onValueChange={setHeightUnit}>
           <Picker.Item label="Cm" value="cm" />
           <Picker.Item label="Inches" value="in" />
         </Picker>
@@ -57,13 +67,27 @@ const CalculationScreen = () => {
       keyboardType='numeric' 
       onChangeText={setWeight}
       value = {weight}
-      className='w-[70%] p-2 rounded-xl bg-white text-base'></TextInput>
+      className='w-[70%] p-2 rounded-xl bg-white text-base mb-5 text-center'></TextInput>
       <TextInput placeholder={`Enter your height in ${heightUnit}`} 
       keyboardType='numeric' 
       onChangeText={setHeight}
       value = {height}
-      className='w-[70%] p-2 rounded-xl bg-white text-base'></TextInput>
-    </View>
+      className='w-[70%] p-2 rounded-xl bg-white text-base text-center'></TextInput>
+
+
+
+    <TouchableOpacity onPress={calculateBmi} className='p-3 bg-blue-300 my-5 rounded-xl mt-10'>
+      <Text className='font-bold text-lg'>Calculate BMI</Text>
+    </TouchableOpacity>
+
+    {bmi!==null ? (
+      <View className='my-10 rounded-2xl bg-neutral-300 p-5'>
+        <Text className='text-lg font-bold text-center'>Your BMI is :  <Text className='text-2xl font-bold text-center'>{bmi}</Text></Text>
+        
+        <Text style={{fontSize:20,marginTop:10,textAlign:'center',color:bmiMessage.color}}>{bmiMessage.messsage}</Text>
+      </View>
+    ): null}
+    </SafeAreaView>
   )
 }
 
