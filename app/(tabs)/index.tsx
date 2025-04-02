@@ -14,8 +14,9 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import ExerciseScreen from '../../src/screens/ExerciseScreen';
 
 import CategoryExerciseScreen from '@/src/screens/CategoryExerciseScreen';
-import { NavigationContainer } from '@react-navigation/native';
 
+import LoginScreen from '../../src/screens/LoginScreen';
+import SignupScreen from '../../src/screens/SignUpScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -62,6 +63,8 @@ export default function App() {
   return (
 
     <Stack.Navigator screenOptions={{headerShown:false}}>
+      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Signup" component={SignupScreen} />
       <Stack.Screen name='TabNav' component={TabNavigator}></Stack.Screen>
       <Stack.Screen name='Exercise' component={ExerciseScreen}></Stack.Screen>
       <Stack.Screen name='CategoryExercise' component={CategoryExerciseScreen}></Stack.Screen>
