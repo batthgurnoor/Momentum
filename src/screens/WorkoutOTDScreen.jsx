@@ -41,19 +41,7 @@ const route = useRoute();
   setIsAudioPlaying(true)
   } 
 
-  const fetchGifUrl = async () => {
-    try {
-      const storageRef = ref(storage, `AllExercises/${selectedExercise.gif_url}`);
-      const url = await getDownloadURL(storageRef);
-      setGifUrl(url);
-    }
-  catch (error) {}
-  }
 
-  useEffect (() => {
-    fetchGifUrl();
-    
-  },[]);
   const handleDecreaseTime =() => {
     if(!isRunning && time > minTime){
       setTime((prevTime) => prevTime - 10);

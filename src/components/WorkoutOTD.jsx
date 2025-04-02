@@ -35,9 +35,13 @@ const getExerciseOTD = async () => {
       const exerciseName = exerciseUrl.split('/').pop();
       setWorkoutName(exerciseName);
       
-      navigation.navigate("WorkoutOTDScreen",{name:workoutName, url:workoutOTDUrl});
+      
     });
   });
+  if(workoutOTDUrl && workoutName){
+    navigation.navigate("WorkoutOTDScreen",{name:workoutName, url:workoutOTDUrl});
+  }
+ 
 };
 
   return (
