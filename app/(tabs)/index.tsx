@@ -1,6 +1,6 @@
 
 import React from 'react';
-
+import { StatusBar } from 'expo-status-bar';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
@@ -14,6 +14,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import ExerciseScreen from '../../src/screens/ExerciseScreen';
 
 import CategoryExerciseScreen from '@/src/screens/CategoryExerciseScreen';
+import { NavigationContainer } from '@react-navigation/native';
 
 
 const Tab = createBottomTabNavigator();
@@ -59,13 +60,14 @@ export default function App() {
     )
   }
   return (
-  
+
     <Stack.Navigator screenOptions={{headerShown:false}}>
       <Stack.Screen name='TabNav' component={TabNavigator}></Stack.Screen>
       <Stack.Screen name='Exercise' component={ExerciseScreen}></Stack.Screen>
       <Stack.Screen name='CategoryExercise' component={CategoryExerciseScreen}></Stack.Screen>
       <Stack.Screen name='WorkoutOTDScreen' component={WorkoutOTDScreen}></Stack.Screen>
     </Stack.Navigator>
-  
-  );
+
+
+ );
 }
