@@ -6,11 +6,9 @@ import { useNavigation } from '@react-navigation/native';
 
 export default function SignupScreen() {
   const navigation = useNavigation();
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  // Sign up using Firebase
   const handleSignup = async () => {
     if (!email || !password) {
       Alert.alert('Error', 'Please enter your email and password.');
@@ -19,8 +17,7 @@ export default function SignupScreen() {
 
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      // If successful, user is now signed in; you can redirect them to the main app
-      navigation.replace('TabNav'); // or whichever screen you want to show next
+      navigation.replace('ProfileSetup'); 
     } catch (error) {
       Alert.alert('Signup Error', error.message);
     }
