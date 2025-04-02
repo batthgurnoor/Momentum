@@ -1,22 +1,48 @@
 import { View, Text, ImageBackground,TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 const otdImage = require('../../assets/images/workoutotd.jpg')
-
+import { getDownloadURL, listAll, ref } from 'firebase/storage';
+import { storage } from '../../Firebase/config';
 import {
   useFonts,
   Lato_400Regular,
 } from '@expo-google-fonts/lato';
+import { useNavigation } from '@react-navigation/native';
+
 
 
 const WorkoutOTD = () => {
+  const navigation = useNavigation();
+  const [workoutOTD, setWorkoutOTD] = useState(null);
+  const [workoutName, setWorkoutName] = useState(null);
   let [fontsLoaded] = useFonts({
     Lato_400Regular,
   });
   if (!fontsLoaded) {
     return null;
   }
+  
+const getExerciseOTD = async () => {
+
+  const date = new Date().getDate();
+  const storageRef = ref(storage, `AllExercises/`);
+
+
+  listAll(storageRef).then(async (res) => {
+    const exerciseUrl = res.items[date%29].fullPath;
+    await getDownloadURL(ref(storage, exerciseUrl)).then((url) => {
+      setWorkoutOTD(url);
+      const exerciseName = exerciseUrl.split('/').pop()
+      setWorkoutName(exerciseName);
+      navigation.navigate("Exercise", {workoutName});
+    });
+  });
+};
+
   return (
-    <TouchableOpacity className="items-center justify-center">
+    <TouchableOpacity 
+    onPress={getExerciseOTD}
+    className="items-center justify-center">
       <View className="rounded-3xl overflow-hidden h-40 w-[80%]">
         <ImageBackground
            source ={otdImage}
