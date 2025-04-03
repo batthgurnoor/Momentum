@@ -24,3 +24,26 @@ Momentum is a fitness app designed to help users stay motivated, set goals, and 
 
 - Social Sharing – Would enable users to share fitness achievements on social media.
 
+## Installation & Setup
+
+### Prerequisites
+
+- Node.js & npm installed
+
+- Expo CLI installed globally
+
+### Clone the Repository
+
+```bash
+git clone git@github.com:batthgurnoor/Momentum.git 
+```
+
+### Install Dependencies
+```bash
+npm install
+```
+
+### Run the App
+```bash
+npx expo start
+```
