@@ -3,7 +3,6 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import WorkoutScreen from "../../src/screens/WorkoutScreen";
 import CalculationScreen from "../../src/screens/CalculationScreen";
-import TimerScreen from "../../src/screens/TimerScreen";
 import WorkoutOTDScreen from '../../src/screens/WorkoutOTDScreen';
 import ProfileScreen from '../../src/screens/ProfileScreen';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';

@@ -135,7 +135,7 @@ export default function ProfileScreen() {
     <KeyboardAvoidingView
       className="flex-1 bg-gray-50"
     >
-      <ScrollView showsVerticalScrollIndicator={false} className='h-[60%]'>
+      <ScrollView showsVerticalScrollIndicator={false} className=''>
         <View className="h-40 w-full">
           <ImageBackground
             source={bannerImage}
@@ -259,8 +259,8 @@ export default function ProfileScreen() {
         )}
 </ScrollView>
 
-        {/* Activity History Section */}
-        <View className="mt-4 mx-4 mb-6">
+        {/* Activity History Section */}<View className='relative h-[55%]'> 
+        <View className="mt-4 mx-4 mb-6 fixed">
           <Text className="text-xl font-bold mb-2 text-gray-800 text-center">
             Activity History
           </Text></View>
@@ -275,7 +275,7 @@ export default function ProfileScreen() {
               renderItem={({ item }) => <ActivityCard item={item} />}
             />
           )}
-        
+        </View>
         
     </KeyboardAvoidingView>
   );

@@ -4,12 +4,12 @@
     "slug": "momentum",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/splash-icon.png",
+      "image": "./assets/images/momentum.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -18,7 +18,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/momentum.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.batth.gurnoor.momentum"
@@ -26,7 +26,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/momentum.png"
     },
     "plugins": [
       "expo-router",
