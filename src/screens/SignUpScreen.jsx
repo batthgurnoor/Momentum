@@ -48,7 +48,7 @@ export default function SignupScreen() {
         <Text style={{ color: 'white', textAlign: 'center', fontWeight: '600' }}>Sign Up</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate('Login')} style={{ marginTop: 16 }}>
+      <TouchableOpacity onPress={() => navigati2on.navigate('Login')} style={{ marginTop: 16 }}>
         <Text style={{ textAlign: 'center' }}>
           Already have an account? 
           <Text style={{ color: 'blue' }}> Log In</Text>
