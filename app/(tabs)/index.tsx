@@ -17,23 +17,16 @@ import SignupScreen from '../../src/screens/SignUpScreen';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import LogWorkoutScreen from '../../src/screens/LogWorkoutScreen';
 import * as Notifications from 'expo-notifications';
-
+import GoalListScreen from '../../src/screens/GoalListScreen';
+import GoalSetupScreen from '../../src/screens/GoalSetupScreen';
+import GoalDetailScreen from '../../src/screens/GoalDetailScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 
 export default function App() {
- 
-
-
-
-
-
-
-
-
-  function TabNavigator(){
+   function TabNavigator(){
     return(
       <Tab.Navigator
       screenOptions={({route})=>({
@@ -53,6 +46,9 @@ export default function App() {
               case "Profile":
               iconName="user";
               return(<AntDesign name="user" size={size} color={color} />);
+              case "Goals":
+              iconName="checkcircleo";
+              return(<AntDesign name="checkcircleo" size={size} color={color}  />);
           }
         },
         tabBarShowLabel:false,
@@ -68,6 +64,7 @@ export default function App() {
         })}>
         <Tab.Screen name="Workout" component={WorkoutScreen}></Tab.Screen>
         <Tab.Screen name="LogWorkout" component={LogWorkoutScreen} />
+        <Tab.Screen name="Goals" component={GoalListScreen} />
         <Tab.Screen name="Calculation" component={CalculationScreen}></Tab.Screen>
         <Tab.Screen name="Profile" component={ProfileScreen} />
       </Tab.Navigator>
@@ -84,7 +81,9 @@ export default function App() {
       <Stack.Screen name='WorkoutOTDScreen' component={WorkoutOTDScreen}></Stack.Screen>
       <Stack.Screen name="ActivityMonitoring" component={ActivityMonitoringScreen} />
       <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />
-      
+      <Stack.Screen name="GoalList" component={GoalListScreen} />
+        <Stack.Screen name="GoalSetup" component={GoalSetupScreen} />
+        <Stack.Screen name="GoalDetail" component={GoalDetailScreen}/>
 
     </Stack.Navigator>
 
