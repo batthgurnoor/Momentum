@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import WorkoutScreen from "../../src/screens/WorkoutScreen";
@@ -16,6 +16,7 @@ import LoginScreen from '../../src/screens/LoginScreen';
 import SignupScreen from '../../src/screens/SignUpScreen';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import LogWorkoutScreen from '../../src/screens/LogWorkoutScreen';
+import * as Notifications from 'expo-notifications';
 
 
 const Tab = createBottomTabNavigator();
@@ -23,6 +24,15 @@ const Stack = createNativeStackNavigator();
 
 
 export default function App() {
+ 
+
+
+
+
+
+
+
+
   function TabNavigator(){
     return(
       <Tab.Navigator
@@ -74,6 +84,7 @@ export default function App() {
       <Stack.Screen name='WorkoutOTDScreen' component={WorkoutOTDScreen}></Stack.Screen>
       <Stack.Screen name="ActivityMonitoring" component={ActivityMonitoringScreen} />
       <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />
+      
 
     </Stack.Navigator>
 

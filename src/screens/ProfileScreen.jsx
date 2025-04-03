@@ -133,11 +133,9 @@ export default function ProfileScreen() {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       className="flex-1 bg-gray-50"
     >
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Banner Section */}
+      <ScrollView showsVerticalScrollIndicator={false} className='h-[60%]'>
         <View className="h-40 w-full">
           <ImageBackground
             source={bannerImage}
@@ -259,12 +257,13 @@ export default function ProfileScreen() {
             />
           </View>
         )}
+</ScrollView>
 
         {/* Activity History Section */}
         <View className="mt-4 mx-4 mb-6">
-          <Text className="text-xl font-bold mb-2 text-gray-800">
+          <Text className="text-xl font-bold mb-2 text-gray-800 text-center">
             Activity History
-          </Text>
+          </Text></View>
           {loadingActivities ? (
             <ActivityIndicator size="large" color="gray" />
           ) : activities.length === 0 ? (
@@ -276,8 +275,8 @@ export default function ProfileScreen() {
               renderItem={({ item }) => <ActivityCard item={item} />}
             />
           )}
-        </View>
-      </ScrollView>
+        
+        
     </KeyboardAvoidingView>
   );
 }

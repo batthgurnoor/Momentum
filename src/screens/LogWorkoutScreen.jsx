@@ -6,12 +6,11 @@ import {
   TextInput,
   Alert,
   KeyboardAvoidingView,
-  Platform,
+  Platform,StyleSheet,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { auth, db } from '../../Firebase/config';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-// Use a gradient background
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function LogWorkoutScreen() {
@@ -114,7 +113,6 @@ export default function LogWorkoutScreen() {
     }
   };
 
-  // Helper: format time
   const formatTime = (secs) => {
     const minutes = Math.floor(secs / 60);
     const leftover = secs % 60;
@@ -122,12 +120,23 @@ export default function LogWorkoutScreen() {
   };
 
   const displayedTime = formatTime(elapsedTime);
+  const styles = StyleSheet.create({
+    background: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      top: 0,
+      height: 300,
+    },
+  });
+
 
   return (
     <LinearGradient
-      colors={['#1E3A8A', '#1E40AF', '#1E3A8A']}
-      style={{ flex: 1 }}
-    >
+        // Background Linear Gradient
+        colors={['rgba(0,0,0,0.8)', 'transparent']}
+        style={styles.background}
+      >
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1 px-4 pt-10 pb-6"
@@ -136,13 +145,11 @@ export default function LogWorkoutScreen() {
           Log Workout
         </Text>
 
-        {/* Timer Display */}
+        
         <View className="items-center justify-center mb-8">
           <Text className="text-white text-6xl font-bold mb-4 tracking-tight">
             {displayedTime}
           </Text>
-
-          {/* Controls */}
           {!isRunning ? (
             <TouchableOpacity
               onPress={handleStart}
@@ -183,7 +190,7 @@ export default function LogWorkoutScreen() {
           )}
         </View>
 
-        {/* Input Fields */}
+    
         <View className="bg-white/80 rounded-2xl p-4">
           <Text className="text-gray-700 text-base font-semibold mb-1">Workout Title</Text>
           <TextInput

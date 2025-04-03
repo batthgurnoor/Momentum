@@ -1,94 +1,146 @@
-import { View, Text, TextInput, TouchableOpacity } from 'react-native'
-import React,{useState}  from 'react'
-import {Picker} from '@react-native-picker/picker';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform ,StyleSheet,} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Picker } from '@react-native-picker/picker';
+import { LinearGradient } from 'expo-linear-gradient';
 
-const CalculationScreen = () => {
-
-  const [weight, setWeight] = useState(null);
-  const [height, setHeight] = useState(null);
+export default function CalculationScreen() {
+  const [weight, setWeight] = useState('');
+  const [height, setHeight] = useState('');
   const [bmi, setBmi] = useState(null);
   const [weightUnit, setWeightUnit] = useState('kg');
   const [heightUnit, setHeightUnit] = useState('cm');
 
   const calculateBmi = () => {
     if (weight && height) {
-      const wightKg = weightUnit === 'kg' ? parseFloat(weight) : parseFloat(weight) / 2.20462;
-      const heightM = heightUnit === 'cm' ? parseFloat(height)/100 : parseFloat(height) * 0.0254
-      const bmiValue = wightKg / (heightM * heightM);
-    setBmi(bmiValue.toFixed(2));
-  }else{
-    setBmi(null);
-  }
-  }
+      const weightKg = weightUnit === 'kg'
+        ? parseFloat(weight)
+        : parseFloat(weight) / 2.20462; 
+      const heightM = heightUnit === 'cm'
+        ? parseFloat(height) / 100
+        : parseFloat(height) * 0.0254; 
+      const bmiValue = weightKg / (heightM * heightM);
+      setBmi(bmiValue.toFixed(2));
+    } else {
+      setBmi(null);
+    }
+  };
 
   const getBmiMeaning = () => {
-    if(bmi !==null){
-      if(bmi<18.5){
-        return {messsage:'You are underweight. Consider consulting a doctor or a nutitionist.',color:'red'};
-    }else if(bmi>=18.5 && bmi<24.9){
-      return {messsage:'Congratulations! You are in a healthy weight range.',color:'green'};
-    }else if(bmi>=24.9 && bmi<29.9){
-      return {messsage:'You are overweight. Consider consulting a doctor or a nutitionist.',color:'orange'};
+    if (bmi === null) return null;
+    const numericBmi = parseFloat(bmi);
+    if (numericBmi < 18.5) {
+      return { message: 'You are underweight. Consider consulting a doctor.', color: 'text-red-500' };
+    } else if (numericBmi < 24.9) {
+      return { message: 'Congratulations! You are in a healthy weight range.', color: 'text-green-500' };
+    } else if (numericBmi < 29.9) {
+      return { message: 'You are overweight. Consider consulting a nutritionist.', color: 'text-yellow-500' };
+    } else {
+      return { message: 'You are obese. Please consider consulting a health professional.', color: 'text-red-500' };
     }
-    else{
-      return {messsage:'You are obese. Please consider consulting a health professional.',color:'red'};
-    }
-  }
-  }
-
+  };
 
   const bmiMessage = getBmiMeaning();
+const styles = StyleSheet.create({
+    background: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      top: 0,
+      height: 300,
+    },
+  });
   return (
-    <SafeAreaView className='bg-gray-200 flex-1 items-center '>
-      <Text className='text-2xl my-4 font-bold '>BMI Calculator</Text>
-      <View className='flex-row'>
-        <Text className='text-center flex-1 text-lg font medium bg-neutral-300 ml-8 mr-8 rounded-lg'>Weight Unit</Text> 
-        <Text className='text-center flex-1 text-lg font medium bg-neutral-300 ml-8 mr-8 rounded-lg' >Height Unit</Text> 
-      </View>
-      <View className='flex-row space-y mb-5'>
-        <Picker style={{flex :1, height: 50}} 
-      selectedValue={weightUnit}
-      onValueChange={setWeightUnit}
-     
-      >
-          <Picker.Item label="Kg" value="kg" />
-          <Picker.Item label="Pounds" value="lbs" />
-        </Picker>
-        <Picker style={{flex :1, height: 50}}
-         selectedValue={heightUnit}
-         onValueChange={setHeightUnit}>
-          <Picker.Item label="Cm" value="cm" />
-          <Picker.Item label="Inches" value="in" />
-        </Picker>
-      </View>
+    <LinearGradient
+            
+            colors={['rgba(0,0,0,0.8)', 'transparent']}
+            style={styles.background}
+          >
+      <SafeAreaView className="flex-1 px-4">
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          className="flex-1"
+        >
+          <Text className="text-white text-3xl font-extrabold text-center mt-8 mb-6">
+            BMI Calculator
+          </Text>
 
-      <TextInput placeholder={`Enter your weight in ${weightUnit}`} 
-      keyboardType='numeric' 
-      onChangeText={setWeight}
-      value = {weight}
-      className='w-[70%] p-2 rounded-xl bg-white text-base mb-5 text-center'></TextInput>
-      <TextInput placeholder={`Enter your height in ${heightUnit}`} 
-      keyboardType='numeric' 
-      onChangeText={setHeight}
-      value = {height}
-      className='w-[70%] p-2 rounded-xl bg-white text-base text-center'></TextInput>
+          
+          <View className="bg-white/90 rounded-2xl px-4 py-3 mb-4">
+            <Text className="text-gray-700 font-semibold mb-2 text-center">Select Units</Text>
+            <View className="flex-row justify-between">
+              {/* Weight Unit Picker */}
+              <View className="flex-1 mx-1 bg-white rounded-lg">
+                <Picker
+                  selectedValue={weightUnit}
+                  onValueChange={(val) => setWeightUnit(val)}
+                  style={{ height: 50 }}
+                >
+                  <Picker.Item label="Kg" value="kg" />
+                  <Picker.Item label="Pounds" value="lbs" />
+                </Picker>
+              </View>
 
+              
+              <View className="flex-1 mx-1 bg-white rounded-lg">
+                <Picker
+                  selectedValue={heightUnit}
+                  onValueChange={(val) => setHeightUnit(val)}
+                  style={{ height: 50 }}
+                >
+                  <Picker.Item label="Cm" value="cm" />
+                  <Picker.Item label="Inches" value="in" />
+                </Picker>
+              </View>
+            </View>
+          </View>
 
+          
+          <View className="bg-white/90 rounded-2xl px-4 py-4">
+            <Text className="text-gray-700 font-semibold mb-1">Enter Weight ({weightUnit})</Text>
+            <TextInput
+              placeholder={`Enter your weight in ${weightUnit}`}
+              value={weight}
+              onChangeText={setWeight}
+              keyboardType="numeric"
+              className="bg-white rounded-lg px-3 py-2 mb-4"
+            />
 
-    <TouchableOpacity onPress={calculateBmi} className='p-3 bg-blue-300 my-5 rounded-xl mt-10'>
-      <Text className='font-bold text-lg'>Calculate BMI</Text>
-    </TouchableOpacity>
+            <Text className="text-gray-700 font-semibold mb-1">Enter Height ({heightUnit})</Text>
+            <TextInput
+              placeholder={`Enter your height in ${heightUnit}`}
+              value={height}
+              onChangeText={setHeight}
+              keyboardType="numeric"
+              className="bg-white rounded-lg px-3 py-2 mb-4"
+            />
 
-    {bmi!==null ? (
-      <View className='my-10 rounded-2xl bg-neutral-300 p-5'>
-        <Text className='text-lg font-bold text-center'>Your BMI is :  <Text className='text-2xl font-bold text-center'>{bmi}</Text></Text>
-        
-        <Text style={{fontSize:20,marginTop:10,textAlign:'center',color:bmiMessage.color}}>{bmiMessage.messsage}</Text>
-      </View>
-    ): null}
-    </SafeAreaView>
-  )
+            
+            <TouchableOpacity
+              onPress={calculateBmi}
+              className="bg-green-500 rounded-full py-3 my-2"
+            >
+              <Text className="text-center text-white font-semibold text-lg">Calculate BMI</Text>
+            </TouchableOpacity>
+          </View>
+
+          
+          {bmi !== null && (
+            <View className="bg-white/90 rounded-2xl px-4 py-4 mt-6">
+              <Text className="text-lg font-bold text-center mb-2">
+                Your BMI: <Text className="text-blue-600">{bmi}</Text>
+              </Text>
+              {bmiMessage && (
+                <Text
+                  className={`text-center px-3 text-base ${bmiMessage.color}`}
+                >
+                  {bmiMessage.message}
+                </Text>
+              )}
+            </View>
+          )}
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </LinearGradient>
+  );
 }
-
-export default CalculationScreen
