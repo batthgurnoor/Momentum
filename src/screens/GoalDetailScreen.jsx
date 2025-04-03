@@ -1,6 +1,6 @@
 // GoalDetailScreen.jsx
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, FlatList, Alert, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, Alert, StyleSheet, TextInput } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { auth, db } from '../../Firebase/config';
 import { doc, updateDoc } from 'firebase/firestore';
@@ -11,12 +11,12 @@ export default function GoalDetailScreen() {
   const navigation = useNavigation();
   const user = auth.currentUser;
   const { goal } = route.params;
-
+  const [progressInput, setProgressInput] = useState('');
   const [goalData, setGoalData] = useState(goal);
 
   if (!goalData) {
     return (
-      <LinearGradient colors={['#1F1C2C', '#928DAB']} style={styles.gradient}>
+      <LinearGradient colors={['rgba(0,0,0,0.8)', 'transparent']} style={styles.gradient}>
         <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
           <Text style={styles.noDataText}>No goal data available.</Text>
         </View>
@@ -24,36 +24,35 @@ export default function GoalDetailScreen() {
     );
   }
 
-  const removeProgress = async (value) => {
-    // Example placeholder for removing progress
-    // If you want to remove from currentProgress or do something else
-  };
-
-  const removeGoal = async () => {
-    // If you want to allow deleting the entire goal doc
-  };
-
-  const removeExercise = async (index) => {
+  const updateProgress = async () => {
     if (!user) return;
-    const updatedExercises = [...(goalData.instructions || [])];
-    updatedExercises.splice(index, 1);
+    const numericProgress = parseFloat(progressInput);
+    if (isNaN(numericProgress)) {
+      Alert.alert('Invalid input', 'Enter a valid number for progress.');
+      return;
+    }
 
+    // Sum with existing progress
+    const newProgress = goal.currentProgress + numericProgress;
+
+    const docRef = doc(db, 'users', user.uid, 'goals', goal.id);
     try {
-      const goalRef = doc(db, 'users', user.uid, 'goals', goalData.id);
-      await updateDoc(goalRef, { instructions: updatedExercises });
-      // or if you stored exercises differently, update the correct field
-      setGoalData({ ...goalData, instructions: updatedExercises });
-      Alert.alert('Removed!', 'Item was removed from this goal.');
+      await updateDoc(docRef, {
+        currentProgress: newProgress,
+      });
+      Alert.alert('Progress Updated!', `You added ${numericProgress} to your progress.`);
+      setProgressInput('');
     } catch (error) {
-      Alert.alert('Error', error.message);
+      Alert.alert('Error updating progress', error.message);
     }
   };
 
-  // For the example, your "goal" might store `instructions`, `exercises`, or something else
-  // Adjust the code to match how you store "exercises" or steps.
+  const remaining = goal.targetValue - goal.currentProgress;
+  const progressPercentage = ((goal.currentProgress / goal.targetValue) * 100).toFixed(1);
 
-  const exercises = goalData.exercises || []; // if you used `exercises` field
 
+
+  const exercises = goalData.exercises || [];
   return (
     <LinearGradient colors={['rgba(0,0,0,0.8)', 'transparent']} style={styles.gradient}>
       <View style={styles.container}>
@@ -69,36 +68,26 @@ export default function GoalDetailScreen() {
         </View>
 
         <Text style={[styles.subHeader, { marginHorizontal: 16, marginTop: 10 }]}>
-          Exercises / Steps
         </Text>
-        {exercises.length === 0 ? (
-          <Text style={[styles.infoText, { marginHorizontal: 16 }]}>No exercises defined.</Text>
-        ) : (
-          <FlatList
-            data={exercises}
-            keyExtractor={(_, idx) => idx.toString()}
-            contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 16 }}
-            renderItem={({ item, index }) => (
-              <View style={styles.itemCard}>
-                <Text style={styles.itemCardTitle}>
-                  {item.name || 'Custom Step'}
-                </Text>
-                <Text style={styles.itemCardDesc}>
-                  {item.day && `Day ${item.day} `}
-                  {item.sets && `${item.sets} x ${item.reps} `}
-                  {item.duration && `(${item.duration} min)`}
-                </Text>
-                <TouchableOpacity
-                  style={styles.removeButton}
-                  onPress={() => removeExercise(index)}
-                >
-                  <Text style={styles.removeButtonText}>Remove</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-          />
-        )}
+
+        <TextInput className='ml-10 bg-white mr-10 p-2 rounded-md text-center'
+        placeholder="Add weekly progress (lbs lost, etc.)"
+        value={progressInput}
+        onChangeText={setProgressInput}
+        keyboardType="numeric"
+        
+      />
+
+      
       </View>
+      <TouchableOpacity
+        onPress={updateProgress}
+        style={{ backgroundColor:'green', padding:12, borderRadius:8 }}
+      >
+        <Text style={{ color:'white', textAlign:'center', fontWeight:'bold' }}>
+          Update Weekly Progress
+        </Text>
+      </TouchableOpacity>
     </LinearGradient>
   );
 }

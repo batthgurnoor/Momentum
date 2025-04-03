@@ -1,4 +1,4 @@
-// GoalSetupScreen.jsx
+
 import React, { useState } from 'react';
 import {
   View,
@@ -13,6 +13,7 @@ import { auth, db } from '../../Firebase/config'; // adjust path
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
+import {Picker} from '@react-native-picker/picker';
 
 export default function GoalSetupScreen() {
   const navigation = useNavigation();
@@ -70,12 +71,17 @@ export default function GoalSetupScreen() {
 
         <View style={styles.formCard}>
           <Text style={styles.label}>Goal Type (e.g. weightLoss)</Text>
-          <TextInput
-            style={styles.input}
-            value={goalType}
-            onChangeText={setGoalType}
-          />
-
+          <View className="px-2 bg-white rounded-lg border-gray-200">
+            <Picker  
+          selectedValue={goalType}
+          onValueChange={(itemValue) =>
+          setGoalType(itemValue)
+          }>
+          <Picker.Item label="Wieght Loss" value="Wieght Loss" />
+          <Picker.Item label="Weight Gain" value="Weight Gain" />
+          
+          </Picker>
+          </View>
           <Text style={styles.label}>Target Value (lbs to lose, etc.)</Text>
           <TextInput
             style={styles.input}

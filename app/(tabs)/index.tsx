@@ -20,6 +20,9 @@ import * as Notifications from 'expo-notifications';
 import GoalListScreen from '../../src/screens/GoalListScreen';
 import GoalSetupScreen from '../../src/screens/GoalSetupScreen';
 import GoalDetailScreen from '../../src/screens/GoalDetailScreen';
+import PlanListScreen from '../../src/screens/PlanListScreen';
+import PlanSetupScreen from '../../src/screens/PlanSetupScreen';
+import PlanDetailScreen from '../../src/screens/PlanDetailScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -84,6 +87,19 @@ export default function App() {
       <Stack.Screen name="GoalList" component={GoalListScreen} />
         <Stack.Screen name="GoalSetup" component={GoalSetupScreen} />
         <Stack.Screen name="GoalDetail" component={GoalDetailScreen}/>
+        <Stack.Screen
+        name="PlanList"
+        component={PlanListScreen}
+      />
+      <Stack.Screen
+        name="PlanSetup"
+        component={PlanSetupScreen}
+  
+      />
+      <Stack.Screen
+        name="PlanDetail"
+        component={PlanDetailScreen}
+      />
 
     </Stack.Navigator>
 

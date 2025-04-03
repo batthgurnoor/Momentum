@@ -1,15 +1,15 @@
-// GoalListScreen.jsx
+// PlanListScreen.jsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator, FlatList, StyleSheet } from 'react-native';
-import { auth, db } from '../../Firebase/config'; // adjust path
+import { auth, db } from '../../Firebase/config'; // Adjust path
 import { collection, onSnapshot } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 
-export default function GoalListScreen() {
+export default function PlanListScreen() {
   const navigation = useNavigation();
   const user = auth.currentUser;
-  const [goals, setGoals] = useState([]);
+  const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -17,24 +17,19 @@ export default function GoalListScreen() {
       setLoading(false);
       return;
     }
-
-    const ref = collection(db, 'users', user.uid, 'goals');
+    const plansRef = collection(db, 'users', user.uid, 'workoutPlans');
     const unsubscribe = onSnapshot(
-      ref,
+      plansRef,
       (snapshot) => {
-        const items = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        setGoals(items);
+        const planList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setPlans(planList);
         setLoading(false);
       },
       (error) => {
-        console.log('Error fetching goals:', error);
+        console.log('Error fetching plans:', error);
         setLoading(false);
       }
     );
-
     return () => unsubscribe();
   }, [user]);
 
@@ -43,7 +38,7 @@ export default function GoalListScreen() {
       <LinearGradient colors={['#1F1C2C', '#928DAB']} style={styles.gradient}>
         <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
           <ActivityIndicator size="large" color="#fff" />
-          <Text style={{ color: '#fff', marginTop: 12 }}>Loading goals...</Text>
+          <Text style={styles.infoText}>Loading plans...</Text>
         </View>
       </LinearGradient>
     );
@@ -52,41 +47,31 @@ export default function GoalListScreen() {
   return (
     <LinearGradient colors={['rgba(0,0,0,0.8)', 'transparent']} style={styles.gradient}>
       <View style={styles.container}>
-        <Text style={styles.headerTitle}>Your Fitness Goals</Text>
-
-        {goals.length === 0 ? (
-          <Text style={[styles.infoText, { marginHorizontal: 16 }]}>
-            No goals found. Create one below!
-          </Text>
+        <Text style={styles.headerTitle}>Your Workout Plans</Text>
+        {plans.length === 0 ? (
+          <Text style={styles.infoText}>No plans found. Create one below!</Text>
         ) : (
           <FlatList
-            data={goals}
+            data={plans}
             keyExtractor={(item) => item.id}
-            contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 16 }}
+            contentContainerStyle={styles.listContainer}
             renderItem={({ item }) => (
               <TouchableOpacity
-                style={styles.goalCard}
-                onPress={() => navigation.navigate('GoalDetail', { goal: item })}
+                style={styles.planCard}
+                onPress={() => navigation.navigate('PlanDetail', { plan: item })}
               >
-                <Text style={styles.goalCardTitle}>{item.title || 'Untitled Goal'}</Text>
-                <Text style={styles.goalCardSub}>
-                  Progress: {item.currentProgress} / {item.targetValue}
-                </Text>
+                <Text style={styles.planCardTitle}>{item.planName}</Text>
+                <Text style={styles.planCardSub}>Focus: {item.focus}</Text>
               </TouchableOpacity>
             )}
           />
         )}
-<TouchableOpacity
-          onPress={() => navigation.navigate('PlanList')}
-          style={styles.createButton}
-        >
-          <Text style={styles.createButtonText}>View Your Plans</Text>
-        </TouchableOpacity>
+
         <TouchableOpacity
-          onPress={() => navigation.navigate('GoalSetup')}
+          onPress={() => navigation.navigate('PlanSetup')}
           style={styles.createButton}
         >
-          <Text style={styles.createButtonText}>Create New Goal</Text>
+          <Text style={styles.createButtonText}>Create New Plan</Text>
         </TouchableOpacity>
       </View>
     </LinearGradient>
@@ -94,52 +79,56 @@ export default function GoalListScreen() {
 }
 
 const styles = StyleSheet.create({
-  gradient: {
-    flex: 1
-  },
+  gradient: { flex: 1 },
   container: {
     flex: 1,
-    paddingTop: 40
+    paddingTop: 40,
+    paddingHorizontal: 16,
   },
   headerTitle: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
     color: '#fff',
     textAlign: 'center',
-    marginBottom: 16
+    marginBottom: 16,
   },
   infoText: {
+    fontSize: 16,
     color: '#fff',
-    fontSize: 16
+    textAlign: 'center',
+    marginVertical: 10,
   },
-  goalCard: {
-    backgroundColor: 'rgba(255,255,255,0.85)',
+  listContainer: {
+    paddingBottom: 16,
+  },
+  planCard: {
+    backgroundColor: 'rgba(255,255,255,0.9)',
     borderRadius: 12,
     padding: 16,
-    marginVertical: 6
+    marginVertical: 6,
   },
-  goalCardTitle: {
+  planCardTitle: {
+    fontSize: 20,
     fontWeight: 'bold',
-    fontSize: 18,
+    color: '#333',
     marginBottom: 4,
-    color: '#333'
   },
-  goalCardSub: {
-    fontSize: 14,
-    color: '#666'
+  planCardSub: {
+    fontSize: 16,
+    color: '#666',
   },
   createButton: {
     backgroundColor: '#4f5bd5',
     padding: 14,
     borderRadius: 25,
+    marginTop: 10,
     marginHorizontal: 16,
-    marginBottom: 16,
-    marginTop: 10
+    marginBottom: 20,
   },
   createButtonText: {
     color: '#fff',
-    fontWeight: 'bold',
+    fontSize: 18,
     textAlign: 'center',
-    fontSize: 16
-  }
+    fontWeight: 'bold',
+  },
 });
