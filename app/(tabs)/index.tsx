@@ -22,12 +22,44 @@ import GoalDetailScreen from '../../src/screens/GoalDetailScreen';
 import PlanListScreen from '../../src/screens/PlanListScreen';
 import PlanSetupScreen from '../../src/screens/PlanSetupScreen';
 import PlanDetailScreen from '../../src/screens/PlanDetailScreen';
+import NotificationsScreen from '../../src/screens/NotificationsScreen';
+import { registerForPushNotificationsAsync } from '../../src/notifications';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 
 export default function App() {
+  // Set up notifications when app loads
+  useEffect(() => {
+    // Configure how the notification will appear
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+      }),
+    });
+
+    // Get permission for notifications
+    registerForPushNotificationsAsync().then(token => {
+      if (token) {
+        console.log("Push token obtained:", token);
+      }
+    });
+
+    // Handle notification response
+    const responseListener = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log("Notification responded to:", response);
+      // You can add logic to navigate to specific screens based on notification
+    });
+
+    return () => {
+      // Clean up listeners
+      Notifications.removeNotificationSubscription(responseListener);
+    };
+  }, []);
+
    function TabNavigator(){
     return(
       <Tab.Navigator
@@ -98,6 +130,10 @@ export default function App() {
       <Stack.Screen
         name="PlanDetail"
         component={PlanDetailScreen}
+      />
+      <Stack.Screen
+        name="Notifications"
+        component={NotificationsScreen}
       />
 
     </Stack.Navigator>

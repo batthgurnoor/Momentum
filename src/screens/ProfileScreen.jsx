@@ -200,12 +200,20 @@ export default function ProfileScreen() {
             {/* Edit/Save Button */}
             <View className="mt-4">
               {!editing ? (
-                <TouchableOpacity
-                  onPress={() => setEditing(true)}
-                  className="bg-indigo-500 py-2 px-4 rounded-full self-end"
-                >
-                  <Text className="text-white font-semibold">Edit Profile</Text>
-                </TouchableOpacity>
+                <View className="flex-row justify-between">
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate('Notifications')}
+                    className="bg-blue-500 py-2 px-4 rounded-full"
+                  >
+                    <Text className="text-white font-semibold">Notifications</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => setEditing(true)}
+                    className="bg-indigo-500 py-2 px-4 rounded-full"
+                  >
+                    <Text className="text-white font-semibold">Edit Profile</Text>
+                  </TouchableOpacity>
+                </View>
               ) : (
                 <TouchableOpacity
                   onPress={handleSave}
