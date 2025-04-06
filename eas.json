@@ -22,6 +22,9 @@
     }
   },
   "submit": {
-    "production": {}
+    "production": {"android": {
+        "serviceAccountKeyPath": "../../Google auth Key/momentum-456019-055b85a6bf64.json",
+        "track": "internal"}
+      }
   }
 }

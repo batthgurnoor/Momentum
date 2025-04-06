@@ -24,6 +24,7 @@ import PlanSetupScreen from '../../src/screens/PlanSetupScreen';
 import PlanDetailScreen from '../../src/screens/PlanDetailScreen';
 import NotificationsScreen from '../../src/screens/NotificationsScreen';
 import { registerForPushNotificationsAsync } from '../../src/notifications';
+import '../../Firebase/config'; // Import firebase to ensure it's initialized
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
