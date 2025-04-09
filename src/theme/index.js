@@ -6,5 +6,6 @@
 export * from './colors';
 export * from './typography';
 export * from './spacing';
+export * from './styles';
 
 // Additional theme-related exports can be added here in the future 

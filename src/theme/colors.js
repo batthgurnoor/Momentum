@@ -4,53 +4,35 @@
  */
 
 export const COLORS = {
-  // Primary brand colors
+  // Primary colors typically represent the main branding
   primary: {
-    default: '#6366F1', // Indigo - main brand color
-    light: '#A5B4FC',   // Light indigo - secondary elements
-    dark: '#4338CA',    // Deep indigo - accents
+    default: '#3498db',     // Main primary color (e.g., used for buttons, highlights)
+    light: '#5dade2',       // A lighter version of the primary color for backgrounds, overlays, etc.
   },
-  
-  // Secondary colors for highlights and accents
+  // Secondary colors complement the primary colors and add variety
   secondary: {
-    default: '#EC4899', // Pink - highlights
-    light: '#F9A8D4',   // Light pink
+    default: '#e74c3c',     // Main secondary color, can be used for accent elements
+    light: '#ec7063',       // Lighter shade of secondary
   },
-  
-  // Accent colors
-  accent: {
-    teal: '#14B8A6',
-    amber: '#F59E0B',
-    emerald: '#10B981',
-    purple: '#8B5CF6',
-  },
-  
-  // UI colors for interface elements
-  ui: {
-    background: '#0F172A',    // Dark slate background
-    card: '#1E293B',          // Slate card background
-    surface: '#334155',       // Surface elements
-    border: '#475569',        // Border colors
-    success: '#34D399',       // Success state
-    warning: '#FBBF24',       // Warning state
-    error: '#F43F5E',         // Error state
-  },
-  
-  // Text color variations
+  // Text colors for different elements
   text: {
-    primary: '#F8FAFC',     // Primary text - almost white
-    secondary: '#CBD5E1',   // Secondary text - light slate
-    tertiary: '#94A3B8',    // Tertiary text - slate
+    primary: '#2c3e50',     // Default text color, often a dark hue
+    secondary: '#7f8c8d',   // Less prominent text
+    tertiary: '#bdc3c7',    // For disabled or less emphasized text
+    onPrimary: '#ffffff',   // Text displayed on top of primary-colored backgrounds
   },
-  
-  // Gradient presets
+  // Gradient definitions for backgrounds or decorative elements
   gradient: {
-    primary: ['#6366F1', '#4338CA', '#EC4899'],
-    secondary: ['#14B8A6', '#10B981', '#8B5CF6'],
-    workout: ['rgba(15,23,42,0.9)', 'rgba(15,23,42,0.4)', 'transparent'],
-    dark: ['#0F172A', '#1E293B'],
-    glass: ['rgba(30,41,59,0.9)', 'rgba(30,41,59,0.8)'],
-  }
+    dark: ['#141e30', '#243b55'],  // Example gradient from a dark blue to a slightly lighter tone
+    primary: ['#3498db', '#5dade2'], // Primary color gradient
+    secondary: ['#e74c3c', '#ec7063'], // Secondary color gradient
+    glass: ['rgba(255, 255, 255, 0.1)', 'rgba(255, 255, 255, 0.05)'], // Glass effect gradient
+  },
+  // UI colors for alerts, errors, etc.
+  ui: {
+    error: '#ff4d4d',       // Red tone typically used for error messages or alerts
+    surface: 'rgba(255, 255, 255, 0.05)', // Surface color for cards and inputs
+  },
 };
 
 // Linear gradient combinations
@@ -66,7 +48,7 @@ export const GRADIENTS = {
     end: { x: 1, y: 1 },
   },
   workout: {
-    colors: COLORS.gradient.workout,
+    colors: COLORS.gradient.primary, // Using primary as fallback
     start: { x: 0, y: 0 },
     end: { x: 0, y: 1 },
   },
