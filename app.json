@@ -21,7 +21,8 @@
         "foregroundImage": "./assets/images/momentum.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.batth.gurnoor.momentum"
+      "package": "com.batth.gurnoor.momentum",
+      "softwareKeyboardLayoutMode": "resize"
     },
     "web": {
       "bundler": "metro",
@@ -40,9 +41,9 @@
         "origin": false
       },
       "eas": {
-        "projectId": "4b9794bb-8933-4cd1-978d-29bc501d9cb5"
+        "projectId": "b9262794-5a60-4c95-aeee-72c140bb5ab5"
       }
     },
-    "owner": "batth.gurnoor"
+    "owner": "learningsingh2003"
   }
 }

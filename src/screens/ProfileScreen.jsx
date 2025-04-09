@@ -269,9 +269,18 @@ export default function ProfileScreen() {
 
         {/* Activity History Section */}<View className='relative h-[55%]'> 
         <View className="mt-4 mx-4 mb-6 fixed">
-          <Text className="text-xl font-bold mb-2 text-gray-800 text-center">
-            Activity History
-          </Text></View>
+          <View className="flex-row justify-between items-center">
+            <Text className="text-xl font-bold text-gray-800">
+              Activity History
+            </Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('ActivityMonitoring')}
+              className="bg-indigo-500 py-1 px-3 rounded-full"
+            >
+              <Text className="text-white font-semibold">View All</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
           {loadingActivities ? (
             <ActivityIndicator size="large" color="gray" />
           ) : activities.length === 0 ? (

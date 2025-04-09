@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, KeyboardAvoidingView, Platform, ScrollView, Image } from 'react-native';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../../Firebase/config'; 
 import { useNavigation } from '@react-navigation/native';
+import { authStyles } from '../theme/authStyles';
+import { Ionicons } from '@expo/vector-icons';
+import { COLORS } from '../theme/colors';
 
 export default function ProfileSetupScreen() {
   const navigation = useNavigation();
@@ -66,62 +69,108 @@ export default function ProfileSetupScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#f0f0f0', padding: 24, justifyContent: 'center' }}>
-      <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 16, textAlign: 'center' }}>
-        Complete Your Profile
-      </Text>
+    <View style={authStyles.container}>
+      <View style={authStyles.backgroundDecoration}>
+        <View style={authStyles.circle1} />
+        <View style={authStyles.circle2} />
+      </View>
 
-      {/* Email (read-only) */}
-      <TextInput
-        value={email}
-        editable={false}
-        style={{ backgroundColor: '#e0e0e0', padding: 12, borderRadius: 8, marginBottom: 12 }}
-      />
-
-      <TextInput
-        placeholder="First Name"
-        value={firstName}
-        onChangeText={setFirstName}
-        style={{ backgroundColor: 'white', padding: 12, borderRadius: 8, marginBottom: 12 }}
-      />
-
-      <TextInput
-        placeholder="Last Name"
-        value={lastName}
-        onChangeText={setLastName}
-        style={{ backgroundColor: 'white', padding: 12, borderRadius: 8, marginBottom: 12 }}
-      />
-
-      <TextInput
-        placeholder="Phone Number"
-        value={phone}
-        onChangeText={setPhone}
-        keyboardType="phone-pad"
-        style={{ backgroundColor: 'white', padding: 12, borderRadius: 8, marginBottom: 12 }}
-      />
-
-      <TextInput
-        placeholder="Height (e.g. 170 in cm)"
-        value={height}
-        onChangeText={setHeight}
-        keyboardType="numeric"
-        style={{ backgroundColor: 'white', padding: 12, borderRadius: 8, marginBottom: 12 }}
-      />
-
-      <TextInput
-        placeholder="Weight (e.g. 65 in kg)"
-        value={weight}
-        onChangeText={setWeight}
-        keyboardType="numeric"
-        style={{ backgroundColor: 'white', padding: 12, borderRadius: 8, marginBottom: 12 }}
-      />
-
-      <TouchableOpacity
-        onPress={saveProfile}
-        style={{ backgroundColor: 'blue', padding: 16, borderRadius: 8, marginTop: 16 }}
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={authStyles.keyboardView}
       >
-        <Text style={{ color: 'white', fontWeight: '600', textAlign: 'center' }}>Save Profile</Text>
-      </TouchableOpacity>
+        <ScrollView contentContainerStyle={authStyles.scrollContent}>
+          <View style={authStyles.logoContainer}>
+            <View style={authStyles.logoBackground}>
+              <Image 
+                source={require('../../assets/images/momentum.png')} 
+                style={{ width: 50, height: 50, resizeMode: 'contain' }}
+              />
+            </View>
+            <Text style={authStyles.appName}>Momentum</Text>
+            <Text style={authStyles.tagline}>Complete your profile to get started</Text>
+          </View>
+
+          <View style={authStyles.formCard}>
+            <Text style={authStyles.formLabel}>Complete Your Profile</Text>
+            
+            {/* Email (read-only) */}
+            <View style={authStyles.inputContainer}>
+              <Ionicons name="mail-outline" size={20} color={COLORS.primary.light} style={authStyles.inputIcon} />
+              <TextInput
+                value={email}
+                editable={false}
+                style={[authStyles.input, { color: COLORS.text.secondary }]}
+              />
+            </View>
+
+            <View style={authStyles.inputContainer}>
+              <Ionicons name="person-outline" size={20} color={COLORS.primary.light} style={authStyles.inputIcon} />
+              <TextInput
+                placeholder="First Name"
+                placeholderTextColor={COLORS.text.tertiary}
+                value={firstName}
+                onChangeText={setFirstName}
+                style={authStyles.input}
+              />
+            </View>
+
+            <View style={authStyles.inputContainer}>
+              <Ionicons name="person-outline" size={20} color={COLORS.primary.light} style={authStyles.inputIcon} />
+              <TextInput
+                placeholder="Last Name"
+                placeholderTextColor={COLORS.text.tertiary}
+                value={lastName}
+                onChangeText={setLastName}
+                style={authStyles.input}
+              />
+            </View>
+
+            <View style={authStyles.inputContainer}>
+              <Ionicons name="call-outline" size={20} color={COLORS.primary.light} style={authStyles.inputIcon} />
+              <TextInput
+                placeholder="Phone Number"
+                placeholderTextColor={COLORS.text.tertiary}
+                value={phone}
+                onChangeText={setPhone}
+                keyboardType="phone-pad"
+                style={authStyles.input}
+              />
+            </View>
+
+            <View style={authStyles.inputContainer}>
+              <Ionicons name="resize-outline" size={20} color={COLORS.primary.light} style={authStyles.inputIcon} />
+              <TextInput
+                placeholder="Height (e.g. 170 in cm)"
+                placeholderTextColor={COLORS.text.tertiary}
+                value={height}
+                onChangeText={setHeight}
+                keyboardType="numeric"
+                style={authStyles.input}
+              />
+            </View>
+
+            <View style={authStyles.inputContainer}>
+              <Ionicons name="scale-outline" size={20} color={COLORS.primary.light} style={authStyles.inputIcon} />
+              <TextInput
+                placeholder="Weight (e.g. 65 in kg)"
+                placeholderTextColor={COLORS.text.tertiary}
+                value={weight}
+                onChangeText={setWeight}
+                keyboardType="numeric"
+                style={authStyles.input}
+              />
+            </View>
+
+            <TouchableOpacity
+              onPress={saveProfile}
+              style={[authStyles.signupButton, { backgroundColor: '#4CAF50' }]}
+            >
+              <Text style={{ color: COLORS.text.onPrimary, textAlign: 'center', fontWeight: '600' }}>Save Profile</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 }

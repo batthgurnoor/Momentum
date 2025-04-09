@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, FlatList, Alert, StyleSheet, TextInput } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { auth, db } from '../../Firebase/config';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function GoalDetailScreen() {
@@ -47,10 +47,33 @@ export default function GoalDetailScreen() {
     }
   };
 
+  const deleteGoal = () => {
+    Alert.alert(
+      "Delete Goal",
+      "Are you sure you want to delete this goal? This action cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        { 
+          text: "Delete", 
+          style: "destructive",
+          onPress: async () => {
+            if (!user) return;
+            try {
+              const docRef = doc(db, 'users', user.uid, 'goals', goal.id);
+              await deleteDoc(docRef);
+              Alert.alert("Success", "Goal deleted successfully");
+              navigation.goBack();
+            } catch (error) {
+              Alert.alert("Error", "Failed to delete goal: " + error.message);
+            }
+          }
+        }
+      ]
+    );
+  };
+
   const remaining = goal.targetValue - goal.currentProgress;
   const progressPercentage = ((goal.currentProgress / goal.targetValue) * 100).toFixed(1);
-
-
 
   const exercises = goalData.exercises || [];
   return (
@@ -80,14 +103,25 @@ export default function GoalDetailScreen() {
 
       
       </View>
-      <TouchableOpacity
-        onPress={updateProgress}
-        style={{ backgroundColor:'green', padding:12, borderRadius:8 }}
-      >
-        <Text style={{ color:'white', textAlign:'center', fontWeight:'bold' }}>
-          Update Weekly Progress
-        </Text>
-      </TouchableOpacity>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          onPress={updateProgress}
+          style={styles.updateButton}
+        >
+          <Text style={styles.buttonText}>
+            Update Weekly Progress
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={deleteGoal}
+          style={styles.deleteButton}
+        >
+          <Text style={styles.buttonText}>
+            Delete Goal
+          </Text>
+        </TouchableOpacity>
+      </View>
     </LinearGradient>
   );
 }
@@ -155,5 +189,30 @@ const styles = StyleSheet.create({
   removeButtonText: {
     color: '#fff',
     fontWeight: '600'
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    marginBottom: 20
+  },
+  updateButton: {
+    backgroundColor: 'green',
+    padding: 12,
+    borderRadius: 8,
+    flex: 1,
+    marginRight: 8
+  },
+  deleteButton: {
+    backgroundColor: 'red',
+    padding: 12,
+    borderRadius: 8,
+    flex: 1,
+    marginLeft: 8
+  },
+  buttonText: {
+    color: 'white',
+    textAlign: 'center',
+    fontWeight: 'bold'
   }
 });

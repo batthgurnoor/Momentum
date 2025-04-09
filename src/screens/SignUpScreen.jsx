@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, KeyboardAvoidingView, Platform, ScrollView, Image } from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../Firebase/config';
 import { useNavigation } from '@react-navigation/native';
+import { authStyles } from '../theme/authStyles';
+import { Ionicons } from '@expo/vector-icons';
+import { COLORS } from '../theme/colors';
 
 export default function SignupScreen() {
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSignup = async () => {
     if (!email || !password) {
@@ -24,36 +28,86 @@ export default function SignupScreen() {
   };
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', padding: 24, backgroundColor: '#f4f4f4' }}>
-      <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 24, textAlign: 'center' }}>
-        Create an Account
-      </Text>
+    <View style={authStyles.container}>
+      <View style={authStyles.backgroundDecoration}>
+        <View style={authStyles.circle1} />
+        <View style={authStyles.circle2} />
+      </View>
 
-      <TextInput
-        placeholder="Email"
-        autoCapitalize="none"
-        onChangeText={setEmail}
-        value={email}
-        style={{ backgroundColor: 'white', padding: 12, borderRadius: 8, marginBottom: 12 }}
-      />
-      <TextInput
-        placeholder="Password"
-        secureTextEntry
-        onChangeText={setPassword}
-        value={password}
-        style={{ backgroundColor: 'white', padding: 12, borderRadius: 8, marginBottom: 12 }}
-      />
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={authStyles.keyboardView}
+      >
+        <ScrollView contentContainerStyle={authStyles.scrollContent}>
+          <View style={authStyles.logoContainer}>
+            <View style={authStyles.logoBackground}>
+              <Image 
+                source={require('../../assets/images/momentum.png')} 
+                style={{ width: 50, height: 50, resizeMode: 'contain' }}
+              />
+            </View>
+            <Text style={authStyles.appName}>Momentum</Text>
+            <Text style={authStyles.tagline}>Your journey to better health starts here</Text>
+          </View>
 
-      <TouchableOpacity onPress={handleSignup} style={{ backgroundColor: 'green', padding: 16, borderRadius: 8 }}>
-        <Text style={{ color: 'white', textAlign: 'center', fontWeight: '600' }}>Sign Up</Text>
-      </TouchableOpacity>
+          <View style={authStyles.formCard}>
+            <Text style={authStyles.formLabel}>Create Account</Text>
+            
+            <View style={authStyles.inputContainer}>
+              <Ionicons name="mail-outline" size={20} color={COLORS.primary.light} style={authStyles.inputIcon} />
+              <TextInput
+                placeholder="Email"
+                placeholderTextColor={COLORS.text.tertiary}
+                autoCapitalize="none"
+                onChangeText={setEmail}
+                value={email}
+                style={authStyles.input}
+              />
+            </View>
 
-      <TouchableOpacity onPress={() => navigation.navigate('Login')} style={{ marginTop: 16 }}>
-        <Text style={{ textAlign: 'center' }}>
-          Already have an account? 
-          <Text style={{ color: 'blue' }}> Log In</Text>
-        </Text>
-      </TouchableOpacity>
+            <View style={authStyles.inputContainer}>
+              <Ionicons name="lock-closed-outline" size={20} color={COLORS.primary.light} style={authStyles.inputIcon} />
+              <TextInput
+                placeholder="Password"
+                placeholderTextColor={COLORS.text.tertiary}
+                secureTextEntry={!showPassword}
+                onChangeText={setPassword}
+                value={password}
+                style={[authStyles.input, authStyles.passwordInput]}
+              />
+              <TouchableOpacity 
+                onPress={() => setShowPassword(!showPassword)}
+                style={authStyles.eyeIcon}
+              >
+                <Ionicons 
+                  name={showPassword ? "eye-off-outline" : "eye-outline"} 
+                  size={20} 
+                  color={COLORS.primary.light} 
+                />
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity 
+              onPress={handleSignup} 
+              style={[authStyles.signupButton, { backgroundColor: '#4CAF50' }]}
+            >
+              <Text style={{ color: COLORS.text.onPrimary, textAlign: 'center', fontWeight: '600' }}>Sign Up</Text>
+            </TouchableOpacity>
+
+            <View style={authStyles.loginLink}>
+              <Text style={authStyles.loginText}>
+                Already have an account?{' '}
+                <Text 
+                  style={authStyles.loginHighlight}
+                  onPress={() => navigation.navigate('Login')}
+                >
+                  Log In
+                </Text>
+              </Text>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 }

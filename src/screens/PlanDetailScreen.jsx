@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, FlatList, Alert, StyleSheet } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { auth, db } from '../../Firebase/config'; // Adjust path
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function PlanDetailScreen() {
@@ -25,6 +25,31 @@ export default function PlanDetailScreen() {
     } catch (error) {
       Alert.alert('Error', error.message);
     }
+  };
+
+  const deletePlan = () => {
+    Alert.alert(
+      "Delete Workout Plan",
+      "Are you sure you want to delete this workout plan? This action cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        { 
+          text: "Delete", 
+          style: "destructive",
+          onPress: async () => {
+            if (!user) return;
+            try {
+              const planRef = doc(db, 'users', user.uid, 'workoutPlans', planData.id);
+              await deleteDoc(planRef);
+              Alert.alert("Success", "Workout plan deleted successfully");
+              navigation.goBack();
+            } catch (error) {
+              Alert.alert("Error", "Failed to delete plan: " + error.message);
+            }
+          }
+        }
+      ]
+    );
   };
 
   const exercises = planData.exercises || [];
@@ -62,6 +87,13 @@ export default function PlanDetailScreen() {
             />
           )}
         </View>
+        
+        <TouchableOpacity
+          onPress={deletePlan}
+          style={styles.deleteButton}
+        >
+          <Text style={styles.deleteButtonText}>Delete Plan</Text>
+        </TouchableOpacity>
       </View>
     </LinearGradient>
   );
@@ -126,5 +158,17 @@ const styles = StyleSheet.create({
   removeButtonText: {
     color: '#fff',
     fontWeight: '600',
+  },
+  deleteButton: {
+    backgroundColor: 'red',
+    padding: 12,
+    borderRadius: 8,
+    marginVertical: 16,
+  },
+  deleteButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    fontSize: 16,
   },
 });
