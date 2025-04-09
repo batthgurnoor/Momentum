@@ -1,46 +1,38 @@
-import { COLORS } from './colors';
+import { StyleSheet } from 'react-native';
+import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from './index';
 
-export const styles = {
+export const commonStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.text.primary,
+  },
   input: {
     backgroundColor: 'white',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 12,
+    padding: SPACING.md,
+    borderRadius: BORDER_RADIUS.md,
+    marginBottom: SPACING.md,
     color: COLORS.text.primary,
-  },
-  passwordInput: {
-    marginBottom: 16,
   },
   button: {
     backgroundColor: COLORS.primary.default,
-    padding: 16,
-    borderRadius: 8,
-    marginTop: 8,
+    padding: SPACING.md,
+    borderRadius: BORDER_RADIUS.md,
+    marginTop: SPACING.sm,
+    ...SHADOWS.small,
   },
   buttonText: {
-    color: 'white',
+    color: COLORS.text.onPrimary,
     textAlign: 'center',
     fontWeight: '600',
-  },
-  linkText: {
-    textAlign: 'center',
-    marginTop: 16,
-    color: COLORS.text.secondary,
-  },
-  linkTextHighlight: {
-    color: COLORS.primary.default,
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 24,
-    backgroundColor: COLORS.gradient.dark[0],
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 24,
+    marginBottom: SPACING.xl,
     textAlign: 'center',
     color: COLORS.text.primary,
   },
-}; 
+});
+
+// Export individual styles for backward compatibility
+export const styles = commonStyles; 

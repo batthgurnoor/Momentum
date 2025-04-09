@@ -1,17 +1,11 @@
 import { StyleSheet, Dimensions } from 'react-native';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from './index';
+import { commonStyles } from './styles';
 
 const { width } = Dimensions.get('window');
 
-export const authStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.text.primary,
-  },
-  backgroundDecoration: {
-    ...StyleSheet.absoluteFillObject,
-    overflow: 'hidden',
-  },
+// Memoize background decorations to prevent recalculation
+const backgroundDecorations = {
   circle1: {
     position: 'absolute',
     width: width * 0.8,
@@ -30,6 +24,15 @@ export const authStyles = StyleSheet.create({
     bottom: -width * 0.3,
     left: -width * 0.3,
   },
+};
+
+export const authStyles = StyleSheet.create({
+  ...commonStyles,
+  backgroundDecoration: {
+    ...StyleSheet.absoluteFillObject,
+    overflow: 'hidden',
+  },
+  ...backgroundDecorations,
   keyboardView: {
     flex: 1,
   },

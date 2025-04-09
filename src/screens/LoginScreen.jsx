@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, KeyboardAvoidingView, Platform, ScrollView, Image } from 'react-native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../Firebase/config';
@@ -7,6 +7,44 @@ import { authStyles } from '../theme/authStyles';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../theme/colors';
 
+// Memoized components for better performance
+const LogoSection = memo(() => (
+  <View style={authStyles.logoContainer}>
+    <View style={authStyles.logoBackground}>
+      <Image 
+        source={require('../../assets/images/momentum.png')} 
+        style={{ width: 50, height: 50, resizeMode: 'contain' }}
+      />
+    </View>
+    <Text style={authStyles.appName}>Momentum</Text>
+    <Text style={authStyles.tagline}>Your journey to better health starts here</Text>
+  </View>
+));
+
+const PasswordInput = memo(({ password, setPassword, showPassword, setShowPassword }) => (
+  <View style={authStyles.inputContainer}>
+    <Ionicons name="lock-closed-outline" size={20} color={COLORS.primary.light} style={authStyles.inputIcon} />
+    <TextInput
+      placeholder="Password"
+      placeholderTextColor={COLORS.text.tertiary}
+      secureTextEntry={!showPassword}
+      onChangeText={setPassword}
+      value={password}
+      style={[authStyles.input, authStyles.passwordInput]}
+    />
+    <TouchableOpacity 
+      onPress={() => setShowPassword(!showPassword)}
+      style={authStyles.eyeIcon}
+    >
+      <Ionicons 
+        name={showPassword ? "eye-off-outline" : "eye-outline"} 
+        size={20} 
+        color={COLORS.primary.light} 
+      />
+    </TouchableOpacity>
+  </View>
+));
+
 export default function LoginScreen() {
   const navigation = useNavigation();
   
@@ -14,8 +52,8 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  // Log in with Firebase
-  const handleLogin = async () => {
+  // Memoized login handler
+  const handleLogin = useCallback(async () => {
     if (!email || !password) {
       Alert.alert('Error', 'Please enter your email and password.');
       return;
@@ -23,12 +61,11 @@ export default function LoginScreen() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      // If successful, user is now signed in; redirect to main app
       navigation.replace('TabNav'); 
     } catch (error) {
       Alert.alert('Login Error', error.message);
     }
-  };
+  }, [email, password, navigation]);
 
   return (
     <View style={authStyles.container}>
@@ -42,16 +79,7 @@ export default function LoginScreen() {
         style={authStyles.keyboardView}
       >
         <ScrollView contentContainerStyle={authStyles.scrollContent}>
-          <View style={authStyles.logoContainer}>
-            <View style={authStyles.logoBackground}>
-              <Image 
-                source={require('../../assets/images/momentum.png')} 
-                style={{ width: 50, height: 50, resizeMode: 'contain' }}
-              />
-            </View>
-            <Text style={authStyles.appName}>Momentum</Text>
-            <Text style={authStyles.tagline}>Your journey to better health starts here</Text>
-          </View>
+          <LogoSection />
 
           <View style={authStyles.formCard}>
             <Text style={authStyles.formLabel}>Welcome Back</Text>
@@ -68,27 +96,12 @@ export default function LoginScreen() {
               />
             </View>
 
-            <View style={authStyles.inputContainer}>
-              <Ionicons name="lock-closed-outline" size={20} color={COLORS.primary.light} style={authStyles.inputIcon} />
-              <TextInput
-                placeholder="Password"
-                placeholderTextColor={COLORS.text.tertiary}
-                secureTextEntry={!showPassword}
-                onChangeText={setPassword}
-                value={password}
-                style={[authStyles.input, authStyles.passwordInput]}
-              />
-              <TouchableOpacity 
-                onPress={() => setShowPassword(!showPassword)}
-                style={authStyles.eyeIcon}
-              >
-                <Ionicons 
-                  name={showPassword ? "eye-off-outline" : "eye-outline"} 
-                  size={20} 
-                  color={COLORS.primary.light} 
-                />
-              </TouchableOpacity>
-            </View>
+            <PasswordInput 
+              password={password}
+              setPassword={setPassword}
+              showPassword={showPassword}
+              setShowPassword={setShowPassword}
+            />
 
             <TouchableOpacity 
               onPress={handleLogin} 
