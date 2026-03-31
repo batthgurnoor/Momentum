@@ -2,7 +2,7 @@
 import { View, Text, ActivityIndicator, ScrollView, TouchableOpacity, Image } from 'react-native'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useRoute } from '@react-navigation/native';
-import {ref, getDownloadURL, listAll} from '@firebase/storage';  
+import {ref, listAll} from '@firebase/storage';  
 import {storage} from '../../Firebase/config';
 import { Audio } from 'expo-av';
 import BackButton from '../components/BackButton';
@@ -11,12 +11,65 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import { COLORS } from '../theme/colors';
 import { FlashList } from '@shopify/flash-list';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getCachedDownloadUrl } from '../utils/storageUrlCache';
 
 
 
 
 
 const  countDownAudio = require('../../assets/audio/countdownaudio.mp3');
+
+function ExerciseThumb({ intensity, fileName, cachedUrl, onResolved }) {
+  const [uri, setUri] = useState(cachedUrl || null);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (cachedUrl) {
+      setUri(cachedUrl);
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    (async () => {
+      try {
+        const path = `${intensity}Exercises/${fileName}`;
+        const url = await getCachedDownloadUrl(path);
+        if (cancelled) return;
+        setUri(url);
+        if (typeof onResolved === 'function') onResolved(url);
+      } catch {
+        // ignore
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [cachedUrl, fileName, intensity, onResolved]);
+
+  return (
+    <View
+      style={{
+        width: 72,
+        height: 72,
+        borderRadius: 12,
+        overflow: 'hidden',
+        backgroundColor: 'rgba(255,255,255,0.04)',
+        borderWidth: 1,
+        borderColor: COLORS.app.cardBorder,
+      }}
+    >
+      {uri ? (
+        <Image source={{ uri }} style={{ width: 72, height: 72 }} />
+      ) : (
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <ActivityIndicator size="small" color={COLORS.app.accent} />
+        </View>
+      )}
+    </View>
+  );
+}
 
 
 const CategoryExerciseScreen = () => {
@@ -31,7 +84,6 @@ const CategoryExerciseScreen = () => {
       const [isAudioPlaying, setIsAudioPlaying] = useState(false);
       const [isFirstTime, setIsFirstTime] = useState(true);
       const [countDownSound, setCountDownSound] = useState();
-      const [exercises, setExercises] = useState([]);
       const [categoryExercises, setCategoryExercises] = useState([]);
       const [exerciseIndex, setExerciseIndex] = useState(0);  
       const [view, setView] = useState('list'); // 'list' | 'detail'
@@ -52,59 +104,49 @@ const CategoryExerciseScreen = () => {
 
 
   const fetchExercisesByIntensity = async (intensity) => {
-
     const folderPath = `${intensity}Exercises`;
     const storageRef = ref(storage, folderPath);
     try {
-      const matchingExercises = []
-      listAll(storageRef).then((res) => {
-        res.items.forEach((item) => {
-          const fileName = item.name.split('/').pop();
-          const matchingExercise= ExerciseData.find((exercise) => 
-            exercise.gif_url === fileName);
-          if(matchingExercise){
-            matchingExercises.push(matchingExercise);
-          }
-        })
-        setExercises(matchingExercises);
-      })
-    } catch (error) {      
-    }    
+      const res = await listAll(storageRef);
+      const items = [];
+      res.items.forEach((it) => {
+        const fileName = it.name.split('/').pop();
+        const matchingExercise = ExerciseData.find((exercise) => exercise.gif_url === fileName);
+        if (matchingExercise) {
+          // keep original gif_url (filename) and attach cached URL slot
+          items.push({ ...matchingExercise, gifDownloadUrl: null });
+        }
+      });
+      setCategoryExercises(items);
+    } catch (error) {
+      console.log('Error listing intensity exercises:', error);
+      setCategoryExercises([]);
+    }
   }
 
   useEffect(() => {
     fetchExercisesByIntensity(intensity);
-  },[]);
+  }, []);
 
- const fetchGifUrl = async (exercise) => {
-     try {
-       const storageRef = ref(storage, `${intensity}Exercises/${exercise.gif_url}`);
-       const url = await getDownloadURL(storageRef);
-       return url;
-     }
-   catch (error) {
-    console.log("error =", error);
-    return null
-    
-   }
-   }
+  const ensureExerciseUrl = async (index) => {
+    const ex = categoryExercises[index];
+    if (!ex) return null;
+    if (ex.gifDownloadUrl) return ex.gifDownloadUrl;
 
-   useEffect(() => {
-    const fetchGifUrlsForExercises = async () => {
-      const exerciseWithGifUrl = await Promise.all(
-        exercises.map(async (exercise) => {
-          const gifUrl = await fetchGifUrl(exercise)
-          return{
-            ...exercise,
-            gif_url: gifUrl
-          }
-        }
-      ));
-      setCategoryExercises(exerciseWithGifUrl)
-      
+    try {
+      const path = `${intensity}Exercises/${ex.gif_url}`; // gif_url is filename in ExerciseData
+      const url = await getCachedDownloadUrl(path);
+      setCategoryExercises((prev) => {
+        const next = [...prev];
+        if (next[index]) next[index] = { ...next[index], gifDownloadUrl: url };
+        return next;
+      });
+      return url;
+    } catch (e) {
+      console.log('Error fetching cached download URL:', e);
+      return null;
     }
-    fetchGifUrlsForExercises();
-   },[exercises])
+  };
 
     const handleDecreaseTime =() => {
         if(!isRunning && time > minTime){
@@ -179,12 +221,13 @@ const CategoryExerciseScreen = () => {
         }
       }
 
-  const openDetail = (index) => {
+  const openDetail = async (index) => {
     setExerciseIndex(index);
     setView('detail');
     setIsRunning(false);
     setIsFirstTime(true);
     setTime(initialTime);
+    await ensureExerciseUrl(index);
   };
 
   const backToList = () => {
@@ -246,9 +289,20 @@ const CategoryExerciseScreen = () => {
                   marginBottom: 10,
                 }}
               >
-                <Image
-                  source={{ uri: item.gif_url }}
-                  style={{ width: 72, height: 72, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.04)' }}
+                <ExerciseThumb
+                  intensity={intensity}
+                  fileName={item.gif_url}
+                  cachedUrl={item.gifDownloadUrl}
+                  onResolved={(url) => {
+                    if (!url) return;
+                    setCategoryExercises((prev) => {
+                      const next = [...prev];
+                      if (next[index] && !next[index].gifDownloadUrl) {
+                        next[index] = { ...next[index], gifDownloadUrl: url };
+                      }
+                      return next;
+                    });
+                  }}
                 />
                 <View style={{ flex: 1, justifyContent: 'center' }}>
                   <Text style={{ color: COLORS.text.primary, fontSize: 16, fontWeight: '800' }} numberOfLines={1}>
@@ -270,7 +324,10 @@ const CategoryExerciseScreen = () => {
         <>
           {currentExercise ? (
             <>
-              <Image source={{ uri: currentExercise.gif_url }} className="w-full h-80" />
+              <Image
+                source={{ uri: currentExercise.gifDownloadUrl || currentExercise.gif_url }}
+                className="w-full h-80"
+              />
 
               <SafeAreaView
                 edges={['top']}
