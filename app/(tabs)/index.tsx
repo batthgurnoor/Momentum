@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import WorkoutScreen from "../../src/screens/WorkoutScreen";
@@ -25,10 +25,59 @@ import PlanDetailScreen from '../../src/screens/PlanDetailScreen';
 import NotificationsScreen from '../../src/screens/NotificationsScreen';
 import { registerForPushNotificationsAsync } from '../../src/notifications';
 import '../../Firebase/config'; // Import firebase to ensure it's initialized
+import { COLORS } from '../../src/theme/colors';
+import ErrorBoundary from '../../src/components/ErrorBoundary';
+
+const APP = COLORS.app;
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
+function TabNavigator() {
+  const screenOptions = useCallback(
+    ({ route }) => ({
+      tabBarHideOnKeyboard: true,
+      tabBarIcon: ({ color, size }) => {
+        switch (route.name) {
+          case 'Workout':
+            return <FontAwesome6 name="dumbbell" size={size} color={color} />;
+          case 'LogWorkout':
+            return <AntDesign name="book" size={size} color={color} />;
+          case 'Calculation':
+            return <Ionicons name="calculator-outline" size={size} color={color} />;
+          case 'Profile':
+            return <AntDesign name="user" size={size} color={color} />;
+          case 'Goals':
+            return <AntDesign name="checkcircleo" size={size} color={color} />;
+          default:
+            return null;
+        }
+      },
+      tabBarShowLabel: false,
+      headerShown: false,
+      tabBarStyle: {
+        backgroundColor: APP.bgMid,
+        paddingVertical: 6,
+        paddingTop: 6,
+        borderTopWidth: 1,
+        borderTopColor: APP.cardBorder,
+      },
+      tabBarActiveTintColor: APP.accent,
+      tabBarInactiveTintColor: APP.textDim,
+    }),
+    []
+  );
+
+  return (
+    <Tab.Navigator screenOptions={screenOptions}>
+      <Tab.Screen name="Workout" component={WorkoutScreen} />
+      <Tab.Screen name="LogWorkout" component={LogWorkoutScreen} />
+      <Tab.Screen name="Goals" component={GoalListScreen} />
+      <Tab.Screen name="Calculation" component={CalculationScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
+    </Tab.Navigator>
+  );
+}
 
 export default function App() {
   // Set up notifications when app loads
@@ -60,85 +109,25 @@ export default function App() {
       Notifications.removeNotificationSubscription(responseListener);
     };
   }, []);
-
-   function TabNavigator(){
-    return(
-      <Tab.Navigator
-      screenOptions={({route})=>({
-        tabBarHideOnKeyboard:true,
-        tabBarIcon:({color,size})=>{
-          let iconName;
-          switch(route.name){
-            case "Workout":
-              iconName="dumbbell";
-              return(<FontAwesome6 name={iconName} size={size} color={color} />);
-              case "LogWorkout":
-              iconName="timer-outline";
-              return(<AntDesign name="book" size={size} color={color} />);
-              case "Calculation":
-              iconName="calculator-outline";
-              return(<Ionicons name="calculator-outline" size={size} color={color} />);
-              case "Profile":
-              iconName="user";
-              return(<AntDesign name="user" size={size} color={color} />);
-              case "Goals":
-              iconName="checkcircleo";
-              return(<AntDesign name="checkcircleo" size={size} color={color}  />);
-          }
-        },
-        tabBarShowLabel:false,
-        headerShown:false,
-        tabBarStyle:{
-          backgroundColor:"black",
-          paddingVertical:5,
-          paddingTop:5,
-        },
-        tabBarActiveTintColor:"aqua",
-        tabBarInactiveTintColor:"gray"
-
-        })}>
-        <Tab.Screen name="Workout" component={WorkoutScreen}></Tab.Screen>
-        <Tab.Screen name="LogWorkout" component={LogWorkoutScreen} />
-        <Tab.Screen name="Goals" component={GoalListScreen} />
-        <Tab.Screen name="Calculation" component={CalculationScreen}></Tab.Screen>
-        <Tab.Screen name="Profile" component={ProfileScreen} />
-      </Tab.Navigator>
-    )
-  }
   return (
-
-    <Stack.Navigator screenOptions={{headerShown:false}}>
-      <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="Signup" component={SignupScreen} />
-      <Stack.Screen name='TabNav' component={TabNavigator}></Stack.Screen>
-      <Stack.Screen name='Exercise' component={ExerciseScreen}></Stack.Screen>
-      <Stack.Screen name='CategoryExercise' component={CategoryExerciseScreen}></Stack.Screen>
-      <Stack.Screen name='WorkoutOTDScreen' component={WorkoutOTDScreen}></Stack.Screen>
-      <Stack.Screen name="ActivityMonitoring" component={ActivityMonitoringScreen} />
-      <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />
-      <Stack.Screen name="GoalList" component={GoalListScreen} />
+    <ErrorBoundary title="Momentum crashed on this screen">
+      <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: APP.bgTop } }}>
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Signup" component={SignupScreen} />
+        <Stack.Screen name="TabNav" component={TabNavigator} />
+        <Stack.Screen name="Exercise" component={ExerciseScreen} />
+        <Stack.Screen name="CategoryExercise" component={CategoryExerciseScreen} />
+        <Stack.Screen name="WorkoutOTDScreen" component={WorkoutOTDScreen} />
+        <Stack.Screen name="ActivityMonitoring" component={ActivityMonitoringScreen} />
+        <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />
+        <Stack.Screen name="GoalList" component={GoalListScreen} />
         <Stack.Screen name="GoalSetup" component={GoalSetupScreen} />
-        <Stack.Screen name="GoalDetail" component={GoalDetailScreen}/>
-        <Stack.Screen
-        name="PlanList"
-        component={PlanListScreen}
-      />
-      <Stack.Screen
-        name="PlanSetup"
-        component={PlanSetupScreen}
-  
-      />
-      <Stack.Screen
-        name="PlanDetail"
-        component={PlanDetailScreen}
-      />
-      <Stack.Screen
-        name="Notifications"
-        component={NotificationsScreen}
-      />
-
-    </Stack.Navigator>
-
-
- );
+        <Stack.Screen name="GoalDetail" component={GoalDetailScreen} />
+        <Stack.Screen name="PlanList" component={PlanListScreen} />
+        <Stack.Screen name="PlanSetup" component={PlanSetupScreen} />
+        <Stack.Screen name="PlanDetail" component={PlanDetailScreen} />
+        <Stack.Screen name="Notifications" component={NotificationsScreen} />
+      </Stack.Navigator>
+    </ErrorBoundary>
+  );
 }

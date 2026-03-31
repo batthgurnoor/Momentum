@@ -1,5 +1,5 @@
-import {  GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
-import { View, Text,StyleSheet, } from 'react-native'
+import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
+import { View, StyleSheet } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react'
 import Welcome from '../components/welcome'
@@ -8,41 +8,42 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import Separator from '../components/Separator'
 import Category from '../components/Category'
 import Exercise from '../components/Exercise'
+import { COLORS } from '../theme/colors'
+
+const WH = COLORS.workoutHome
+
 const WorkoutScreen = () => {
-
-
-  const styles = StyleSheet.create({
-      background: {
-        position: 'absolute',
-        left: 0,
-        right: 0,
-        top: 0,
-        height: '100%',
-      },
-    });
   return (
-
     <GestureHandlerRootView style={{ flex: 1 }}>
       <LinearGradient
-            
-    colors={['rgba(0,0,0,0.8)', 'transparent']}
-    style={styles.background}
-  >
-  <ScrollView >
-    <SafeAreaView className='mx-[1%]'>
-      <Welcome></Welcome>
-
-      
-      <WorkoutOTD />
-      <Separator />
-      <Category></Category>
-      <Separator />
-      <Exercise/>
-     
-    </SafeAreaView>
-    </ScrollView></LinearGradient>
-     </GestureHandlerRootView>
+        colors={[WH.bgTop, WH.bgMid, WH.bgBottom]}
+        locations={[0, 0.45, 1]}
+        style={StyleSheet.absoluteFill}
+      />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <SafeAreaView style={styles.safe}>
+          <Welcome />
+          <WorkoutOTD />
+          <Separator />
+          <Category />
+          <Separator />
+          <Exercise />
+        </SafeAreaView>
+      </ScrollView>
+    </GestureHandlerRootView>
   )
 }
+
+const styles = StyleSheet.create({
+  scrollContent: {
+    paddingBottom: 32,
+  },
+  safe: {
+    paddingHorizontal: 20,
+  },
+})
 
 export default WorkoutScreen

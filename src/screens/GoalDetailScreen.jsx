@@ -5,6 +5,9 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import { auth, db } from '../../Firebase/config';
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { LinearGradient } from 'expo-linear-gradient';
+import { COLORS } from '../theme/colors';
+
+const APP = COLORS.app;
 
 export default function GoalDetailScreen() {
   const route = useRoute();
@@ -16,7 +19,7 @@ export default function GoalDetailScreen() {
 
   if (!goalData) {
     return (
-      <LinearGradient colors={['rgba(0,0,0,0.8)', 'transparent']} style={styles.gradient}>
+      <LinearGradient colors={[APP.bgTop, APP.bgMid, APP.bgBottom]} locations={[0, 0.45, 1]} style={styles.gradient}>
         <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
           <Text style={styles.noDataText}>No goal data available.</Text>
         </View>
@@ -72,12 +75,8 @@ export default function GoalDetailScreen() {
     );
   };
 
-  const remaining = goal.targetValue - goal.currentProgress;
-  const progressPercentage = ((goal.currentProgress / goal.targetValue) * 100).toFixed(1);
-
-  const exercises = goalData.exercises || [];
   return (
-    <LinearGradient colors={['rgba(0,0,0,0.8)', 'transparent']} style={styles.gradient}>
+    <LinearGradient colors={[APP.bgTop, APP.bgMid, APP.bgBottom]} locations={[0, 0.45, 1]} style={styles.gradient}>
       <View style={styles.container}>
         <Text style={styles.headerTitle}>{goalData.title || 'Goal Detail'}</Text>
         <View style={styles.detailCard}>
@@ -90,18 +89,15 @@ export default function GoalDetailScreen() {
           </Text>
         </View>
 
-        <Text style={[styles.subHeader, { marginHorizontal: 16, marginTop: 10 }]}>
-        </Text>
+        <TextInput
+          style={styles.progressInput}
+          placeholder="Add weekly progress (lbs lost, etc.)"
+          placeholderTextColor={APP.textDim}
+          value={progressInput}
+          onChangeText={setProgressInput}
+          keyboardType="numeric"
+        />
 
-        <TextInput className='ml-10 bg-white mr-10 p-2 rounded-md text-center'
-        placeholder="Add weekly progress (lbs lost, etc.)"
-        value={progressInput}
-        onChangeText={setProgressInput}
-        keyboardType="numeric"
-        
-      />
-
-      
       </View>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
@@ -117,7 +113,7 @@ export default function GoalDetailScreen() {
           onPress={deleteGoal}
           style={styles.deleteButton}
         >
-          <Text style={styles.buttonText}>
+          <Text style={styles.deleteButtonLabel}>
             Delete Goal
           </Text>
         </TouchableOpacity>
@@ -137,26 +133,39 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
+    color: APP.text,
     textAlign: 'center',
     marginBottom: 20
   },
   noDataText: {
-    color: '#fff',
+    color: APP.textMuted,
     fontSize: 18
   },
   detailCard: {
-    backgroundColor: 'rgba(255,255,255,0.9)',
+    backgroundColor: 'rgba(18, 21, 31, 0.92)',
     marginHorizontal: 16,
     padding: 16,
     borderRadius: 12,
-    marginBottom: 12
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: APP.cardBorder,
   },
   subHeader: {
     fontWeight: '600',
     fontSize: 16,
     marginBottom: 6,
-    color: '#333'
+    color: APP.textMuted
+  },
+  progressInput: {
+    marginHorizontal: 16,
+    marginTop: 10,
+    padding: 12,
+    borderRadius: 8,
+    textAlign: 'center',
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1,
+    borderColor: APP.cardBorder,
+    color: APP.text,
   },
   infoText: {
     color: '#fff',
@@ -197,21 +206,28 @@ const styles = StyleSheet.create({
     marginBottom: 20
   },
   updateButton: {
-    backgroundColor: 'green',
+    backgroundColor: APP.accent,
     padding: 12,
     borderRadius: 8,
     flex: 1,
     marginRight: 8
   },
   deleteButton: {
-    backgroundColor: 'red',
+    backgroundColor: 'rgba(248, 113, 113, 0.25)',
+    borderWidth: 1,
+    borderColor: '#f87171',
     padding: 12,
     borderRadius: 8,
     flex: 1,
     marginLeft: 8
   },
   buttonText: {
-    color: 'white',
+    color: COLORS.text.onPrimary,
+    textAlign: 'center',
+    fontWeight: 'bold'
+  },
+  deleteButtonLabel: {
+    color: '#fecaca',
     textAlign: 'center',
     fontWeight: 'bold'
   }

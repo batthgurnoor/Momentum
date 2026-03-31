@@ -1,10 +1,12 @@
 import { StyleSheet } from 'react-native';
 import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from './constants';
 
+const APP = COLORS.app;
+
 export const commonStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.text.primary,
+    backgroundColor: APP.bgTop,
   },
   input: {
     backgroundColor: 'white',
@@ -30,7 +32,7 @@ export const commonStyles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: SPACING.xl,
     textAlign: 'center',
-    color: COLORS.text.primary,
+    color: APP.text,
   },
 });
 

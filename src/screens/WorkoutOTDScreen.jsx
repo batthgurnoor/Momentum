@@ -8,18 +8,19 @@ import { Image } from 'react-native';
 import { Audio } from 'expo-av';
 import BackButton from '../components/BackButton';
 import exercisesData from '../../exercise_data.json'
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
 const  countDownAudio = require('../../assets/audio/countdownaudio.mp3');
 
 const WorkoutOTDScreen = () => {
 const route = useRoute();
+  const insets = useSafeAreaInsets();
   
   const {name,url} = route.params;
   const initialTime = 60;
   const minTime = 10;
   const selectedExercise = exercisesData.find(exercise => exercise.gif_url === name);
-  const [gifUrl, setGifUrl] = useState(null);
   const [time, setTime] = useState(initialTime);
   const [isRunning, setIsRunning] = useState(false);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
@@ -65,25 +66,24 @@ const route = useRoute();
 
   useEffect(() => {
     let countDownInterval;
-    //console.log("inside time decrase useffect")
     if (isRunning && time > 0) {
       countDownInterval = setInterval(() => {
-        setTime((prevTime) => prevTime - 1);
-        if(time === 4){
-          
-          playSound();
-        }
-      },1000)
-    }
-    else{
+        setTime((prevTime) => {
+          if (prevTime <= 1) return 0;
+          const next = prevTime - 1;
+          if (next === 4) playSound();
+          return next;
+        });
+      }, 1000);
+    } else {
       setIsRunning(false);
       clearInterval(countDownInterval);
     }
-    return () => {clearInterval(countDownInterval)};
+    return () => clearInterval(countDownInterval);
   }, [isRunning, time]);
 
   const handleStart =() => {
-    if(!isRunning & isFirstTime){
+    if(!isRunning && isFirstTime){
       setIsFirstTime(false);
       setIsRunning(true);
   }
@@ -102,58 +102,68 @@ const route = useRoute();
 
   
   return (
-    <View className='flex-1'>
+    <View className='flex-1 bg-momentum-bg'>
     {url ? (
      <Image source={{uri: url}} className='w-full h-80'/>
    ) :(
    <View className='justify-center items-center w-full h-80'>
-     <ActivityIndicator size={"large"} color={"gray"}/>
+     <ActivityIndicator size={"large"} color={"#2dd4bf"}/>
    </View>)
      }
-     <BackButton />
+     <View style={{ position: 'absolute', left: 16, top: insets.top + 12, zIndex: 50 }}>
+       <BackButton mode="light" />
+     </View>
      <ScrollView >
        <View className='mt-4 mx-3'>
-         <Text className='text-2xl font-bold text-center mb-1'>{selectedExercise.title}</Text>
-         <Text className='text-gray-500 mt-1'>
+         {selectedExercise ? (
+           <>
+         <Text className='text-2xl font-bold text-center mb-1 text-ui-text-primary'>{selectedExercise.title}</Text>
+         <Text className='text-ui-text-secondary mt-1'>
            {selectedExercise.category.split(', ').map((cat, index) => (
              <View key={index} className='mr-2'>
-               <View className='mr-2 bg-gray-300 rounded-2xl px-2 '>
-                 <Text className='text-fuchsia-500'>{cat}</Text>
+               <View className='mr-2 bg-ui-surface border border-momentum-border rounded-2xl px-2'>
+                 <Text className='text-primary'>{cat}</Text>
                </View>
              </View>
            ))}
          </Text>
          <View className='flex-row items-center space-x-2 mt-2'>
-           <Text className='font-semibold text-blue-500'>Itensity:</Text>
-           <Text className='text-cyan-400 italic text-base'>{selectedExercise.intensity}</Text>
+           <Text className='font-semibold text-primary'>Intensity:</Text>
+           <Text className='text-ui-text-secondary italic text-base'>{selectedExercise.intensity}</Text>
          </View>
-         <Text className='text-xl font-semibold mt-4'>Instructions:</Text>
+         <Text className='text-xl font-semibold mt-4 text-ui-text-primary'>Instructions:</Text>
          <View className='mt-2'>
            {selectedExercise.instructions.map((instruction) => (
              <View key={instruction.step} className='flex-row items-center space-x-2 '>
-               <Text className='text-base text-gray-600 mb-2'>{instruction.step}.</Text>
-               <Text className='ml-2 text-base '>{instruction.text}</Text>
+               <Text className='text-base text-ui-text-tertiary mb-2'>{instruction.step}.</Text>
+               <Text className='ml-2 text-base text-ui-text-primary'>{instruction.text}</Text>
              </View>
            ))}
          </View>
+           </>
+         ) : (
+           <Text className="text-center text-gray-600 mb-2">
+             Exercise details not found for this file. You can still use the timer below.
+           </Text>
+         )}
        </View>
        <View className='mt-4 flex-row items-center justify-center space-x-3'>
          <TouchableOpacity onPress={handleDecreaseTime} className='items-center justify-center w-14 h-14 bg-red-500 rounded-full' >
            <Text className='text-white text-4xl'>-</Text>
          </TouchableOpacity>
-         <Text className='text-xl font-bold'>{time} secs</Text>
-         <TouchableOpacity onPress={handleIncreaseTime} className='items-center justify-center w-14 h-14 bg-green-500 rounded-full'>
+         <Text className='text-xl font-bold text-ui-text-primary'>{time} secs</Text>
+         <TouchableOpacity onPress={handleIncreaseTime} className='items-center justify-center w-14 h-14 bg-primary rounded-full'>
            <Text className='text-white text-3xl'>+</Text>
          </TouchableOpacity>
        </View>
        <View className='mt-4 flex-row  items-center justify-center space-x-3 mb-10'>
          <TouchableOpacity onPress={isRunning ? handlePause : handleStart} disabled={time === 0}>
-           <Text className={`text-blue-500 text-xl py-2 border rounded-lg border-blue-500 px-4 ${time === 0 ? 'opacity-50' : ''}`}>
+           <Text className={`text-primary text-xl py-2 border rounded-lg border-primary px-4 ${time === 0 ? 'opacity-50' : ''}`}>
              {isRunning ? "PAUSE" : "START"}
            </Text>
          </TouchableOpacity>
          <TouchableOpacity onPress={handleReset}>
-           <Text className='text-bray-500 text-xl py-2 border rounded-lg border-gray-500 px-4'>RESET</Text>
+           <Text className='text-ui-text-secondary text-xl py-2 border rounded-lg border-momentum-border px-4'>RESET</Text>
          </TouchableOpacity>
        </View>
      </ScrollView>

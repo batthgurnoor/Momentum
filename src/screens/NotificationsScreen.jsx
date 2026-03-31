@@ -7,7 +7,9 @@ import {
   TouchableOpacity, 
   ScrollView, 
   Alert,
-  Platform
+  Modal,
+  Pressable,
+  Linking,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Picker } from '@react-native-picker/picker';
@@ -18,8 +20,35 @@ import {
   scheduleDailyWorkoutReminder,
   scheduleWaterReminders,
   cancelAllNotifications,
-  getAllScheduledNotifications
+  cancelWorkoutReminders,
+  getAllScheduledNotifications,
+  NOTIFICATION_PERMISSION_DENIED,
 } from '../notifications';
+import { COLORS } from '../theme/colors';
+
+const APP = COLORS.app;
+
+const WORKOUT_REMINDER_TITLE = 'Time to Workout!';
+const WORKOUT_REMINDER_BODY =
+  'Your daily workout reminder. Stay committed to your fitness journey!';
+
+function isNotificationPermissionError(error) {
+  return (
+    error?.code === NOTIFICATION_PERMISSION_DENIED ||
+    error?.message === NOTIFICATION_PERMISSION_DENIED
+  );
+}
+
+function alertNotificationPermissionDenied() {
+  Alert.alert(
+    'Notifications are off',
+    'Allow notifications for Momentum so workout reminders can appear. If you already tapped Don’t allow, turn them on in system settings.',
+    [
+      { text: 'Not now', style: 'cancel' },
+      { text: 'Open settings', onPress: () => Linking.openSettings() },
+    ]
+  );
+}
 
 export default function NotificationsScreen() {
   const [workoutReminderEnabled, setWorkoutReminderEnabled] = useState(false);
@@ -28,6 +57,9 @@ export default function NotificationsScreen() {
   const [workoutMinute, setWorkoutMinute] = useState(0);
   const [scheduledNotifications, setScheduledNotifications] = useState([]);
   const [pushToken, setPushToken] = useState(null);
+  const [workoutTimeModalVisible, setWorkoutTimeModalVisible] = useState(false);
+  const [draftWorkoutHour, setDraftWorkoutHour] = useState(8);
+  const [draftWorkoutMinute, setDraftWorkoutMinute] = useState(0);
 
   // Load saved preferences
   useEffect(() => {
@@ -55,13 +87,15 @@ export default function NotificationsScreen() {
     }
   };
 
-  const savePreferences = async () => {
+  /** Persist prefs; pass overrides when React state has not committed yet (e.g. after toggles). */
+  const persistPreferences = async (overrides = {}) => {
     try {
       const prefs = {
         workoutReminderEnabled,
         waterReminderEnabled,
         workoutHour,
-        workoutMinute
+        workoutMinute,
+        ...overrides,
       };
       await AsyncStorage.setItem('notificationPreferences', JSON.stringify(prefs));
     } catch (error) {
@@ -74,42 +108,62 @@ export default function NotificationsScreen() {
     setScheduledNotifications(notifications);
   };
 
-  const handleWorkoutReminderToggle = async (value) => {
-    setWorkoutReminderEnabled(value);
-    
+  const openWorkoutTimeModal = () => {
+    setDraftWorkoutHour(workoutHour);
+    setDraftWorkoutMinute(workoutMinute);
+    setWorkoutTimeModalVisible(true);
+  };
+
+  const closeWorkoutTimeModal = () => {
+    setWorkoutTimeModalVisible(false);
+  };
+
+  const handleWorkoutSwitchChange = (value) => {
     if (value) {
-      try {
-        const id = await scheduleDailyWorkoutReminder(
-          workoutHour, 
-          workoutMinute,
-          'Time to Workout!',
-          'Your daily workout reminder. Stay committed to your fitness journey!'
-        );
-        Alert.alert('Success', 'Workout reminder scheduled successfully!');
-      } catch (error) {
-        console.error('Failed to schedule workout reminder:', error);
+      openWorkoutTimeModal();
+    } else {
+      handleWorkoutReminderDisable();
+    }
+  };
+
+  const handleWorkoutReminderDisable = async () => {
+    setWorkoutReminderEnabled(false);
+    try {
+      await cancelWorkoutReminders();
+    } catch (error) {
+      console.error('Error cancelling workout notifications:', error);
+    }
+    await persistPreferences({ workoutReminderEnabled: false });
+    loadScheduledNotifications();
+  };
+
+  const saveWorkoutReminderTime = async () => {
+    try {
+      await cancelWorkoutReminders();
+      await scheduleDailyWorkoutReminder(
+        draftWorkoutHour,
+        draftWorkoutMinute,
+        WORKOUT_REMINDER_TITLE,
+        WORKOUT_REMINDER_BODY
+      );
+      setWorkoutHour(draftWorkoutHour);
+      setWorkoutMinute(draftWorkoutMinute);
+      setWorkoutReminderEnabled(true);
+      setWorkoutTimeModalVisible(false);
+      await persistPreferences({
+        workoutReminderEnabled: true,
+        workoutHour: draftWorkoutHour,
+        workoutMinute: draftWorkoutMinute,
+      });
+      loadScheduledNotifications();
+    } catch (error) {
+      console.error('Failed to schedule workout reminder:', error);
+      if (isNotificationPermissionError(error)) {
+        alertNotificationPermissionDenied();
+      } else {
         Alert.alert('Error', 'Failed to schedule workout reminder');
       }
-    } else {
-      // Cancel workout reminders
-      try {
-        const allNotifications = await getAllScheduledNotifications();
-        const workoutNotifications = allNotifications.filter(
-          notification => 
-            notification.content.title === 'Time to Workout!' || 
-            notification.content.title === 'Daily Workout Reminder'
-        );
-        
-        for (const notification of workoutNotifications) {
-          await Notifications.cancelScheduledNotificationAsync(notification.identifier);
-        }
-      } catch (error) {
-        console.error('Error cancelling workout notifications:', error);
-      }
     }
-    
-    savePreferences();
-    loadScheduledNotifications();
   };
 
   const handleWaterReminderToggle = async (value) => {
@@ -121,7 +175,15 @@ export default function NotificationsScreen() {
         Alert.alert('Success', 'Water reminders scheduled successfully!');
       } catch (error) {
         console.error('Failed to schedule water reminders:', error);
-        Alert.alert('Error', 'Failed to schedule water reminders');
+        setWaterReminderEnabled(false);
+        await persistPreferences({ waterReminderEnabled: false });
+        if (isNotificationPermissionError(error)) {
+          alertNotificationPermissionDenied();
+        } else {
+          Alert.alert('Error', 'Failed to schedule water reminders');
+        }
+        loadScheduledNotifications();
+        return;
       }
     } else {
       // Cancel water reminders through our utility function
@@ -139,20 +201,8 @@ export default function NotificationsScreen() {
       }
     }
     
-    savePreferences();
+    await persistPreferences({ waterReminderEnabled: value });
     loadScheduledNotifications();
-  };
-
-  const handleTimeChange = () => {
-    if (workoutReminderEnabled) {
-      // Reschedule with new time
-      handleWorkoutReminderToggle(false);
-      setTimeout(() => {
-        handleWorkoutReminderToggle(true);
-      }, 500);
-    } else {
-      savePreferences();
-    }
   };
 
   const handleCancelAllNotifications = async () => {
@@ -160,7 +210,11 @@ export default function NotificationsScreen() {
       await cancelAllNotifications();
       setWorkoutReminderEnabled(false);
       setWaterReminderEnabled(false);
-      savePreferences();
+      setWorkoutTimeModalVisible(false);
+      await persistPreferences({
+        workoutReminderEnabled: false,
+        waterReminderEnabled: false,
+      });
       loadScheduledNotifications();
       Alert.alert('Success', 'All notifications have been cancelled');
     } catch (error) {
@@ -169,14 +223,11 @@ export default function NotificationsScreen() {
     }
   };
 
-  // Generate hour options (0-23)
   const hourOptions = Array.from({ length: 24 }, (_, i) => i);
-  
-  // Generate minute options (0, 15, 30, 45)
-  const minuteOptions = [0, 15, 30, 45];
+  const minuteOptions = Array.from({ length: 60 }, (_, i) => i);
 
   return (
-    <LinearGradient colors={['#000000', '#1E1E1E']} style={styles.container}>
+    <LinearGradient colors={[APP.bgTop, APP.bgMid, APP.bgBottom]} locations={[0, 0.5, 1]} style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.headerTitle}>Notification Settings</Text>
         
@@ -187,63 +238,26 @@ export default function NotificationsScreen() {
             <Text style={styles.settingLabel}>Daily Workout Reminder</Text>
             <Switch
               value={workoutReminderEnabled}
-              onValueChange={handleWorkoutReminderToggle}
-              trackColor={{ false: '#767577', true: '#4CAF50' }}
+              onValueChange={handleWorkoutSwitchChange}
+              trackColor={{ false: '#767577', true: APP.accent }}
               thumbColor={workoutReminderEnabled ? '#fff' : '#f4f3f4'}
             />
           </View>
-          
+
           {workoutReminderEnabled && (
-            <View style={styles.timePickerContainer}>
-              <Text style={styles.settingLabel}>Reminder Time:</Text>
-              
-              <View style={styles.pickerRow}>
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    selectedValue={workoutHour}
-                    onValueChange={(value) => {
-                      setWorkoutHour(value);
-                      handleTimeChange();
-                    }}
-                    style={styles.picker}
-                    dropdownIconColor="#fff"
-                    mode="dropdown"
-                  >
-                    {hourOptions.map(hour => (
-                      <Picker.Item 
-                        key={`hour-${hour}`} 
-                        label={hour < 10 ? `0${hour}` : `${hour}`} 
-                        value={hour}
-                        style={styles.pickerItem}
-                      />
-                    ))}
-                  </Picker>
-                </View>
-                
-                <Text style={styles.timeSeparator}>:</Text>
-                
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    selectedValue={workoutMinute}
-                    onValueChange={(value) => {
-                      setWorkoutMinute(value);
-                      handleTimeChange();
-                    }}
-                    style={styles.picker}
-                    dropdownIconColor="#fff"
-                    mode="dropdown"
-                  >
-                    {minuteOptions.map(minute => (
-                      <Picker.Item 
-                        key={`minute-${minute}`} 
-                        label={minute < 10 ? `0${minute}` : `${minute}`} 
-                        value={minute}
-                        style={styles.pickerItem}
-                      />
-                    ))}
-                  </Picker>
-                </View>
-              </View>
+            <View style={styles.workoutActiveRow}>
+              <Text style={styles.workoutTimeSummary}>
+                Daily at{' '}
+                {workoutHour < 10 ? `0${workoutHour}` : workoutHour}:
+                {workoutMinute < 10 ? `0${workoutMinute}` : workoutMinute}
+              </Text>
+              <TouchableOpacity
+                onPress={openWorkoutTimeModal}
+                style={styles.changeTimeButton}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.changeTimeButtonText}>Change time</Text>
+              </TouchableOpacity>
             </View>
           )}
         </View>
@@ -256,7 +270,7 @@ export default function NotificationsScreen() {
             <Switch
               value={waterReminderEnabled}
               onValueChange={handleWaterReminderToggle}
-              trackColor={{ false: '#767577', true: '#4CAF50' }}
+              trackColor={{ false: '#767577', true: APP.accent }}
               thumbColor={waterReminderEnabled ? '#fff' : '#f4f3f4'}
             />
           </View>
@@ -296,6 +310,83 @@ export default function NotificationsScreen() {
           <Text style={styles.cancelButtonText}>Cancel All Notifications</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      <Modal
+        visible={workoutTimeModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={closeWorkoutTimeModal}
+      >
+        <Pressable style={styles.modalBackdrop} onPress={closeWorkoutTimeModal}>
+          <Pressable style={styles.modalCard} onPress={(e) => e.stopPropagation()}>
+            <Text style={styles.modalTitle}>Reminder time</Text>
+            <Text style={styles.modalSubtitle}>
+              Choose when you want your daily workout reminder.
+            </Text>
+
+            <View style={styles.modalPickerRow}>
+              <View style={styles.modalPickerBox}>
+                <Picker
+                  selectedValue={draftWorkoutHour}
+                  onValueChange={setDraftWorkoutHour}
+                  style={styles.modalPicker}
+                  itemStyle={styles.modalPickerItemIOS}
+                  dropdownIconColor={APP.accent}
+                  mode="dropdown"
+                >
+                  {hourOptions.map((hour) => (
+                    <Picker.Item
+                      key={`modal-hour-${hour}`}
+                      label={hour < 10 ? `0${hour}` : `${hour}`}
+                      value={hour}
+                      color={APP.text}
+                      style={styles.modalPickerItem}
+                    />
+                  ))}
+                </Picker>
+              </View>
+              <Text style={styles.modalTimeSeparator}>:</Text>
+              <View style={styles.modalPickerBox}>
+                <Picker
+                  selectedValue={draftWorkoutMinute}
+                  onValueChange={setDraftWorkoutMinute}
+                  style={styles.modalPicker}
+                  itemStyle={styles.modalPickerItemIOS}
+                  dropdownIconColor={APP.accent}
+                  mode="dropdown"
+                >
+                  {minuteOptions.map((minute) => (
+                    <Picker.Item
+                      key={`modal-minute-${minute}`}
+                      label={minute < 10 ? `0${minute}` : `${minute}`}
+                      value={minute}
+                      color={APP.text}
+                      style={styles.modalPickerItem}
+                    />
+                  ))}
+                </Picker>
+              </View>
+            </View>
+
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonCancel]}
+                onPress={closeWorkoutTimeModal}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.modalButtonCancelText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonSave]}
+                onPress={saveWorkoutReminderTime}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.modalButtonSaveText}>Save</Text>
+              </TouchableOpacity>
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </LinearGradient>
   );
 }
@@ -344,8 +435,96 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginBottom: 10,
   },
-  timePickerContainer: {
-    marginTop: 10,
+  workoutActiveRow: {
+    marginTop: 14,
+    paddingTop: 14,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: APP.cardBorder,
+  },
+  workoutTimeSummary: {
+    fontSize: 16,
+    color: APP.textMuted,
+    marginBottom: 10,
+  },
+  changeTimeButton: {
+    alignSelf: 'flex-start',
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+    backgroundColor: APP.accentMuted,
+    borderWidth: 1,
+    borderColor: APP.accent,
+  },
+  changeTimeButtonText: {
+    color: APP.accent,
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.65)',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  modalCard: {
+    backgroundColor: APP.bgMid,
+    borderRadius: 16,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: APP.cardBorder,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: APP.text,
+    marginBottom: 8,
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    color: APP.textMuted,
+    marginBottom: 18,
+    lineHeight: 20,
+  },
+  modalPickerRow: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    justifyContent: 'center',
+    marginBottom: 22,
+    gap: 4,
+  },
+  modalPickerBox: {
+    flex: 1,
+    maxWidth: 148,
+    minHeight: 88,
+    backgroundColor: 'rgba(0, 0, 0, 0.35)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: APP.cardBorder,
+    overflow: 'hidden',
+    justifyContent: 'center',
+  },
+  modalPicker: {
+    color: APP.text,
+    width: '100%',
+    minHeight: 88,
+    fontSize: 26,
+  },
+  modalPickerItem: {
+    fontSize: 20,
+    backgroundColor: APP.bgBottom,
+  },
+  modalPickerItemIOS: {
+    color: APP.text,
+    fontSize: 22,
+    height: 120,
+  },
+  modalTimeSeparator: {
+    fontSize: 36,
+    fontWeight: '700',
+    color: APP.text,
+    alignSelf: 'center',
+    marginHorizontal: 6,
+    marginTop: 8,
   },
   pickerRow: {
     flexDirection: 'row',
@@ -393,5 +572,35 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  modalActions: {
+    flexDirection: 'row',
+    gap: 12,
+    justifyContent: 'flex-end',
+  },
+  modalButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 22,
+    borderRadius: 10,
+    minWidth: 100,
+    alignItems: 'center',
+  },
+  modalButtonCancel: {
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderWidth: 1,
+    borderColor: APP.cardBorder,
+  },
+  modalButtonCancelText: {
+    color: APP.text,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  modalButtonSave: {
+    backgroundColor: APP.accent,
+  },
+  modalButtonSaveText: {
+    color: COLORS.text.onPrimary,
+    fontSize: 16,
+    fontWeight: '700',
   },
 }); 

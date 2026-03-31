@@ -54,7 +54,7 @@ export default function SignupScreen() {
             <Text style={authStyles.formLabel}>Create Account</Text>
             
             <View style={authStyles.inputContainer}>
-              <Ionicons name="mail-outline" size={20} color={COLORS.primary.light} style={authStyles.inputIcon} />
+              <Ionicons name="mail-outline" size={20} color={COLORS.app.accent} style={authStyles.inputIcon} />
               <TextInput
                 placeholder="Email"
                 placeholderTextColor={COLORS.text.tertiary}
@@ -66,7 +66,7 @@ export default function SignupScreen() {
             </View>
 
             <View style={authStyles.inputContainer}>
-              <Ionicons name="lock-closed-outline" size={20} color={COLORS.primary.light} style={authStyles.inputIcon} />
+              <Ionicons name="lock-closed-outline" size={20} color={COLORS.app.accent} style={authStyles.inputIcon} />
               <TextInput
                 placeholder="Password"
                 placeholderTextColor={COLORS.text.tertiary}
@@ -89,9 +89,9 @@ export default function SignupScreen() {
 
             <TouchableOpacity 
               onPress={handleSignup} 
-              style={[authStyles.signupButton, { backgroundColor: '#4CAF50' }]}
+              style={authStyles.signupButton}
             >
-              <Text style={{ color: COLORS.text.onPrimary, textAlign: 'center', fontWeight: '600' }}>Sign Up</Text>
+              <Text style={{ color: COLORS.text.onPrimary, textAlign: 'center', fontWeight: '700' }}>Sign Up</Text>
             </TouchableOpacity>
 
             <View style={authStyles.loginLink}>

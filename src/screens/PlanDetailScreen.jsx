@@ -5,6 +5,9 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import { auth, db } from '../../Firebase/config'; // Adjust path
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { LinearGradient } from 'expo-linear-gradient';
+import { COLORS } from '../theme/colors';
+
+const APP = COLORS.app;
 
 export default function PlanDetailScreen() {
   const route = useRoute();
@@ -55,7 +58,7 @@ export default function PlanDetailScreen() {
   const exercises = planData.exercises || [];
 
   return (
-    <LinearGradient colors={['rgba(0,0,0,0.8)', 'transparent']} style={styles.gradient}>
+    <LinearGradient colors={[APP.bgTop, APP.bgMid, APP.bgBottom]} locations={[0, 0.45, 1]} style={styles.gradient}>
       <View style={styles.container}>
         <Text style={styles.headerTitle}>{planData.planName}</Text>
         <Text style={styles.focusText}>Focus: {planData.focus}</Text>
@@ -105,46 +108,50 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 26,
     fontWeight: 'bold',
-    color: '#fff',
+    color: APP.text,
     textAlign: 'center',
     marginBottom: 4,
   },
   focusText: {
     fontSize: 20,
-    color: '#ddd',
+    color: APP.textMuted,
     textAlign: 'center',
     marginBottom: 16,
   },
   detailCard: {
-    backgroundColor: 'rgba(255,255,255,0.9)',
+    backgroundColor: 'rgba(18, 21, 31, 0.92)',
     padding: 16,
     borderRadius: 12,
     flex: 1,
+    borderWidth: 1,
+    borderColor: APP.cardBorder,
   },
   sectionHeader: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: APP.text,
     marginBottom: 8,
   },
   infoText: {
     fontSize: 16,
-    color: '#666',
+    color: APP.textMuted,
   },
   itemCard: {
-    backgroundColor: 'rgba(255,255,255,0.85)',
+    backgroundColor: 'rgba(255,255,255,0.04)',
     padding: 12,
     borderRadius: 10,
     marginVertical: 6,
+    borderWidth: 1,
+    borderColor: APP.cardBorder,
   },
   itemTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: APP.text,
   },
   itemDesc: {
     fontSize: 16,
-    color: '#555',
+    color: APP.textMuted,
     marginVertical: 4,
   },
   removeButton: {
@@ -160,13 +167,15 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   deleteButton: {
-    backgroundColor: 'red',
+    backgroundColor: 'rgba(248, 113, 113, 0.2)',
+    borderWidth: 1,
+    borderColor: '#f87171',
     padding: 12,
     borderRadius: 8,
     marginVertical: 16,
   },
   deleteButtonText: {
-    color: '#fff',
+    color: '#fecaca',
     fontWeight: 'bold',
     textAlign: 'center',
     fontSize: 16,

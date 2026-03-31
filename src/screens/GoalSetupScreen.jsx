@@ -9,11 +9,14 @@ import {
   ScrollView,
   StyleSheet
 } from 'react-native';
-import { auth, db } from '../../Firebase/config'; // adjust path
+import { auth, db } from '../../Firebase/config';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
-import {Picker} from '@react-native-picker/picker';
+import { Picker } from '@react-native-picker/picker';
+import { COLORS } from '../theme/colors';
+
+const APP = COLORS.app;
 
 export default function GoalSetupScreen() {
   const navigation = useNavigation();
@@ -41,7 +44,6 @@ export default function GoalSetupScreen() {
       return;
     }
 
-    // Example: compute endDate for months from now
     const now = new Date();
     const end = new Date();
     end.setMonth(now.getMonth() + numericDuration);
@@ -65,26 +67,27 @@ export default function GoalSetupScreen() {
   };
 
   return (
-    <LinearGradient colors={['rgba(0,0,0,0.8)', 'transparent']} style={styles.gradient}>
+    <LinearGradient colors={[APP.bgTop, APP.bgMid, APP.bgBottom]} locations={[0, 0.45, 1]} style={styles.gradient}>
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.headerTitle}>Set Your Fitness Goal</Text>
 
         <View style={styles.formCard}>
-          <Text style={styles.label}>Goal Type (e.g. weightLoss)</Text>
-          <View className="px-2 bg-white rounded-lg border-gray-200">
-            <Picker  
-          selectedValue={goalType}
-          onValueChange={(itemValue) =>
-          setGoalType(itemValue)
-          }>
-          <Picker.Item label="Wieght Loss" value="Wieght Loss" />
-          <Picker.Item label="Weight Gain" value="Weight Gain" />
-          
-          </Picker>
+          <Text style={styles.label}>Goal Type</Text>
+          <View style={styles.pickerWrap}>
+            <Picker
+              selectedValue={goalType}
+              onValueChange={(itemValue) => setGoalType(itemValue)}
+              style={{ color: APP.text }}
+              dropdownIconColor={APP.accent}
+            >
+              <Picker.Item label="Weight Loss" value="weightLoss" color={APP.text} />
+              <Picker.Item label="Weight Gain" value="weightGain" color={APP.text} />
+            </Picker>
           </View>
           <Text style={styles.label}>Target Value (lbs to lose, etc.)</Text>
           <TextInput
             style={styles.input}
+            placeholderTextColor={APP.textDim}
             value={targetValue}
             onChangeText={setTargetValue}
             keyboardType="numeric"
@@ -93,6 +96,7 @@ export default function GoalSetupScreen() {
           <Text style={styles.label}>Duration (months)</Text>
           <TextInput
             style={styles.input}
+            placeholderTextColor={APP.textDim}
             value={durationMonths}
             onChangeText={setDurationMonths}
             keyboardType="numeric"
@@ -102,6 +106,7 @@ export default function GoalSetupScreen() {
           <TextInput
             style={[styles.input, { height: 60 }]}
             multiline
+            placeholderTextColor={APP.textDim}
             value={notes}
             onChangeText={setNotes}
             placeholder="Anything to remind yourself..."
@@ -126,37 +131,48 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
+    color: APP.text,
     textAlign: 'center',
     marginVertical: 20
   },
   formCard: {
-    backgroundColor: 'rgba(255,255,255,0.9)',
+    backgroundColor: 'rgba(18, 21, 31, 0.92)',
     padding: 16,
-    borderRadius: 12
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: APP.cardBorder,
+  },
+  pickerWrap: {
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: APP.cardBorder,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    marginBottom: 12,
+    overflow: 'hidden',
   },
   label: {
     fontWeight: '600',
     fontSize: 16,
     marginBottom: 4,
-    color: '#333'
+    color: APP.textMuted
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: APP.cardBorder,
     borderRadius: 8,
     padding: 10,
     marginBottom: 12,
-    backgroundColor: '#fff'
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    color: APP.text,
   },
   saveButton: {
-    backgroundColor: '#4f5bd5',
+    backgroundColor: APP.accent,
     padding: 14,
     borderRadius: 25,
     marginTop: 8
   },
   saveButtonText: {
-    color: '#fff',
+    color: COLORS.text.onPrimary,
     textAlign: 'center',
     fontWeight: 'bold',
     fontSize: 16

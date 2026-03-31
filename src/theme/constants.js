@@ -1,24 +1,30 @@
 import { StyleSheet } from 'react-native';
+import { COLORS as THEME } from './colors';
 
+const APP = THEME.app;
+
+/** Merged theme for authStyles + legacy commonStyles */
 export const COLORS = {
+  ...THEME,
   primary: {
-    light: '#3498db',
-    default: '#2980b9',
-    dark: '#1c6ea4',
+    default: APP.accent,
+    light: '#5eead4',
+    dark: '#0d9488',
   },
   text: {
-    primary: '#2c3e50',
-    secondary: '#7f8c8d',
-    tertiary: '#95a5a6',
-    onPrimary: '#ffffff',
+    primary: APP.text,
+    secondary: APP.textMuted,
+    tertiary: APP.textDim,
+    onPrimary: '#0c0e14',
   },
   ui: {
-    error: '#e74c3c',
-    success: '#2ecc71',
-    warning: '#f1c40f',
+    error: '#f87171',
+    success: APP.accent,
+    warning: '#fbbf24',
+    surface: 'rgba(255,255,255,0.06)',
   },
   gradient: {
-    dark: ['#2c3e50', '#3498db'],
+    dark: [APP.bgTop, APP.bgBottom],
   },
 };
 
@@ -55,7 +61,7 @@ export const SHADOWS = StyleSheet.create({
       width: 0,
       height: 4,
     },
-    shadowOpacity: 0.30,
+    shadowOpacity: 0.3,
     shadowRadius: 4.65,
     elevation: 4,
   },
@@ -69,4 +75,4 @@ export const SHADOWS = StyleSheet.create({
     shadowRadius: 7.49,
     elevation: 6,
   },
-}); 
+});

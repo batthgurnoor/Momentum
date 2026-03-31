@@ -6,12 +6,15 @@ import {
   TextInput,
   Alert,
   KeyboardAvoidingView,
-  Platform,StyleSheet,
+  Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { auth, db } from '../../Firebase/config';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { LinearGradient } from 'expo-linear-gradient';
+import { COLORS } from '../theme/colors';
+
+const APP = COLORS.app;
 
 export default function LogWorkoutScreen() {
   const navigation = useNavigation();
@@ -120,54 +123,42 @@ export default function LogWorkoutScreen() {
   };
 
   const displayedTime = formatTime(elapsedTime);
-  const styles = StyleSheet.create({
-    background: {
-      position: 'absolute',
-      left: 0,
-      right: 0,
-      top: 0,
-      height: 300,
-    },
-  });
-
-
   return (
     <LinearGradient
-        // Background Linear Gradient
-        colors={['rgba(0,0,0,0.8)', 'transparent']}
-        style={styles.background}
-      >
+      colors={[APP.bgTop, APP.bgMid, APP.bgBottom]}
+      locations={[0, 0.45, 1]}
+      style={{ flex: 1 }}
+    >
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1 px-4 pt-10 pb-6"
       >
-        <Text className="text-3xl font-extrabold text-white mt-4 mb-6 text-center">
+        <Text className="text-3xl font-extrabold text-ui-text-primary mt-4 mb-6 text-center">
           Log Workout
         </Text>
 
-        
         <View className="items-center justify-center mb-8">
-          <Text className="text-white text-6xl font-bold mb-4 tracking-tight">
+          <Text className="text-primary text-6xl font-bold mb-4 tracking-tight">
             {displayedTime}
           </Text>
           {!isRunning ? (
             <TouchableOpacity
               onPress={handleStart}
-              className="bg-green-500 py-3 px-6 rounded-full"
+              className="bg-primary py-3 px-6 rounded-full"
             >
-              <Text className="text-white text-lg font-semibold">Start Workout</Text>
+              <Text className="text-momentum-bg text-lg font-bold">Start Workout</Text>
             </TouchableOpacity>
           ) : !isPaused ? (
             <View className="flex-row space-x-3">
               <TouchableOpacity
                 onPress={handlePause}
-                className="bg-yellow-400 py-3 px-5 rounded-full"
+                className="bg-amber-500 py-3 px-5 rounded-full"
               >
-                <Text className="text-white text-base font-semibold">Pause</Text>
+                <Text className="text-momentum-bg text-base font-semibold">Pause</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={handleStop}
-                className="bg-red-500 py-3 px-5 rounded-full"
+                className="bg-ui-error py-3 px-5 rounded-full"
               >
                 <Text className="text-white text-base font-semibold">Stop</Text>
               </TouchableOpacity>
@@ -176,13 +167,13 @@ export default function LogWorkoutScreen() {
             <View className="flex-row space-x-3">
               <TouchableOpacity
                 onPress={handleResume}
-                className="bg-blue-500 py-3 px-5 rounded-full"
+                className="bg-primary py-3 px-5 rounded-full"
               >
-                <Text className="text-white text-base font-semibold">Resume</Text>
+                <Text className="text-momentum-bg text-base font-bold">Resume</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={handleStop}
-                className="bg-red-500 py-3 px-5 rounded-full"
+                className="bg-ui-error py-3 px-5 rounded-full"
               >
                 <Text className="text-white text-base font-semibold">Stop</Text>
               </TouchableOpacity>
@@ -190,29 +181,31 @@ export default function LogWorkoutScreen() {
           )}
         </View>
 
-    
-        <View className="bg-white/80 rounded-2xl p-4">
-          <Text className="text-gray-700 text-base font-semibold mb-1">Workout Title</Text>
+        <View className="rounded-2xl p-4 border border-momentum-border bg-ui-card">
+          <Text className="text-ui-text-secondary text-base font-semibold mb-1">Workout Title</Text>
           <TextInput
-            className="bg-white rounded-lg px-3 py-2 mb-4"
+            className="bg-ui-surface rounded-lg px-3 py-2 mb-4 text-ui-text-primary border border-momentum-border"
             placeholder="e.g. 45-min cardio"
+            placeholderTextColor="#64748b"
             value={workoutTitle}
             onChangeText={setWorkoutTitle}
           />
 
-          <Text className="text-gray-700 text-base font-semibold mb-1">Calories Burned</Text>
+          <Text className="text-ui-text-secondary text-base font-semibold mb-1">Calories Burned</Text>
           <TextInput
-            className="bg-white rounded-lg px-3 py-2 mb-4"
+            className="bg-ui-surface rounded-lg px-3 py-2 mb-4 text-ui-text-primary border border-momentum-border"
             placeholder="e.g. 350"
+            placeholderTextColor="#64748b"
             value={calories}
             onChangeText={setCalories}
             keyboardType="numeric"
           />
 
-          <Text className="text-gray-700 text-base font-semibold mb-1">Notes</Text>
+          <Text className="text-ui-text-secondary text-base font-semibold mb-1">Notes</Text>
           <TextInput
-            className="bg-white rounded-lg px-3 py-2"
+            className="bg-ui-surface rounded-lg px-3 py-2 text-ui-text-primary border border-momentum-border"
             placeholder="e.g. Felt great!"
+            placeholderTextColor="#64748b"
             value={notes}
             onChangeText={setNotes}
           />

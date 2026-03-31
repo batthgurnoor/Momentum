@@ -23,10 +23,10 @@ const LogoSection = memo(() => (
 
 const PasswordInput = memo(({ password, setPassword, showPassword, setShowPassword }) => (
   <View style={authStyles.inputContainer}>
-    <Ionicons name="lock-closed-outline" size={20} color={COLORS.primary.light} style={authStyles.inputIcon} />
+    <Ionicons name="lock-closed-outline" size={20} color={COLORS.app.accent} style={authStyles.inputIcon} />
     <TextInput
       placeholder="Password"
-      placeholderTextColor={COLORS.text.tertiary}
+      placeholderTextColor={COLORS.app.textDim}
       secureTextEntry={!showPassword}
       onChangeText={setPassword}
       value={password}
@@ -39,7 +39,7 @@ const PasswordInput = memo(({ password, setPassword, showPassword, setShowPasswo
       <Ionicons 
         name={showPassword ? "eye-off-outline" : "eye-outline"} 
         size={20} 
-        color={COLORS.primary.light} 
+        color={COLORS.app.accent} 
       />
     </TouchableOpacity>
   </View>
@@ -85,10 +85,10 @@ export default function LoginScreen() {
             <Text style={authStyles.formLabel}>Welcome Back</Text>
             
             <View style={authStyles.inputContainer}>
-              <Ionicons name="mail-outline" size={20} color={COLORS.primary.light} style={authStyles.inputIcon} />
+              <Ionicons name="mail-outline" size={20} color={COLORS.app.accent} style={authStyles.inputIcon} />
               <TextInput
                 placeholder="Email"
-                placeholderTextColor={COLORS.text.tertiary}
+                placeholderTextColor={COLORS.app.textDim}
                 autoCapitalize="none"
                 onChangeText={setEmail}
                 value={email}
@@ -107,7 +107,7 @@ export default function LoginScreen() {
               onPress={handleLogin} 
               style={authStyles.signupButton}
             >
-              <Text style={{ color: COLORS.text.onPrimary, textAlign: 'center', fontWeight: '600' }}>Log In</Text>
+              <Text style={{ color: COLORS.text.onPrimary, textAlign: 'center', fontWeight: '700' }}>Log In</Text>
             </TouchableOpacity>
 
             <View style={authStyles.loginLink}>

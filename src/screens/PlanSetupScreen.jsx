@@ -1,10 +1,13 @@
 // PlanSetupScreen.jsx
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView, StyleSheet } from 'react-native';
-import { auth, db } from '../../Firebase/config'; // Adjust path
+import { auth, db } from '../../Firebase/config';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { COLORS } from '../theme/colors';
+
+const APP = COLORS.app;
 
 export default function PlanSetupScreen() {
   const navigation = useNavigation();
@@ -14,7 +17,6 @@ export default function PlanSetupScreen() {
   const [focus, setFocus] = useState('Strength');
   const [exercises, setExercises] = useState([]);
 
-  // Temporary fields for adding an exercise
   const [tempDay, setTempDay] = useState('1');
   const [tempExerciseName, setTempExerciseName] = useState('');
   const [tempSets, setTempSets] = useState('');
@@ -67,13 +69,14 @@ export default function PlanSetupScreen() {
   };
 
   return (
-    <LinearGradient colors={['rgba(0,0,0,0.8)', 'transparent']} style={styles.gradient}>
+    <LinearGradient colors={[APP.bgTop, APP.bgMid, APP.bgBottom]} locations={[0, 0.45, 1]} style={styles.gradient}>
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.headerTitle}>Create a Workout Plan</Text>
         <View style={styles.formCard}>
           <Text style={styles.label}>Plan Name:</Text>
           <TextInput
             style={styles.input}
+            placeholderTextColor={APP.textDim}
             value={planName}
             onChangeText={setPlanName}
             placeholder="e.g. 4-Day Strength"
@@ -82,6 +85,7 @@ export default function PlanSetupScreen() {
           <Text style={styles.label}>Focus:</Text>
           <TextInput
             style={styles.input}
+            placeholderTextColor={APP.textDim}
             value={focus}
             onChangeText={setFocus}
             placeholder="e.g. Strength, Endurance"
@@ -99,6 +103,7 @@ export default function PlanSetupScreen() {
           <Text style={styles.subLabel}>Exercise Name:</Text>
           <TextInput
             style={styles.input}
+            placeholderTextColor={APP.textDim}
             value={tempExerciseName}
             onChangeText={setTempExerciseName}
             placeholder="e.g. Bench Press"
@@ -161,64 +166,71 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
+    color: APP.text,
     textAlign: 'center',
     marginVertical: 20,
   },
   formCard: {
-    backgroundColor: 'rgba(255,255,255,0.9)',
+    backgroundColor: 'rgba(18, 21, 31, 0.92)',
     padding: 16,
     borderRadius: 12,
     marginBottom: 20,
+    borderWidth: 1,
+    borderColor: APP.cardBorder,
   },
-  label: { fontSize: 18, fontWeight: '600', color: '#333', marginBottom: 6 },
-  subLabel: { fontSize: 16, fontWeight: '500', color: '#555', marginTop: 10 },
+  label: { fontSize: 18, fontWeight: '600', color: APP.text, marginBottom: 6 },
+  subLabel: { fontSize: 16, fontWeight: '500', color: APP.textMuted, marginTop: 10 },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: APP.cardBorder,
     borderRadius: 8,
     padding: 10,
     marginVertical: 6,
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    color: APP.text,
   },
   addButton: {
-    backgroundColor: 'orange',
+    backgroundColor: APP.accentMuted,
+    borderWidth: 1,
+    borderColor: APP.cardBorder,
     padding: 12,
     borderRadius: 8,
     marginTop: 10,
   },
   addButtonText: {
-    color: '#fff',
+    color: APP.accent,
     textAlign: 'center',
     fontWeight: 'bold',
     fontSize: 16,
   },
   previewCard: {
-    backgroundColor: 'rgba(0,0,0,0.1)',
+    backgroundColor: 'rgba(255,255,255,0.04)',
     padding: 12,
     borderRadius: 10,
     marginBottom: 20,
+    borderWidth: 1,
+    borderColor: APP.cardBorder,
   },
   previewHeader: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#fff',
+    color: APP.text,
     marginBottom: 6,
   },
   previewText: {
     fontSize: 16,
-    color: '#fff',
+    color: APP.textMuted,
     marginVertical: 2,
   },
   saveButton: {
-    backgroundColor: '#4f5bd5',
+    backgroundColor: APP.accent,
     padding: 14,
     borderRadius: 25,
     marginHorizontal: 16,
     marginBottom: 20,
   },
   saveButtonText: {
-    color: '#fff',
+    color: COLORS.text.onPrimary,
     textAlign: 'center',
     fontWeight: 'bold',
     fontSize: 16,

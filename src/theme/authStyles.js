@@ -3,26 +3,26 @@ import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from './constants';
 import { commonStyles } from './styles';
 
 const { width } = Dimensions.get('window');
+const APP = COLORS.app;
 
-// Memoize background decorations to prevent recalculation
 const backgroundDecorations = {
   circle1: {
     position: 'absolute',
-    width: width * 0.8,
-    height: width * 0.8,
-    borderRadius: width * 0.4,
-    backgroundColor: 'rgba(52, 152, 219, 0.1)',
-    top: -width * 0.4,
-    right: -width * 0.2,
+    width: width * 0.85,
+    height: width * 0.85,
+    borderRadius: width * 0.425,
+    backgroundColor: 'rgba(45, 212, 191, 0.12)',
+    top: -width * 0.42,
+    right: -width * 0.22,
   },
   circle2: {
     position: 'absolute',
-    width: width * 0.7,
-    height: width * 0.7,
-    borderRadius: width * 0.35,
-    backgroundColor: 'rgba(231, 76, 60, 0.08)',
-    bottom: -width * 0.3,
-    left: -width * 0.3,
+    width: width * 0.65,
+    height: width * 0.65,
+    borderRadius: width * 0.325,
+    backgroundColor: 'rgba(45, 212, 191, 0.06)',
+    bottom: -width * 0.28,
+    left: -width * 0.32,
   },
 };
 
@@ -48,62 +48,69 @@ export const authStyles = StyleSheet.create({
     marginBottom: SPACING.xl,
   },
   logoBackground: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: COLORS.primary.light,
+    backgroundColor: APP.accentMuted,
+    borderWidth: 1,
+    borderColor: APP.cardBorder,
     ...SHADOWS.medium,
   },
   appName: {
-    color: COLORS.text.onPrimary,
+    color: APP.text,
     fontSize: 32,
     fontWeight: 'bold',
   },
   appNameFull: {
-    color: COLORS.text.onPrimary,
+    color: APP.text,
     marginTop: SPACING.sm,
     fontWeight: 'bold',
     letterSpacing: 1.5,
   },
   tagline: {
-    color: COLORS.text.secondary,
+    color: APP.textMuted,
     marginTop: SPACING.xs,
+    textAlign: 'center',
+    paddingHorizontal: SPACING.md,
   },
   formCard: {
     width: '100%',
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.xl,
-    backgroundColor: 'rgba(44, 62, 80, 0.8)',
+    backgroundColor: 'rgba(18, 21, 31, 0.92)',
     borderRadius: BORDER_RADIUS.lg,
+    borderWidth: 1,
+    borderColor: APP.cardBorder,
   },
   form: {
     width: '100%',
   },
   formLabel: {
     marginBottom: SPACING.lg,
-    color: COLORS.text.onPrimary,
+    color: APP.text,
     textAlign: 'center',
     fontSize: 22,
+    fontWeight: '700',
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
     borderRadius: BORDER_RADIUS.md,
     marginBottom: SPACING.md,
     paddingHorizontal: SPACING.md,
-    height: 50,
+    height: 52,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+    borderColor: APP.cardBorder,
   },
   inputIcon: {
     marginRight: SPACING.sm,
   },
   input: {
     flex: 1,
-    color: COLORS.text.onPrimary,
+    color: APP.text,
     height: '100%',
   },
   passwordInput: {
@@ -119,7 +126,7 @@ export const authStyles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: SPACING.md,
-    backgroundColor: 'rgba(255, 77, 77, 0.1)',
+    backgroundColor: 'rgba(248, 113, 113, 0.12)',
     padding: SPACING.sm,
     borderRadius: BORDER_RADIUS.sm,
   },
@@ -129,7 +136,7 @@ export const authStyles = StyleSheet.create({
   },
   signupButton: {
     marginTop: SPACING.sm,
-    backgroundColor: COLORS.primary.default,
+    backgroundColor: APP.accent,
     padding: SPACING.md,
     borderRadius: BORDER_RADIUS.lg,
     ...SHADOWS.medium,
@@ -139,10 +146,10 @@ export const authStyles = StyleSheet.create({
     alignItems: 'center',
   },
   loginText: {
-    color: COLORS.text.secondary,
+    color: APP.textMuted,
   },
   loginHighlight: {
-    color: COLORS.primary.light,
+    color: APP.accent,
     fontWeight: 'bold',
   },
-}); 
+});

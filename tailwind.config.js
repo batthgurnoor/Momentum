@@ -1,41 +1,46 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./App.{js,jsx,ts,tsx}", "./src/**/*.{js,jsx,ts,tsx}", " ./app/**/*.{js,jsx,ts,tsx}", 
-    " ./app/(tabs)/*.{js,jsx,ts,tsx}"],
+  content: ["./App.{js,jsx,ts,tsx}", "./src/**/*.{js,jsx,ts,tsx}", "./app/**/*.{js,jsx,ts,tsx}",
+    "./app/(tabs)/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
       colors: {
-        // Primary brand colors
         primary: {
-          DEFAULT: '#4361EE', // Vibrant blue - primary actions
-          light: '#4CC9F0',   // Light blue - secondary elements
-          dark: '#3A0CA3',    // Deep purple - accents
+          DEFAULT: '#2dd4bf',
+          light: '#5eead4',
+          dark: '#14b8a6',
         },
-        // Secondary colors
         secondary: {
-          DEFAULT: '#F72585', // Vibrant pink - highlights
-          light: '#F72585',   // High-intensity elements
+          DEFAULT: '#f472b6',
+          light: '#fbcfe8',
         },
-        // UI colors
+        momentum: {
+          bg: '#0c0e14',
+          mid: '#12151f',
+          bottom: '#161a26',
+          accent: '#2dd4bf',
+          muted: '#94a3b8',
+          dim: '#64748b',
+          border: 'rgba(255, 255, 255, 0.08)',
+        },
         ui: {
-          background: '#121212',    // Dark background
-          card: '#1E1E1E',          // Slightly lighter card background
-          surface: '#2A2A2A',       // Surface elements
-          border: '#3D3D3D',        // Border colors
-          success: '#4ADE80',       // Success state
-          warning: '#FBBF24',       // Warning state
-          error: '#F43F5E',         // Error state
+          background: '#0c0e14',
+          card: 'rgba(18, 21, 31, 0.92)',
+          surface: 'rgba(255, 255, 255, 0.06)',
+          border: 'rgba(255, 255, 255, 0.08)',
+          success: '#2dd4bf',
+          warning: '#fbbf24',
+          error: '#f87171',
           text: {
-            primary: '#FFFFFF',     // Primary text
-            secondary: '#A3A3A3',   // Secondary text
-            tertiary: '#6B7280',    // Tertiary text
+            primary: '#f1f5f9',
+            secondary: '#94a3b8',
+            tertiary: '#64748b',
           }
         },
-        // Gradient colors
         gradient: {
-          start: '#4361EE',
-          mid: '#3A0CA3',
-          end: '#F72585',
+          start: '#0c0e14',
+          mid: '#12151f',
+          end: '#161a26',
         }
       },
       fontFamily: {
@@ -51,4 +56,3 @@ module.exports = {
   },
   plugins: [],
 }
-

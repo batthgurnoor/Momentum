@@ -6,6 +6,9 @@ import { collection, onSnapshot, doc, deleteDoc } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Swipeable, GestureHandlerRootView } from 'react-native-gesture-handler';
+import { COLORS } from '../theme/colors';
+
+const APP = COLORS.app;
 
 export default function PlanListScreen() {
   const navigation = useNavigation();
@@ -72,9 +75,9 @@ export default function PlanListScreen() {
 
   if (loading) {
     return (
-      <LinearGradient colors={['#1F1C2C', '#928DAB']} style={styles.gradient}>
+      <LinearGradient colors={[APP.bgTop, APP.bgMid, APP.bgBottom]} locations={[0, 0.45, 1]} style={styles.gradient}>
         <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-          <ActivityIndicator size="large" color="#fff" />
+          <ActivityIndicator size="large" color={APP.accent} />
           <Text style={styles.infoText}>Loading plans...</Text>
         </View>
       </LinearGradient>
@@ -83,7 +86,7 @@ export default function PlanListScreen() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <LinearGradient colors={['rgba(0,0,0,0.8)', 'transparent']} style={styles.gradient}>
+      <LinearGradient colors={[APP.bgTop, APP.bgMid, APP.bgBottom]} locations={[0, 0.45, 1]} style={styles.gradient}>
         <View style={styles.container}>
           <Text style={styles.headerTitle}>Your Workout Plans</Text>
           {plans.length === 0 ? (
@@ -131,13 +134,13 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 26,
     fontWeight: 'bold',
-    color: '#fff',
+    color: APP.text,
     textAlign: 'center',
     marginBottom: 16,
   },
   infoText: {
     fontSize: 16,
-    color: '#fff',
+    color: APP.textMuted,
     textAlign: 'center',
     marginVertical: 10,
   },
@@ -145,23 +148,25 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   planCard: {
-    backgroundColor: 'rgba(255,255,255,0.9)',
+    backgroundColor: 'rgba(18, 21, 31, 0.92)',
     borderRadius: 12,
     padding: 16,
     marginVertical: 6,
+    borderWidth: 1,
+    borderColor: APP.cardBorder,
   },
   planCardTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: APP.text,
     marginBottom: 4,
   },
   planCardSub: {
     fontSize: 16,
-    color: '#666',
+    color: APP.textMuted,
   },
   createButton: {
-    backgroundColor: '#4f5bd5',
+    backgroundColor: APP.accent,
     padding: 14,
     borderRadius: 25,
     marginTop: 10,
@@ -169,7 +174,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   createButtonText: {
-    color: '#fff',
+    color: COLORS.text.onPrimary,
     fontSize: 18,
     textAlign: 'center',
     fontWeight: 'bold',

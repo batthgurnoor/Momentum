@@ -7,8 +7,6 @@ import {
   TouchableOpacity,
   ImageBackground,
   Image,
-  FlatList,
-  Platform,
   KeyboardAvoidingView,
   ScrollView
 } from 'react-native';
@@ -16,23 +14,24 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '../../Firebase/config';
 import { useNavigation } from '@react-navigation/native';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { COLORS } from '../theme/colors';
 
-const bannerImage = require('../../assets/images/fitnessBanner.jpg'); // <- example path
-const defaultAvatar = require('../../assets/images/avatar.png'); // <- example path
+const APP = COLORS.app;
+
+const bannerImage = require('../../assets/images/fitnessBanner.jpg');
+const defaultAvatar = require('../../assets/images/avatar.png');
 
 export default function ProfileScreen() {
   const navigation = useNavigation();
 
   const [profile, setProfile] = useState(null);
-  const [editing, setEditing] = useState(false); // toggles edit mode
+  const [editing, setEditing] = useState(false);
 
-  // For activity logs
   const [activities, setActivities] = useState([]);
   const [loadingActivities, setLoadingActivities] = useState(true);
 
   const user = auth.currentUser;
 
-  // 1) Load user profile doc
   useEffect(() => {
     const fetchProfile = async () => {
       if (!user) return;
@@ -42,7 +41,6 @@ export default function ProfileScreen() {
         if (snapshot.exists()) {
           setProfile(snapshot.data());
         } else {
-          // If doc doesn't exist, set a default object so we can fill fields
           setProfile({
             firstName: '',
             lastName: '',
@@ -59,7 +57,6 @@ export default function ProfileScreen() {
     fetchProfile();
   }, []);
 
-  // 2) Real-time load the user's activities
   useEffect(() => {
     if (!user) return;
     const activitiesRef = collection(db, 'users', user.uid, 'activities');
@@ -82,7 +79,6 @@ export default function ProfileScreen() {
     return () => unsubscribe();
   }, []);
 
-  // 3) Handle updating profile
   const handleSave = async () => {
     if (!user || !profile) return;
     try {
@@ -100,200 +96,192 @@ export default function ProfileScreen() {
     }
   };
 
-  // If profile isn't loaded yet, show spinner
   if (!profile) {
     return (
-      <View className="flex-1 justify-center items-center bg-white">
-        <ActivityIndicator size="large" color="gray" />
-        <Text className="text-gray-500 mt-2">Loading Profile...</Text>
+      <View className="flex-1 justify-center items-center bg-momentum-bg">
+        <ActivityIndicator size="large" color={APP.accent} />
+        <Text className="text-ui-text-secondary mt-2">Loading Profile...</Text>
       </View>
     );
   }
 
-  // A custom ActivityCard for the list
   const ActivityCard = ({ item }) => {
     const dateStr = item.timestamp?.toDate
       ? item.timestamp.toDate().toLocaleString()
       : 'N/A';
 
     return (
-      <View className="bg-white rounded-xl p-4 mb-3 shadow-sm">
-        <Text className="text-lg font-bold">{item.title}</Text>
-        <Text className="text-sm text-gray-600">{dateStr}</Text>
+      <View className="rounded-xl p-4 mb-3 border border-momentum-border bg-ui-card">
+        <Text className="text-lg font-bold text-ui-text-primary">{item.title}</Text>
+        <Text className="text-sm text-ui-text-secondary">{dateStr}</Text>
         {item.duration ? (
-          <Text className="text-sm mt-1">Duration: {item.duration} min</Text>
+          <Text className="text-sm mt-1 text-ui-text-secondary">Duration: {item.duration} min</Text>
         ) : null}
         {item.caloriesBurned ? (
-          <Text className="text-sm">Calories: {item.caloriesBurned}</Text>
+          <Text className="text-sm text-ui-text-secondary">Calories: {item.caloriesBurned}</Text>
         ) : null}
-        {item.notes ? <Text className="text-sm">Notes: {item.notes}</Text> : null}
+        {item.notes ? <Text className="text-sm text-ui-text-tertiary">Notes: {item.notes}</Text> : null}
       </View>
     );
   };
 
   return (
-    <KeyboardAvoidingView
-      className="flex-1 bg-gray-50"
-    >
-      <ScrollView showsVerticalScrollIndicator={false} className=''>
+    <KeyboardAvoidingView className="flex-1 bg-momentum-bg">
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        className="flex-1"
+        contentContainerStyle={{ paddingBottom: 40 }}
+        keyboardShouldPersistTaps="handled"
+      >
         <View className="h-40 w-full">
           <ImageBackground
             source={bannerImage}
             resizeMode="cover"
             className="flex-1 justify-end"
           >
-            <View className="flex-row items-center px-4 py-2 bg-black/30">
+            <View className="flex-row items-center px-4 py-3 bg-black/50">
               <Text className="text-white font-bold text-2xl">Welcome!</Text>
             </View>
           </ImageBackground>
         </View>
 
-        {/* Profile Header Card */}
         <View className="-mt-14 px-4">
-          {/* White Card */}
-          <View className="bg-white rounded-2xl shadow-md p-4">
-            {/* Avatar + Name Row */}
+          <View className="rounded-2xl p-4 border border-momentum-border bg-ui-card">
             <View className="flex-row">
               <Image
                 source={defaultAvatar}
-                className="w-24 h-24 rounded-full border-2 border-white -mt-3"
+                className="w-24 h-24 rounded-full border-2 border-primary -mt-3"
               />
               <View className="ml-4 flex-1 justify-center">
-                <Text className="text-xl font-bold text-gray-800">
+                <Text className="text-xl font-bold text-ui-text-primary">
                   {profile.firstName || 'First'} {profile.lastName || 'Last'}
                 </Text>
-                <Text className="text-sm text-gray-500">
+                <Text className="text-sm text-ui-text-secondary">
                   {profile.email || user.email}
                 </Text>
               </View>
             </View>
 
-            {/* Stats Row (Height/Weight/Phone) */}
             <View className="flex-row justify-between mt-4">
-              {/* Height */}
               <View className="flex-1 items-center">
-                <Text className="text-xs text-gray-500">Height</Text>
-                <Text className="text-base font-semibold text-gray-900">
+                <Text className="text-xs text-ui-text-tertiary">Height</Text>
+                <Text className="text-base font-semibold text-ui-text-primary">
                   {profile.height || 0} cm
                 </Text>
               </View>
-              {/* Divider */}
-              <View className="w-[1px] bg-gray-300 mx-2" />
-              {/* Weight */}
+              <View className="w-[1px] bg-momentum-border mx-2" />
               <View className="flex-1 items-center">
-                <Text className="text-xs text-gray-500">Weight</Text>
-                <Text className="text-base font-semibold text-gray-900">
+                <Text className="text-xs text-ui-text-tertiary">Weight</Text>
+                <Text className="text-base font-semibold text-ui-text-primary">
                   {profile.weight || 0} kg
                 </Text>
               </View>
-              {/* Divider */}
-              <View className="w-[1px] bg-gray-300 mx-2" />
-              {/* Phone */}
+              <View className="w-[1px] bg-momentum-border mx-2" />
               <View className="flex-1 items-center">
-                <Text className="text-xs text-gray-500">Phone</Text>
-                <Text className="text-base font-semibold text-gray-900">
+                <Text className="text-xs text-ui-text-tertiary">Phone</Text>
+                <Text className="text-base font-semibold text-ui-text-primary">
                   {profile.phone || 'N/A'}
                 </Text>
               </View>
             </View>
 
-            {/* Edit/Save Button */}
             <View className="mt-4">
               {!editing ? (
                 <View className="flex-row justify-between">
                   <TouchableOpacity
                     onPress={() => navigation.navigate('Notifications')}
-                    className="bg-blue-500 py-2 px-4 rounded-full"
+                    className="bg-primary py-2 px-4 rounded-full"
                   >
-                    <Text className="text-white font-semibold">Notifications</Text>
+                    <Text className="text-momentum-bg font-bold">Notifications</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => setEditing(true)}
-                    className="bg-indigo-500 py-2 px-4 rounded-full"
+                    className="bg-ui-surface border border-momentum-border py-2 px-4 rounded-full"
                   >
-                    <Text className="text-white font-semibold">Edit Profile</Text>
+                    <Text className="text-primary font-bold">Edit Profile</Text>
                   </TouchableOpacity>
                 </View>
               ) : (
                 <TouchableOpacity
                   onPress={handleSave}
-                  className="bg-green-500 py-2 px-4 rounded-full self-end"
+                  className="bg-primary py-2 px-4 rounded-full self-end"
                 >
-                  <Text className="text-white font-semibold">Save Changes</Text>
+                  <Text className="text-momentum-bg font-bold">Save Changes</Text>
                 </TouchableOpacity>
               )}
             </View>
           </View>
         </View>
 
-        {/* Editable Section (appears if editing) */}
         {editing && (
-          <View className="mx-4 mt-4 bg-white p-4 rounded-xl shadow-sm">
-            <Text className="text-lg font-semibold mb-2">Update Details</Text>
-            <Text className="text-gray-600">First Name</Text>
+          <View className="mx-4 mt-4 p-4 rounded-xl border border-momentum-border bg-ui-card">
+            <Text className="text-lg font-semibold mb-2 text-ui-text-primary">Update Details</Text>
+            <Text className="text-ui-text-secondary">First Name</Text>
             <TextInput
-              className="bg-gray-100 px-3 py-2 rounded-lg mb-2"
+              className="bg-ui-surface px-3 py-2 rounded-lg mb-2 text-ui-text-primary border border-momentum-border"
+              placeholderTextColor={APP.textDim}
               value={profile.firstName}
               onChangeText={(t) => setProfile({ ...profile, firstName: t })}
             />
-            <Text className="text-gray-600">Last Name</Text>
+            <Text className="text-ui-text-secondary">Last Name</Text>
             <TextInput
-              className="bg-gray-100 px-3 py-2 rounded-lg mb-2"
+              className="bg-ui-surface px-3 py-2 rounded-lg mb-2 text-ui-text-primary border border-momentum-border"
+              placeholderTextColor={APP.textDim}
               value={profile.lastName}
               onChangeText={(t) => setProfile({ ...profile, lastName: t })}
             />
-            <Text className="text-gray-600">Phone</Text>
+            <Text className="text-ui-text-secondary">Phone</Text>
             <TextInput
-              className="bg-gray-100 px-3 py-2 rounded-lg mb-2"
+              className="bg-ui-surface px-3 py-2 rounded-lg mb-2 text-ui-text-primary border border-momentum-border"
+              placeholderTextColor={APP.textDim}
               keyboardType="phone-pad"
               value={profile.phone}
               onChangeText={(t) => setProfile({ ...profile, phone: t })}
             />
-            <Text className="text-gray-600">Height (cm)</Text>
+            <Text className="text-ui-text-secondary">Height (cm)</Text>
             <TextInput
-              className="bg-gray-100 px-3 py-2 rounded-lg mb-2"
+              className="bg-ui-surface px-3 py-2 rounded-lg mb-2 text-ui-text-primary border border-momentum-border"
+              placeholderTextColor={APP.textDim}
               keyboardType="numeric"
               value={String(profile.height)}
               onChangeText={(t) => setProfile({ ...profile, height: t })}
             />
-            <Text className="text-gray-600">Weight (kg)</Text>
+            <Text className="text-ui-text-secondary">Weight (kg)</Text>
             <TextInput
-              className="bg-gray-100 px-3 py-2 rounded-lg mb-2"
+              className="bg-ui-surface px-3 py-2 rounded-lg mb-2 text-ui-text-primary border border-momentum-border"
+              placeholderTextColor={APP.textDim}
               keyboardType="numeric"
               value={String(profile.weight)}
               onChangeText={(t) => setProfile({ ...profile, weight: t })}
             />
           </View>
         )}
-</ScrollView>
 
-        {/* Activity History Section */}<View className='relative h-[55%]'> 
-        <View className="mt-4 mx-4 mb-6 fixed">
-          <View className="flex-row justify-between items-center">
-            <Text className="text-xl font-bold text-gray-800">
+        <View className="mt-6 mx-4 mb-4">
+          <View className="flex-row justify-between items-center mb-2">
+            <Text className="text-xl font-bold text-ui-text-primary">
               Activity History
             </Text>
             <TouchableOpacity
               onPress={() => navigation.navigate('ActivityMonitoring')}
-              className="bg-indigo-500 py-1 px-3 rounded-full"
+              className="bg-primary py-1 px-3 rounded-full"
             >
-              <Text className="text-white font-semibold">View All</Text>
+              <Text className="text-momentum-bg font-bold">View All</Text>
             </TouchableOpacity>
           </View>
-        </View>
           {loadingActivities ? (
-            <ActivityIndicator size="large" color="gray" />
+            <View className="items-center py-8">
+              <ActivityIndicator size="large" color={APP.accent} />
+            </View>
           ) : activities.length === 0 ? (
-            <Text className="text-gray-600">No activity found.</Text>
+            <Text className="text-ui-text-secondary">No activity found.</Text>
           ) : (
-            <FlatList
-              data={activities}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => <ActivityCard item={item} />}
-            />
+            activities.map((item) => (
+              <ActivityCard key={item.id} item={item} />
+            ))
           )}
         </View>
-        
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }

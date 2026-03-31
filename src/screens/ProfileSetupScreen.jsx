@@ -96,7 +96,7 @@ export default function ProfileSetupScreen() {
             
             {/* Email (read-only) */}
             <View style={authStyles.inputContainer}>
-              <Ionicons name="mail-outline" size={20} color={COLORS.primary.light} style={authStyles.inputIcon} />
+              <Ionicons name="mail-outline" size={20} color={COLORS.app.accent} style={authStyles.inputIcon} />
               <TextInput
                 value={email}
                 editable={false}
@@ -105,7 +105,7 @@ export default function ProfileSetupScreen() {
             </View>
 
             <View style={authStyles.inputContainer}>
-              <Ionicons name="person-outline" size={20} color={COLORS.primary.light} style={authStyles.inputIcon} />
+              <Ionicons name="person-outline" size={20} color={COLORS.app.accent} style={authStyles.inputIcon} />
               <TextInput
                 placeholder="First Name"
                 placeholderTextColor={COLORS.text.tertiary}
@@ -116,7 +116,7 @@ export default function ProfileSetupScreen() {
             </View>
 
             <View style={authStyles.inputContainer}>
-              <Ionicons name="person-outline" size={20} color={COLORS.primary.light} style={authStyles.inputIcon} />
+              <Ionicons name="person-outline" size={20} color={COLORS.app.accent} style={authStyles.inputIcon} />
               <TextInput
                 placeholder="Last Name"
                 placeholderTextColor={COLORS.text.tertiary}
@@ -127,7 +127,7 @@ export default function ProfileSetupScreen() {
             </View>
 
             <View style={authStyles.inputContainer}>
-              <Ionicons name="call-outline" size={20} color={COLORS.primary.light} style={authStyles.inputIcon} />
+              <Ionicons name="call-outline" size={20} color={COLORS.app.accent} style={authStyles.inputIcon} />
               <TextInput
                 placeholder="Phone Number"
                 placeholderTextColor={COLORS.text.tertiary}
@@ -139,7 +139,7 @@ export default function ProfileSetupScreen() {
             </View>
 
             <View style={authStyles.inputContainer}>
-              <Ionicons name="resize-outline" size={20} color={COLORS.primary.light} style={authStyles.inputIcon} />
+              <Ionicons name="resize-outline" size={20} color={COLORS.app.accent} style={authStyles.inputIcon} />
               <TextInput
                 placeholder="Height (e.g. 170 in cm)"
                 placeholderTextColor={COLORS.text.tertiary}
@@ -151,7 +151,7 @@ export default function ProfileSetupScreen() {
             </View>
 
             <View style={authStyles.inputContainer}>
-              <Ionicons name="scale-outline" size={20} color={COLORS.primary.light} style={authStyles.inputIcon} />
+              <Ionicons name="scale-outline" size={20} color={COLORS.app.accent} style={authStyles.inputIcon} />
               <TextInput
                 placeholder="Weight (e.g. 65 in kg)"
                 placeholderTextColor={COLORS.text.tertiary}
@@ -164,9 +164,9 @@ export default function ProfileSetupScreen() {
 
             <TouchableOpacity
               onPress={saveProfile}
-              style={[authStyles.signupButton, { backgroundColor: '#4CAF50' }]}
+              style={authStyles.signupButton}
             >
-              <Text style={{ color: COLORS.text.onPrimary, textAlign: 'center', fontWeight: '600' }}>Save Profile</Text>
+              <Text style={{ color: COLORS.text.onPrimary, textAlign: 'center', fontWeight: '700' }}>Save Profile</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>

@@ -6,6 +6,9 @@ import { collection, onSnapshot, doc, deleteDoc } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Swipeable, GestureHandlerRootView } from 'react-native-gesture-handler';
+import { COLORS } from '../theme/colors';
+
+const APP = COLORS.app;
 
 export default function GoalListScreen() {
   const navigation = useNavigation();
@@ -77,10 +80,10 @@ export default function GoalListScreen() {
 
   if (loading) {
     return (
-      <LinearGradient colors={['#1F1C2C', '#928DAB']} style={styles.gradient}>
+      <LinearGradient colors={[APP.bgTop, APP.bgMid, APP.bgBottom]} locations={[0, 0.45, 1]} style={styles.gradient}>
         <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-          <ActivityIndicator size="large" color="#fff" />
-          <Text style={{ color: '#fff', marginTop: 12 }}>Loading goals...</Text>
+          <ActivityIndicator size="large" color={APP.accent} />
+          <Text style={{ color: APP.textMuted, marginTop: 12 }}>Loading goals...</Text>
         </View>
       </LinearGradient>
     );
@@ -88,7 +91,7 @@ export default function GoalListScreen() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <LinearGradient colors={['rgba(0,0,0,0.8)', 'transparent']} style={styles.gradient}>
+      <LinearGradient colors={[APP.bgTop, APP.bgMid, APP.bgBottom]} locations={[0, 0.45, 1]} style={styles.gradient}>
         <View style={styles.container}>
           <Text style={styles.headerTitle}>Your Fitness Goals</Text>
 
@@ -147,32 +150,34 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
+    color: APP.text,
     textAlign: 'center',
     marginBottom: 16
   },
   infoText: {
-    color: '#fff',
+    color: APP.textMuted,
     fontSize: 16
   },
   goalCard: {
-    backgroundColor: 'rgba(255,255,255,0.85)',
+    backgroundColor: 'rgba(18, 21, 31, 0.92)',
     borderRadius: 12,
     padding: 16,
-    marginVertical: 6
+    marginVertical: 6,
+    borderWidth: 1,
+    borderColor: APP.cardBorder,
   },
   goalCardTitle: {
     fontWeight: 'bold',
     fontSize: 18,
     marginBottom: 4,
-    color: '#333'
+    color: APP.text
   },
   goalCardSub: {
     fontSize: 14,
-    color: '#666'
+    color: APP.textMuted
   },
   createButton: {
-    backgroundColor: '#4f5bd5',
+    backgroundColor: APP.accent,
     padding: 14,
     borderRadius: 25,
     marginHorizontal: 16,
@@ -180,7 +185,7 @@ const styles = StyleSheet.create({
     marginTop: 10
   },
   createButtonText: {
-    color: '#fff',
+    color: COLORS.text.onPrimary,
     fontWeight: 'bold',
     textAlign: 'center',
     fontSize: 16

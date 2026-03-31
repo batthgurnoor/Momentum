@@ -14,11 +14,10 @@
     "production": {
       "autoIncrement": true
     },
-    "apkPreview":{
-      "android":{
+    "apkPreview": {
+      "android": {
         "buildType": "apk"
       }
-
     }
   },
   "submit": {
