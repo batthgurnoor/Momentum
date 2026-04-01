@@ -1,12 +1,60 @@
-import React from 'react';
-import { View, Text } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { ActivityIndicator, View, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../theme/colors';
+import { auth, db } from '../../Firebase/config';
+import { collection, onSnapshot, orderBy, query, where } from 'firebase/firestore';
 
 const APP = COLORS.app;
 
 export default function ProgressScreen() {
+  const user = auth.currentUser;
+  const [loading, setLoading] = useState(true);
+  const [weekActivities, setWeekActivities] = useState([]);
+
+  const weekStart = useMemo(() => {
+    const d = new Date();
+    // last 7 days rolling window
+    d.setDate(d.getDate() - 6);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, []);
+
+  useEffect(() => {
+    if (!user) {
+      setWeekActivities([]);
+      setLoading(false);
+      return;
+    }
+
+    const ref = collection(db, 'users', user.uid, 'activities');
+    const q = query(ref, where('timestamp', '>=', weekStart), orderBy('timestamp', 'desc'));
+    const unsub = onSnapshot(
+      q,
+      (snap) => {
+        const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        setWeekActivities(list);
+        setLoading(false);
+      },
+      (err) => {
+        console.log('Progress snapshot error:', err);
+        setWeekActivities([]);
+        setLoading(false);
+      }
+    );
+
+    return () => unsub();
+  }, [user, weekStart]);
+
+  const summary = useMemo(() => {
+    const sessions = weekActivities.length;
+    const totalSeconds = weekActivities.reduce((acc, a) => acc + (Number(a.duration) || 0), 0);
+    const totalCalories = weekActivities.reduce((acc, a) => acc + (Number(a.caloriesBurned) || 0), 0);
+    const minutes = Math.round(totalSeconds / 60);
+    return { sessions, minutes, totalCalories };
+  }, [weekActivities]);
+
   return (
     <LinearGradient colors={[APP.bgTop, APP.bgMid, APP.bgBottom]} locations={[0, 0.45, 1]} style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1, paddingHorizontal: 20, paddingTop: 12 }}>
@@ -14,8 +62,71 @@ export default function ProgressScreen() {
           Progress
         </Text>
         <Text style={{ color: COLORS.text.secondary, marginTop: 10, lineHeight: 20 }}>
-          Coming next: weekly volume, workouts/week, PRs, and trends.
+          Last 7 days summary from your logged workouts.
         </Text>
+
+        {!user ? (
+          <View
+            style={{
+              marginTop: 16,
+              padding: 14,
+              borderRadius: 16,
+              borderWidth: 1,
+              borderColor: APP.cardBorder,
+              backgroundColor: 'rgba(255,255,255,0.06)',
+            }}
+          >
+            <Text style={{ color: COLORS.text.primary, fontWeight: '800', marginBottom: 6 }}>Sign in to see progress</Text>
+            <Text style={{ color: COLORS.text.secondary, lineHeight: 20 }}>
+              Your workout history is tied to your account.
+            </Text>
+          </View>
+        ) : loading ? (
+          <View style={{ marginTop: 18, alignItems: 'center' }}>
+            <ActivityIndicator size="large" color={APP.accent} />
+            <Text style={{ color: COLORS.text.secondary, marginTop: 10 }}>Loading progress…</Text>
+          </View>
+        ) : (
+          <>
+            <View
+              style={{
+                marginTop: 16,
+                padding: 14,
+                borderRadius: 16,
+                borderWidth: 1,
+                borderColor: APP.cardBorder,
+                backgroundColor: 'rgba(255,255,255,0.06)',
+              }}
+            >
+              <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 16, marginBottom: 10 }}>
+                This week
+              </Text>
+
+              <View style={{ flexDirection: 'row', gap: 10 }}>
+                <View style={{ flex: 1, padding: 12, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.22)' }}>
+                  <Text style={{ color: COLORS.text.tertiary, fontWeight: '700', fontSize: 12 }}>Sessions</Text>
+                  <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 22, marginTop: 6 }}>
+                    {summary.sessions}
+                  </Text>
+                </View>
+                <View style={{ flex: 1, padding: 12, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.22)' }}>
+                  <Text style={{ color: COLORS.text.tertiary, fontWeight: '700', fontSize: 12 }}>Minutes</Text>
+                  <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 22, marginTop: 6 }}>
+                    {summary.minutes}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={{ marginTop: 10, padding: 12, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.22)' }}>
+                <Text style={{ color: COLORS.text.tertiary, fontWeight: '700', fontSize: 12 }}>Calories (logged)</Text>
+                <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 22, marginTop: 6 }}>
+                  {Math.round(summary.totalCalories)}
+                </Text>
+              </View>
+            </View>
+          </>
+        )}
+
         <View
           style={{
             marginTop: 16,
@@ -26,10 +137,9 @@ export default function ProgressScreen() {
             backgroundColor: 'rgba(255,255,255,0.06)',
           }}
         >
-          <Text style={{ color: COLORS.text.primary, fontWeight: '800', marginBottom: 6 }}>Planned charts</Text>
+          <Text style={{ color: COLORS.text.primary, fontWeight: '800', marginBottom: 6 }}>Up next</Text>
           <Text style={{ color: COLORS.text.secondary, lineHeight: 20 }}>
-            - Training minutes + sessions per week{'\n'}- Calories (optional){'\n'}- PR tracker (best set, best time){'\n'}
-            - Consistency streaks
+            - Weekly charts + trends{'\n'}- PR tracker (best set, best time){'\n'}- Muscle group breakdown{'\n'}- Consistency
           </Text>
         </View>
       </SafeAreaView>
