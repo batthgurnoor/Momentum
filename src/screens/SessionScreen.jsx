@@ -14,12 +14,14 @@ import { useNavigation } from '@react-navigation/native';
 import { COLORS } from '../theme/colors';
 import { auth, db } from '../../Firebase/config';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import * as Haptics from 'expo-haptics';
 
 const APP = COLORS.app;
 
 export default function SessionScreen() {
   const navigation = useNavigation();
   const intervalRef = useRef(null);
+  const restIntervalRef = useRef(null);
 
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -30,6 +32,32 @@ export default function SessionScreen() {
   const [title, setTitle] = useState('');
   const [calories, setCalories] = useState('');
   const [notes, setNotes] = useState('');
+
+  const [restSeconds, setRestSeconds] = useState(0);
+  const [restRunning, setRestRunning] = useState(false);
+
+  useEffect(() => {
+    if (!restRunning) {
+      clearInterval(restIntervalRef.current);
+      return;
+    }
+
+    if (restSeconds <= 0) {
+      setRestRunning(false);
+      clearInterval(restIntervalRef.current);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+      return;
+    }
+
+    restIntervalRef.current = setInterval(() => {
+      setRestSeconds((s) => {
+        if (s <= 1) return 0;
+        return s - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(restIntervalRef.current);
+  }, [restRunning, restSeconds]);
 
   useEffect(() => {
     if (isRunning && !isPaused) {
@@ -49,6 +77,7 @@ export default function SessionScreen() {
   };
 
   const displayedTime = useMemo(() => formatTime(elapsedTime), [elapsedTime]);
+  const displayedRest = useMemo(() => formatTime(restSeconds), [restSeconds]);
 
   const handleStart = () => {
     if (isRunning) return;
@@ -114,6 +143,20 @@ export default function SessionScreen() {
       console.log('Error saving session:', e);
       Alert.alert('Error', e?.message ?? 'Could not save session.');
     }
+  };
+
+  const setRestPreset = (secs) => {
+    setRestSeconds(secs);
+    setRestRunning(false);
+  };
+
+  const startRest = () => {
+    if (restSeconds <= 0) return;
+    setRestRunning(true);
+  };
+
+  const stopRest = () => {
+    setRestRunning(false);
   };
 
   return (
@@ -208,6 +251,103 @@ export default function SessionScreen() {
                 </TouchableOpacity>
               </View>
             )}
+          </View>
+
+          <View
+            style={{
+              borderRadius: 16,
+              borderWidth: 1,
+              borderColor: APP.cardBorder,
+              backgroundColor: 'rgba(255,255,255,0.06)',
+              padding: 14,
+              marginBottom: 12,
+            }}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 16 }}>Rest timer</Text>
+              <Text style={{ color: COLORS.text.secondary, fontWeight: '900' }}>{displayedRest}</Text>
+            </View>
+
+            <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
+              {[30, 60, 90].map((s) => (
+                <TouchableOpacity
+                  key={s}
+                  activeOpacity={0.9}
+                  onPress={() => setRestPreset(s)}
+                  style={{
+                    flex: 1,
+                    paddingVertical: 10,
+                    borderRadius: 12,
+                    borderWidth: 1,
+                    borderColor: APP.cardBorder,
+                    backgroundColor: restSeconds === s ? 'rgba(45, 212, 191, 0.18)' : 'rgba(0,0,0,0.22)',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Text style={{ color: COLORS.text.primary, fontWeight: '900' }}>{s}s</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
+              {!restRunning ? (
+                <TouchableOpacity
+                  activeOpacity={0.9}
+                  onPress={startRest}
+                  disabled={restSeconds <= 0}
+                  style={{
+                    flex: 1,
+                    paddingVertical: 12,
+                    borderRadius: 999,
+                    backgroundColor: restSeconds <= 0 ? 'rgba(255,255,255,0.08)' : APP.accent,
+                    alignItems: 'center',
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: restSeconds <= 0 ? COLORS.text.secondary : COLORS.text.onPrimary,
+                      fontWeight: '900',
+                    }}
+                  >
+                    Start rest
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  activeOpacity={0.9}
+                  onPress={stopRest}
+                  style={{
+                    flex: 1,
+                    paddingVertical: 12,
+                    borderRadius: 999,
+                    backgroundColor: 'rgba(245, 158, 11, 0.95)',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Text style={{ color: COLORS.text.onPrimary, fontWeight: '900' }}>Stop rest</Text>
+                </TouchableOpacity>
+              )}
+
+              <TouchableOpacity
+                activeOpacity={0.9}
+                onPress={() => {
+                  setRestRunning(false);
+                  setRestSeconds(0);
+                }}
+                style={{
+                  paddingVertical: 12,
+                  paddingHorizontal: 14,
+                  borderRadius: 999,
+                  borderWidth: 1,
+                  borderColor: APP.cardBorder,
+                  backgroundColor: 'rgba(0,0,0,0.22)',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Text style={{ color: COLORS.text.primary, fontWeight: '900' }}>Reset</Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           <View
