@@ -80,6 +80,60 @@ export default function ProgressScreen() {
 
   const streak = useMemo(() => computeStreaks(streakActivities), [streakActivities]);
 
+  const prs = useMemo(() => {
+    let longestSeconds = 0;
+    let longestTitle = null;
+    let mostCalories = 0;
+    let mostCaloriesTitle = null;
+
+    const dayCounts = new Map(); // YYYY-MM-DD -> count
+    for (const a of streakActivities) {
+      const dur = Number(a?.duration) || 0;
+      if (dur > longestSeconds) {
+        longestSeconds = dur;
+        longestTitle = a?.title || null;
+      }
+      const cal = Number(a?.caloriesBurned) || 0;
+      if (cal > mostCalories) {
+        mostCalories = cal;
+        mostCaloriesTitle = a?.title || null;
+      }
+      const ts = a?.timestamp?.toDate?.();
+      if (ts) {
+        const y = ts.getFullYear();
+        const m = String(ts.getMonth() + 1).padStart(2, '0');
+        const d = String(ts.getDate()).padStart(2, '0');
+        const key = `${y}-${m}-${d}`;
+        dayCounts.set(key, (dayCounts.get(key) || 0) + 1);
+      }
+    }
+
+    // best week sessions: sliding window over last 120 days
+    const keys = Array.from(dayCounts.keys()).sort();
+    const counts = keys.map((k) => dayCounts.get(k) || 0);
+    let bestWeekSessions = 0;
+    for (let i = 0; i < counts.length; i++) {
+      let sum = 0;
+      for (let j = i; j < counts.length && j < i + 7; j++) sum += counts[j];
+      bestWeekSessions = Math.max(bestWeekSessions, sum);
+    }
+
+    const fmt = (secs) => {
+      const minutes = Math.floor(secs / 60);
+      const leftover = secs % 60;
+      return `${minutes}m ${leftover}s`;
+    };
+
+    return {
+      longestSeconds,
+      longestLabel: longestSeconds ? fmt(longestSeconds) : '—',
+      longestTitle: longestTitle || '—',
+      mostCalories: mostCalories ? Math.round(mostCalories) : 0,
+      mostCaloriesTitle: mostCaloriesTitle || '—',
+      bestWeekSessions,
+    };
+  }, [streakActivities]);
+
   return (
     <LinearGradient colors={[APP.bgTop, APP.bgMid, APP.bgBottom]} locations={[0, 0.45, 1]} style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1, paddingHorizontal: 20, paddingTop: 12 }}>
@@ -162,6 +216,49 @@ export default function ProgressScreen() {
                     {streak.best}
                   </Text>
                 </View>
+              </View>
+            </View>
+
+            <View
+              style={{
+                marginTop: 16,
+                padding: 14,
+                borderRadius: 16,
+                borderWidth: 1,
+                borderColor: APP.cardBorder,
+                backgroundColor: 'rgba(255,255,255,0.06)',
+              }}
+            >
+              <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 16, marginBottom: 10 }}>
+                Personal records
+              </Text>
+
+              <View style={{ flexDirection: 'row', gap: 10 }}>
+                <View style={{ flex: 1, padding: 12, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.22)' }}>
+                  <Text style={{ color: COLORS.text.tertiary, fontWeight: '700', fontSize: 12 }}>Longest session</Text>
+                  <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 20, marginTop: 6 }}>
+                    {prs.longestLabel}
+                  </Text>
+                  <Text style={{ color: COLORS.text.secondary, marginTop: 4 }} numberOfLines={1}>
+                    {prs.longestTitle}
+                  </Text>
+                </View>
+                <View style={{ flex: 1, padding: 12, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.22)' }}>
+                  <Text style={{ color: COLORS.text.tertiary, fontWeight: '700', fontSize: 12 }}>Most calories</Text>
+                  <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 20, marginTop: 6 }}>
+                    {prs.mostCalories || '—'}
+                  </Text>
+                  <Text style={{ color: COLORS.text.secondary, marginTop: 4 }} numberOfLines={1}>
+                    {prs.mostCalories ? prs.mostCaloriesTitle : '—'}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={{ marginTop: 10, padding: 12, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.22)' }}>
+                <Text style={{ color: COLORS.text.tertiary, fontWeight: '700', fontSize: 12 }}>Best week (sessions)</Text>
+                <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 22, marginTop: 6 }}>
+                  {prs.bestWeekSessions || 0}
+                </Text>
               </View>
             </View>
           </>
