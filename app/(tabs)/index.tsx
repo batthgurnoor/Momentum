@@ -47,8 +47,6 @@ function TabNavigator() {
             return <FontAwesome6 name="dumbbell" size={size} color={color} />;
           case 'Train':
             return <Ionicons name="barbell" size={size} color={color} />;
-          case 'LogWorkout':
-            return <AntDesign name="book" size={size} color={color} />;
           case 'Progress':
             return <Ionicons name="stats-chart" size={size} color={color} />;
           case 'Profile':
@@ -78,7 +76,6 @@ function TabNavigator() {
     <Tab.Navigator screenOptions={screenOptions}>
       <Tab.Screen name="Today" component={WorkoutScreen} />
       <Tab.Screen name="Train" component={TrainScreen} />
-      <Tab.Screen name="LogWorkout" component={LogWorkoutScreen} />
       <Tab.Screen name="Goals" component={GoalListScreen} />
       <Tab.Screen name="Progress" component={ProgressScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />

@@ -269,30 +269,6 @@ export default function ProfileScreen() {
           </View>
         )}
 
-        <View className="mt-6 mx-4 mb-4">
-          <View className="flex-row justify-between items-center mb-2">
-            <Text className="text-xl font-bold text-ui-text-primary">
-              Activity History
-            </Text>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('ActivityMonitoring')}
-              className="bg-primary py-1 px-3 rounded-full"
-            >
-              <Text className="text-momentum-bg font-bold">View All</Text>
-            </TouchableOpacity>
-          </View>
-          {loadingActivities ? (
-            <View className="items-center py-8">
-              <ActivityIndicator size="large" color={APP.accent} />
-            </View>
-          ) : activities.length === 0 ? (
-            <Text className="text-ui-text-secondary">No activity found.</Text>
-          ) : (
-            activities.map((item) => (
-              <ActivityCard key={item.id} item={item} />
-            ))
-          )}
-        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
