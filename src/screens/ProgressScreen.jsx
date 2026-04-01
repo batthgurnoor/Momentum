@@ -4,7 +4,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../theme/colors';
 import { auth, db } from '../../Firebase/config';
-import { collection, onSnapshot, orderBy, query, where } from 'firebase/firestore';
+import { collection, limit, onSnapshot, orderBy, query, where } from 'firebase/firestore';
+import { computeStreaks } from '../utils/streaks';
 
 const APP = COLORS.app;
 
@@ -12,6 +13,7 @@ export default function ProgressScreen() {
   const user = auth.currentUser;
   const [loading, setLoading] = useState(true);
   const [weekActivities, setWeekActivities] = useState([]);
+  const [streakActivities, setStreakActivities] = useState([]);
 
   const weekStart = useMemo(() => {
     const d = new Date();
@@ -24,13 +26,19 @@ export default function ProgressScreen() {
   useEffect(() => {
     if (!user) {
       setWeekActivities([]);
+      setStreakActivities([]);
       setLoading(false);
       return;
     }
 
     const ref = collection(db, 'users', user.uid, 'activities');
     const q = query(ref, where('timestamp', '>=', weekStart), orderBy('timestamp', 'desc'));
-    const unsub = onSnapshot(
+    const streakStart = new Date();
+    streakStart.setDate(streakStart.getDate() - 119);
+    streakStart.setHours(0, 0, 0, 0);
+    const streakQ = query(ref, where('timestamp', '>=', streakStart), orderBy('timestamp', 'desc'), limit(500));
+
+    const unsubWeek = onSnapshot(
       q,
       (snap) => {
         const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
@@ -44,7 +52,22 @@ export default function ProgressScreen() {
       }
     );
 
-    return () => unsub();
+    const unsubStreak = onSnapshot(
+      streakQ,
+      (snap) => {
+        const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        setStreakActivities(list);
+      },
+      (err) => {
+        console.log('Progress streak error:', err);
+        setStreakActivities([]);
+      }
+    );
+
+    return () => {
+      unsubWeek();
+      unsubStreak();
+    };
   }, [user, weekStart]);
 
   const summary = useMemo(() => {
@@ -54,6 +77,8 @@ export default function ProgressScreen() {
     const minutes = Math.round(totalSeconds / 60);
     return { sessions, minutes, totalCalories };
   }, [weekActivities]);
+
+  const streak = useMemo(() => computeStreaks(streakActivities), [streakActivities]);
 
   return (
     <LinearGradient colors={[APP.bgTop, APP.bgMid, APP.bgBottom]} locations={[0, 0.45, 1]} style={{ flex: 1 }}>
@@ -122,6 +147,21 @@ export default function ProgressScreen() {
                 <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 22, marginTop: 6 }}>
                   {Math.round(summary.totalCalories)}
                 </Text>
+              </View>
+
+              <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
+                <View style={{ flex: 1, padding: 12, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.22)' }}>
+                  <Text style={{ color: COLORS.text.tertiary, fontWeight: '700', fontSize: 12 }}>Current streak</Text>
+                  <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 22, marginTop: 6 }}>
+                    {streak.current}
+                  </Text>
+                </View>
+                <View style={{ flex: 1, padding: 12, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.22)' }}>
+                  <Text style={{ color: COLORS.text.tertiary, fontWeight: '700', fontSize: 12 }}>Best streak</Text>
+                  <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 22, marginTop: 6 }}>
+                    {streak.best}
+                  </Text>
+                </View>
               </View>
             </View>
           </>

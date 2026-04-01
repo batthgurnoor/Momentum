@@ -11,6 +11,7 @@ import { COLORS } from '../theme/colors'
 import { useNavigation } from '@react-navigation/native';
 import { auth, db } from '../../Firebase/config';
 import { collection, limit, onSnapshot, orderBy, query, where } from 'firebase/firestore';
+import { computeStreaks } from '../utils/streaks';
 
 const WH = COLORS.workoutHome
 
@@ -20,6 +21,7 @@ const WorkoutScreen = () => {
   const [loadingStats, setLoadingStats] = useState(true);
   const [weekActivities, setWeekActivities] = useState([]);
   const [lastActivity, setLastActivity] = useState(null);
+  const [streakActivities, setStreakActivities] = useState([]);
 
   const weekStart = useMemo(() => {
     const d = new Date();
@@ -32,6 +34,7 @@ const WorkoutScreen = () => {
     if (!user) {
       setWeekActivities([]);
       setLastActivity(null);
+      setStreakActivities([]);
       setLoadingStats(false);
       return;
     }
@@ -42,6 +45,10 @@ const WorkoutScreen = () => {
 
     const weekQ = query(ref, where('timestamp', '>=', weekStart), orderBy('timestamp', 'desc'));
     const lastQ = query(ref, orderBy('timestamp', 'desc'), limit(1));
+    const streakStart = new Date();
+    streakStart.setDate(streakStart.getDate() - 119);
+    streakStart.setHours(0, 0, 0, 0);
+    const streakQ = query(ref, where('timestamp', '>=', streakStart), orderBy('timestamp', 'desc'), limit(500));
 
     const unsubWeek = onSnapshot(
       weekQ,
@@ -67,9 +74,21 @@ const WorkoutScreen = () => {
       }
     );
 
+    const unsubStreak = onSnapshot(
+      streakQ,
+      (snap) => {
+        setStreakActivities(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+      },
+      (err) => {
+        console.log('Today streak error:', err);
+        setStreakActivities([]);
+      }
+    );
+
     return () => {
       unsubWeek();
       unsubLast();
+      unsubStreak();
     };
   }, [user, weekStart]);
 
@@ -79,6 +98,8 @@ const WorkoutScreen = () => {
     const minutes = Math.round(totalSeconds / 60);
     return { sessions, minutes };
   }, [weekActivities]);
+
+  const streak = useMemo(() => computeStreaks(streakActivities), [streakActivities]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -113,6 +134,10 @@ const WorkoutScreen = () => {
               <View style={styles.statBox}>
                 <Text style={styles.statLabel}>Minutes</Text>
                 <Text style={styles.statValue}>{user ? summary.minutes : '—'}</Text>
+              </View>
+              <View style={styles.statBox}>
+                <Text style={styles.statLabel}>Streak</Text>
+                <Text style={styles.statValue}>{user ? streak.current : '—'}</Text>
               </View>
             </View>
 
