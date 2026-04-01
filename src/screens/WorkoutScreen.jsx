@@ -7,7 +7,6 @@ import WorkoutOTD from '../components/WorkoutOTD';
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Separator from '../components/Separator'
 import Category from '../components/Category'
-import Exercise from '../components/Exercise'
 import { COLORS } from '../theme/colors'
 import { useNavigation } from '@react-navigation/native';
 import { auth, db } from '../../Firebase/config';
@@ -140,8 +139,6 @@ const WorkoutScreen = () => {
           <WorkoutOTD />
           <Separator />
           <Category />
-          <Separator />
-          <Exercise />
         </SafeAreaView>
       </ScrollView>
     </GestureHandlerRootView>
