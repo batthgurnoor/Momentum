@@ -187,7 +187,7 @@ export default function ProfileScreen() {
 
             <View className="mt-4">
               {!editing ? (
-                <View className="flex-row justify-between">
+                <View className="flex-row justify-between flex-wrap gap-2">
                   <TouchableOpacity
                     onPress={() => navigation.navigate('Notifications')}
                     className="bg-primary py-2 px-4 rounded-full"
@@ -199,6 +199,12 @@ export default function ProfileScreen() {
                     className="bg-ui-surface border border-momentum-border py-2 px-4 rounded-full"
                   >
                     <Text className="text-ui-text-primary font-bold">BMI</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate('Metrics')}
+                    className="bg-ui-surface border border-momentum-border py-2 px-4 rounded-full"
+                  >
+                    <Text className="text-ui-text-primary font-bold">Metrics</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => setEditing(true)}

@@ -14,6 +14,7 @@ export default function ProgressScreen() {
   const [loading, setLoading] = useState(true);
   const [weekActivities, setWeekActivities] = useState([]);
   const [streakActivities, setStreakActivities] = useState([]);
+  const [metrics, setMetrics] = useState([]);
 
   const weekStart = useMemo(() => {
     const d = new Date();
@@ -27,6 +28,7 @@ export default function ProgressScreen() {
     if (!user) {
       setWeekActivities([]);
       setStreakActivities([]);
+      setMetrics([]);
       setLoading(false);
       return;
     }
@@ -64,9 +66,26 @@ export default function ProgressScreen() {
       }
     );
 
+    const metricsRef = collection(db, 'users', user.uid, 'metrics');
+    const metricsStart = new Date();
+    metricsStart.setDate(metricsStart.getDate() - 29);
+    metricsStart.setHours(0, 0, 0, 0);
+    const metricsQ = query(metricsRef, where('timestamp', '>=', metricsStart), orderBy('timestamp', 'desc'), limit(60));
+    const unsubMetrics = onSnapshot(
+      metricsQ,
+      (snap) => {
+        setMetrics(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+      },
+      (err) => {
+        console.log('Progress metrics error:', err);
+        setMetrics([]);
+      }
+    );
+
     return () => {
       unsubWeek();
       unsubStreak();
+      unsubMetrics();
     };
   }, [user, weekStart]);
 
@@ -79,6 +98,15 @@ export default function ProgressScreen() {
   }, [weekActivities]);
 
   const streak = useMemo(() => computeStreaks(streakActivities), [streakActivities]);
+
+  const weightTrend = useMemo(() => {
+    const weights = (metrics || []).filter((m) => m.type === 'weight' && Number.isFinite(Number(m.value)));
+    if (!weights.length) return { latest: null, change: null };
+    const latest = weights[0];
+    const oldest = weights[weights.length - 1];
+    const change = Number(latest.value) - Number(oldest.value);
+    return { latest, change };
+  }, [metrics]);
 
   const prs = useMemo(() => {
     let longestSeconds = 0;
@@ -214,6 +242,35 @@ export default function ProgressScreen() {
                   <Text style={{ color: COLORS.text.tertiary, fontWeight: '700', fontSize: 12 }}>Best streak</Text>
                   <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 22, marginTop: 6 }}>
                     {streak.best}
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            <View
+              style={{
+                marginTop: 16,
+                padding: 14,
+                borderRadius: 16,
+                borderWidth: 1,
+                borderColor: APP.cardBorder,
+                backgroundColor: 'rgba(255,255,255,0.06)',
+              }}
+            >
+              <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 16, marginBottom: 10 }}>
+                Body metrics
+              </Text>
+              <View style={{ flexDirection: 'row', gap: 10 }}>
+                <View style={{ flex: 1, padding: 12, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.22)' }}>
+                  <Text style={{ color: COLORS.text.tertiary, fontWeight: '700', fontSize: 12 }}>Latest weight</Text>
+                  <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 22, marginTop: 6 }}>
+                    {weightTrend.latest?.value ? `${weightTrend.latest.value} ${weightTrend.latest.unit || 'kg'}` : '—'}
+                  </Text>
+                </View>
+                <View style={{ flex: 1, padding: 12, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.22)' }}>
+                  <Text style={{ color: COLORS.text.tertiary, fontWeight: '700', fontSize: 12 }}>30‑day change</Text>
+                  <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 22, marginTop: 6 }}>
+                    {weightTrend.change === null ? '—' : `${weightTrend.change > 0 ? '+' : ''}${weightTrend.change.toFixed(1)} kg`}
                   </Text>
                 </View>
               </View>

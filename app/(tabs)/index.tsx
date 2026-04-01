@@ -8,6 +8,7 @@ import ProfileScreen from '../../src/screens/ProfileScreen';
 import ProgressScreen from '../../src/screens/ProgressScreen';
 import TrainScreen from '../../src/screens/TrainScreen';
 import SessionScreen from '../../src/screens/SessionScreen';
+import MetricsScreen from '../../src/screens/MetricsScreen';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import ExerciseScreen from '../../src/screens/ExerciseScreen';
@@ -123,6 +124,7 @@ export default function App() {
         <Stack.Screen name="TabNav" component={TabNavigator} />
         <Stack.Screen name="Session" component={SessionScreen} />
         <Stack.Screen name="Calculation" component={CalculationScreen} />
+        <Stack.Screen name="Metrics" component={MetricsScreen} />
         <Stack.Screen name="Exercise" component={ExerciseScreen} />
         <Stack.Screen name="CategoryExercise" component={CategoryExerciseScreen} />
         <Stack.Screen name="WorkoutOTDScreen" component={WorkoutOTDScreen} />

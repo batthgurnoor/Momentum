@@ -1,8 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
+  ScrollView,
   KeyboardAvoidingView,
   Platform,
+  ImageBackground,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -15,8 +18,14 @@ import { COLORS } from '../theme/colors';
 import { auth, db } from '../../Firebase/config';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import * as Haptics from 'expo-haptics';
+import { FlashList } from '@shopify/flash-list';
+import AntDesign from '@expo/vector-icons/AntDesign';
+import exerciseData from '../../exercise_data.json';
+// (picker reverted to full list; no category strip)
 
 const APP = COLORS.app;
+const WH = COLORS.workoutHome;
+const exerciseCardImage = require('../../assets/images/exercise1.jpg');
 
 export default function SessionScreen() {
   const navigation = useNavigation();
@@ -35,6 +44,11 @@ export default function SessionScreen() {
 
   const [restSeconds, setRestSeconds] = useState(0);
   const [restRunning, setRestRunning] = useState(false);
+  const [restTargetSeconds, setRestTargetSeconds] = useState(0);
+
+  const [mode, setMode] = useState('session'); // 'session' | 'picker'
+  const [exerciseQuery, setExerciseQuery] = useState('');
+  const [sessionExercises, setSessionExercises] = useState([]);
 
   useEffect(() => {
     if (!restRunning) {
@@ -45,7 +59,7 @@ export default function SessionScreen() {
     if (restSeconds <= 0) {
       setRestRunning(false);
       clearInterval(restIntervalRef.current);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => { });
       return;
     }
 
@@ -78,6 +92,91 @@ export default function SessionScreen() {
 
   const displayedTime = useMemo(() => formatTime(elapsedTime), [elapsedTime]);
   const displayedRest = useMemo(() => formatTime(restSeconds), [restSeconds]);
+
+  const filteredExercises = useMemo(() => {
+    const q = exerciseQuery.trim().toLowerCase();
+    if (!q) return exerciseData;
+    return exerciseData.filter((e) => {
+      const t = String(e.title || '').toLowerCase();
+      const c = String(e.category || '').toLowerCase();
+      const i = String(e.intensity || '').toLowerCase();
+      return t.includes(q) || c.includes(q) || i.includes(q);
+    });
+  }, [exerciseQuery]);
+
+  const addExerciseToSession = (ex) => {
+    setSessionExercises((prev) => {
+      if (prev.some((p) => p.exerciseId === ex.id)) return prev;
+      return [
+        ...prev,
+        {
+          exerciseId: ex.id,
+          title: ex.title,
+          intensity: ex.intensity,
+          category: ex.category,
+          sets: [],
+        },
+      ];
+    });
+    setMode('session');
+    setExerciseQuery('');
+  };
+
+  const removeExerciseFromSession = (exerciseId) => {
+    setSessionExercises((prev) => prev.filter((e) => e.exerciseId !== exerciseId));
+  };
+
+  const addSet = (exerciseId, partial = {}) => {
+    setSessionExercises((prev) =>
+      prev.map((e) => {
+        if (e.exerciseId !== exerciseId) return e;
+        const next = {
+          reps: '',
+          weight: '',
+          rpe: '',
+          restSeconds: restTargetSeconds || 0,
+          createdAt: Date.now(),
+          ...partial,
+        };
+        return { ...e, sets: [...e.sets, next] };
+      })
+    );
+  };
+
+  const updateSet = (exerciseId, setIndex, patch) => {
+    setSessionExercises((prev) =>
+      prev.map((e) => {
+        if (e.exerciseId !== exerciseId) return e;
+        const sets = e.sets.map((s, idx) => (idx === setIndex ? { ...s, ...patch } : s));
+        return { ...e, sets };
+      })
+    );
+  };
+
+  const copyLastSet = (exerciseId) => {
+    const ex = sessionExercises.find((e) => e.exerciseId === exerciseId);
+    const last = ex?.sets?.[ex.sets.length - 1];
+    if (!last) return addSet(exerciseId);
+    return addSet(exerciseId, {
+      reps: last.reps,
+      weight: last.weight,
+      rpe: last.rpe,
+      restSeconds: last.restSeconds ?? restTargetSeconds ?? 0,
+    });
+  };
+
+  const plusTwoPointFive = (exerciseId) => {
+    const ex = sessionExercises.find((e) => e.exerciseId === exerciseId);
+    const last = ex?.sets?.[ex.sets.length - 1];
+    const lastWeight = parseFloat(String(last?.weight ?? ''));
+    const nextWeight = Number.isFinite(lastWeight) ? String((lastWeight + 2.5).toFixed(1)) : '';
+    return addSet(exerciseId, {
+      reps: last?.reps ?? '',
+      weight: nextWeight,
+      rpe: last?.rpe ?? '',
+      restSeconds: last?.restSeconds ?? restTargetSeconds ?? 0,
+    });
+  };
 
   const handleStart = () => {
     if (isRunning) return;
@@ -118,8 +217,23 @@ export default function SessionScreen() {
     }
 
     try {
-      const ref = collection(db, 'users', user.uid, 'activities');
-      await addDoc(ref, {
+      // Compute session aggregates
+      let totalSets = 0;
+      let totalReps = 0;
+      let totalVolume = 0;
+      for (const ex of sessionExercises) {
+        for (const s of ex.sets || []) {
+          const reps = parseInt(String(s.reps ?? ''), 10);
+          const weight = parseFloat(String(s.weight ?? ''));
+          if (Number.isFinite(reps)) totalReps += reps;
+          if (Number.isFinite(reps)) totalSets += 1;
+          if (Number.isFinite(reps) && Number.isFinite(weight)) totalVolume += reps * weight;
+        }
+      }
+
+      // Save full session document (v2)
+      const sessionsRef = collection(db, 'users', user.uid, 'sessions');
+      await addDoc(sessionsRef, {
         title: title || 'Training Session',
         timestamp: serverTimestamp(),
         duration: totalSeconds,
@@ -127,6 +241,44 @@ export default function SessionScreen() {
         notes: notes || '',
         startTime: startTimestamp ? new Date(startTimestamp) : null,
         endTime: new Date(),
+        restTargetSeconds: restTargetSeconds || 0,
+        totals: {
+          sets: totalSets,
+          reps: totalReps,
+          volume: Number(totalVolume.toFixed(2)),
+        },
+        exercises: sessionExercises.map((ex) => ({
+          exerciseId: ex.exerciseId,
+          title: ex.title,
+          intensity: ex.intensity,
+          category: ex.category,
+          sets: (ex.sets || []).map((s) => ({
+            reps: s.reps === '' ? null : Number(s.reps),
+            weight: s.weight === '' ? null : Number(s.weight),
+            rpe: s.rpe === '' ? null : Number(s.rpe),
+            restSeconds: typeof s.restSeconds === 'number' ? s.restSeconds : null,
+            timestamp: s.createdAt ? new Date(s.createdAt) : null,
+          })),
+        })),
+        source: 'session',
+        schemaVersion: 2,
+      });
+
+      // Keep writing summary to activities for backward compatibility
+      const activitiesRef = collection(db, 'users', user.uid, 'activities');
+      await addDoc(activitiesRef, {
+        title: title || 'Training Session',
+        timestamp: serverTimestamp(),
+        duration: totalSeconds,
+        caloriesBurned: parseFloat(calories) || 0,
+        notes: notes || '',
+        startTime: startTimestamp ? new Date(startTimestamp) : null,
+        endTime: new Date(),
+        totals: {
+          sets: totalSets,
+          reps: totalReps,
+          volume: Number(totalVolume.toFixed(2)),
+        },
         source: 'session',
       });
 
@@ -138,6 +290,7 @@ export default function SessionScreen() {
       setTitle('');
       setCalories('');
       setNotes('');
+      setSessionExercises([]);
       navigation.goBack();
     } catch (e) {
       console.log('Error saving session:', e);
@@ -146,6 +299,7 @@ export default function SessionScreen() {
   };
 
   const setRestPreset = (secs) => {
+    setRestTargetSeconds(secs);
     setRestSeconds(secs);
     setRestRunning(false);
   };
@@ -164,9 +318,11 @@ export default function SessionScreen() {
       <SafeAreaView style={{ flex: 1, paddingHorizontal: 20, paddingTop: 12 }}>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Text style={{ color: COLORS.text.primary, fontSize: 22, fontWeight: '800' }}>Session</Text>
+            <Text style={{ color: COLORS.text.primary, fontSize: 22, fontWeight: '800' }}>
+              {mode === 'picker' ? 'Pick an exercise' : 'Session'}
+            </Text>
             <TouchableOpacity
-              onPress={() => navigation.goBack()}
+              onPress={() => (mode === 'picker' ? setMode('session') : navigation.goBack())}
               style={{
                 paddingVertical: 8,
                 paddingHorizontal: 12,
@@ -176,249 +332,599 @@ export default function SessionScreen() {
                 backgroundColor: 'rgba(255,255,255,0.06)',
               }}
             >
-              <Text style={{ color: COLORS.text.primary, fontWeight: '800' }}>Close</Text>
+              <Text style={{ color: COLORS.text.primary, fontWeight: '800' }}>
+                {mode === 'picker' ? 'Back' : 'Close'}
+              </Text>
             </TouchableOpacity>
           </View>
 
-          <View style={{ alignItems: 'center', marginTop: 26, marginBottom: 18 }}>
-            <Text style={{ color: APP.accent, fontSize: 56, fontWeight: '900' }}>{displayedTime}</Text>
-            {!isRunning ? (
-              <TouchableOpacity
-                activeOpacity={0.9}
-                onPress={handleStart}
+          {mode === 'picker' ? (
+            <View style={{ flex: 1 }}>
+              <View
                 style={{
-                  marginTop: 14,
-                  paddingVertical: 12,
-                  paddingHorizontal: 22,
-                  borderRadius: 999,
-                  backgroundColor: APP.accent,
-                }}
-              >
-                <Text style={{ color: COLORS.text.onPrimary, fontWeight: '900', fontSize: 16 }}>Start session</Text>
-              </TouchableOpacity>
-            ) : !isPaused ? (
-              <View style={{ flexDirection: 'row', gap: 10, marginTop: 14 }}>
-                <TouchableOpacity
-                  activeOpacity={0.9}
-                  onPress={handlePause}
-                  style={{
-                    paddingVertical: 12,
-                    paddingHorizontal: 18,
-                    borderRadius: 999,
-                    backgroundColor: 'rgba(245, 158, 11, 0.95)',
-                  }}
-                >
-                  <Text style={{ color: COLORS.text.onPrimary, fontWeight: '900' }}>Pause</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  activeOpacity={0.9}
-                  onPress={handleFinish}
-                  style={{
-                    paddingVertical: 12,
-                    paddingHorizontal: 18,
-                    borderRadius: 999,
-                    backgroundColor: COLORS.ui.error,
-                  }}
-                >
-                  <Text style={{ color: '#fff', fontWeight: '900' }}>Finish</Text>
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <View style={{ flexDirection: 'row', gap: 10, marginTop: 14 }}>
-                <TouchableOpacity
-                  activeOpacity={0.9}
-                  onPress={handleResume}
-                  style={{
-                    paddingVertical: 12,
-                    paddingHorizontal: 18,
-                    borderRadius: 999,
-                    backgroundColor: APP.accent,
-                  }}
-                >
-                  <Text style={{ color: COLORS.text.onPrimary, fontWeight: '900' }}>Resume</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  activeOpacity={0.9}
-                  onPress={handleFinish}
-                  style={{
-                    paddingVertical: 12,
-                    paddingHorizontal: 18,
-                    borderRadius: 999,
-                    backgroundColor: COLORS.ui.error,
-                  }}
-                >
-                  <Text style={{ color: '#fff', fontWeight: '900' }}>Finish</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-          </View>
-
-          <View
-            style={{
-              borderRadius: 16,
-              borderWidth: 1,
-              borderColor: APP.cardBorder,
-              backgroundColor: 'rgba(255,255,255,0.06)',
-              padding: 14,
-              marginBottom: 12,
-            }}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-              <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 16 }}>Rest timer</Text>
-              <Text style={{ color: COLORS.text.secondary, fontWeight: '900' }}>{displayedRest}</Text>
-            </View>
-
-            <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
-              {[30, 60, 90].map((s) => (
-                <TouchableOpacity
-                  key={s}
-                  activeOpacity={0.9}
-                  onPress={() => setRestPreset(s)}
-                  style={{
-                    flex: 1,
-                    paddingVertical: 10,
-                    borderRadius: 12,
-                    borderWidth: 1,
-                    borderColor: APP.cardBorder,
-                    backgroundColor: restSeconds === s ? 'rgba(45, 212, 191, 0.18)' : 'rgba(0,0,0,0.22)',
-                    alignItems: 'center',
-                  }}
-                >
-                  <Text style={{ color: COLORS.text.primary, fontWeight: '900' }}>{s}s</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-
-            <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
-              {!restRunning ? (
-                <TouchableOpacity
-                  activeOpacity={0.9}
-                  onPress={startRest}
-                  disabled={restSeconds <= 0}
-                  style={{
-                    flex: 1,
-                    paddingVertical: 12,
-                    borderRadius: 999,
-                    backgroundColor: restSeconds <= 0 ? 'rgba(255,255,255,0.08)' : APP.accent,
-                    alignItems: 'center',
-                  }}
-                >
-                  <Text
-                    style={{
-                      color: restSeconds <= 0 ? COLORS.text.secondary : COLORS.text.onPrimary,
-                      fontWeight: '900',
-                    }}
-                  >
-                    Start rest
-                  </Text>
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity
-                  activeOpacity={0.9}
-                  onPress={stopRest}
-                  style={{
-                    flex: 1,
-                    paddingVertical: 12,
-                    borderRadius: 999,
-                    backgroundColor: 'rgba(245, 158, 11, 0.95)',
-                    alignItems: 'center',
-                  }}
-                >
-                  <Text style={{ color: COLORS.text.onPrimary, fontWeight: '900' }}>Stop rest</Text>
-                </TouchableOpacity>
-              )}
-
-              <TouchableOpacity
-                activeOpacity={0.9}
-                onPress={() => {
-                  setRestRunning(false);
-                  setRestSeconds(0);
-                }}
-                style={{
-                  paddingVertical: 12,
-                  paddingHorizontal: 14,
-                  borderRadius: 999,
+                  marginTop: 12,
+                  paddingHorizontal: 12,
+                  paddingVertical: 10,
+                  borderRadius: 14,
                   borderWidth: 1,
                   borderColor: APP.cardBorder,
-                  backgroundColor: 'rgba(0,0,0,0.22)',
+                  backgroundColor: 'rgba(255,255,255,0.06)',
+                  flexDirection: 'row',
                   alignItems: 'center',
-                  justifyContent: 'center',
+                  gap: 10,
                 }}
               >
-                <Text style={{ color: COLORS.text.primary, fontWeight: '900' }}>Reset</Text>
-              </TouchableOpacity>
+                <AntDesign name="search1" size={16} color={COLORS.text.secondary} />
+                <TextInput
+                  value={exerciseQuery}
+                  onChangeText={setExerciseQuery}
+                  placeholder="Search exercises…"
+                  placeholderTextColor={COLORS.text.tertiary}
+                  style={{ flex: 1, color: COLORS.text.primary, paddingVertical: 4 }}
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                />
+                {!!exerciseQuery && (
+                  <TouchableOpacity onPress={() => setExerciseQuery('')} activeOpacity={0.8}>
+                    <AntDesign name="closecircle" size={16} color={COLORS.text.secondary} />
+                  </TouchableOpacity>
+                )}
+              </View>
+
+              <View style={{ flex: 1, marginTop: 12 }}>
+                <FlashList
+                  data={filteredExercises}
+                  estimatedItemSize={200}
+                  keyExtractor={(item) => String(item.id)}
+                  renderItem={({ item, index }) => {
+                    if (index % 2 !== 0) return null;
+                    const nextItem = filteredExercises[index + 1];
+
+                    const Card = ({ data }) => (
+                      <TouchableOpacity
+                        activeOpacity={0.9}
+                        onPress={() => addExerciseToSession(data)}
+                        style={gridStyles.cardOuter}
+                      >
+                        <ImageBackground
+                          source={exerciseCardImage}
+                          style={gridStyles.cardBg}
+                          imageStyle={gridStyles.cardImage}
+                        >
+                          <LinearGradient
+                            colors={['rgba(15,23,42,0.2)', 'rgba(0,0,0,0.82)']}
+                            style={StyleSheet.absoluteFill}
+                          />
+                          <View style={gridStyles.topTag}>
+                            <Text style={gridStyles.tagText} numberOfLines={1}>
+                              {data.category}
+                            </Text>
+                          </View>
+                          <View style={gridStyles.bottomBlock}>
+                            <Text style={gridStyles.cardTitle} numberOfLines={2}>
+                              {data.title}
+                            </Text>
+                            <Text style={gridStyles.tapHint} numberOfLines={1}>
+                              {String(data.intensity || '').toUpperCase() || 'TAP TO ADD'}
+                            </Text>
+                          </View>
+                        </ImageBackground>
+                      </TouchableOpacity>
+                    );
+
+                    return (
+                      <View style={gridStyles.row}>
+                        <Card data={item} />
+                        {nextItem ? <Card data={nextItem} /> : <View style={{ flex: 1, marginHorizontal: 4 }} />}
+                      </View>
+                    );
+                  }}
+                />
+              </View>
             </View>
-          </View>
+          ) : (
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 28 }}>
+              <View style={{ alignItems: 'center', marginTop: 26, marginBottom: 18 }}>
+                <Text style={{ color: APP.accent, fontSize: 56, fontWeight: '900' }}>{displayedTime}</Text>
+                {!isRunning ? (
+                  <TouchableOpacity
+                    activeOpacity={0.9}
+                    onPress={handleStart}
+                    style={{
+                      marginTop: 14,
+                      paddingVertical: 12,
+                      paddingHorizontal: 22,
+                      borderRadius: 999,
+                      backgroundColor: APP.accent,
+                    }}
+                  >
+                    <Text style={{ color: COLORS.text.onPrimary, fontWeight: '900', fontSize: 16 }}>Start session</Text>
+                  </TouchableOpacity>
+                ) : !isPaused ? (
+                  <View style={{ flexDirection: 'row', gap: 10, marginTop: 14 }}>
+                    <TouchableOpacity
+                      activeOpacity={0.9}
+                      onPress={handlePause}
+                      style={{
+                        paddingVertical: 12,
+                        paddingHorizontal: 18,
+                        borderRadius: 999,
+                        backgroundColor: 'rgba(245, 158, 11, 0.95)',
+                      }}
+                    >
+                      <Text style={{ color: COLORS.text.onPrimary, fontWeight: '900' }}>Pause</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      activeOpacity={0.9}
+                      onPress={handleFinish}
+                      style={{
+                        paddingVertical: 12,
+                        paddingHorizontal: 18,
+                        borderRadius: 999,
+                        backgroundColor: COLORS.ui.error,
+                      }}
+                    >
+                      <Text style={{ color: '#fff', fontWeight: '900' }}>Finish</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <View style={{ flexDirection: 'row', gap: 10, marginTop: 14 }}>
+                    <TouchableOpacity
+                      activeOpacity={0.9}
+                      onPress={handleResume}
+                      style={{
+                        paddingVertical: 12,
+                        paddingHorizontal: 18,
+                        borderRadius: 999,
+                        backgroundColor: APP.accent,
+                      }}
+                    >
+                      <Text style={{ color: COLORS.text.onPrimary, fontWeight: '900' }}>Resume</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      activeOpacity={0.9}
+                      onPress={handleFinish}
+                      style={{
+                        paddingVertical: 12,
+                        paddingHorizontal: 18,
+                        borderRadius: 999,
+                        backgroundColor: COLORS.ui.error,
+                      }}
+                    >
+                      <Text style={{ color: '#fff', fontWeight: '900' }}>Finish</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
 
-          <View
-            style={{
-              borderRadius: 16,
-              borderWidth: 1,
-              borderColor: APP.cardBorder,
-              backgroundColor: 'rgba(255,255,255,0.06)',
-              padding: 14,
-            }}
-          >
-            <Text style={{ color: COLORS.text.secondary, fontWeight: '800', marginBottom: 6 }}>Title</Text>
-            <TextInput
-              value={title}
-              onChangeText={setTitle}
-              placeholder="e.g. Upper body"
-              placeholderTextColor={APP.textDim}
-              style={{
-                color: COLORS.text.primary,
-                borderWidth: 1,
-                borderColor: APP.cardBorder,
-                backgroundColor: 'rgba(0,0,0,0.22)',
-                borderRadius: 12,
-                paddingHorizontal: 12,
-                paddingVertical: 10,
-                marginBottom: 12,
-              }}
-            />
+              <View
+                style={{
+                  borderRadius: 16,
+                  borderWidth: 1,
+                  borderColor: APP.cardBorder,
+                  backgroundColor: 'rgba(255,255,255,0.06)',
+                  padding: 14,
+                  marginBottom: 12,
+                }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 16 }}>Exercises</Text>
+                  <TouchableOpacity
+                    activeOpacity={0.9}
+                    onPress={() => setMode('picker')}
+                    style={{
+                      paddingVertical: 8,
+                      paddingHorizontal: 12,
+                      borderRadius: 999,
+                      borderWidth: 1,
+                      borderColor: APP.cardBorder,
+                      backgroundColor: 'rgba(0,0,0,0.22)',
+                    }}
+                  >
+                    <Text style={{ color: COLORS.text.primary, fontWeight: '900' }}>+ Add</Text>
+                  </TouchableOpacity>
+                </View>
 
-            <Text style={{ color: COLORS.text.secondary, fontWeight: '800', marginBottom: 6 }}>Calories (optional)</Text>
-            <TextInput
-              value={calories}
-              onChangeText={setCalories}
-              placeholder="e.g. 350"
-              placeholderTextColor={APP.textDim}
-              keyboardType="numeric"
-              style={{
-                color: COLORS.text.primary,
-                borderWidth: 1,
-                borderColor: APP.cardBorder,
-                backgroundColor: 'rgba(0,0,0,0.22)',
-                borderRadius: 12,
-                paddingHorizontal: 12,
-                paddingVertical: 10,
-                marginBottom: 12,
-              }}
-            />
+                {sessionExercises.length === 0 ? (
+                  <Text style={{ color: COLORS.text.secondary, marginTop: 10 }}>
+                    Add an exercise to start logging sets.
+                  </Text>
+                ) : (
+                  sessionExercises.map((ex) => (
+                    <View
+                      key={ex.exerciseId}
+                      style={{
+                        marginTop: 12,
+                        padding: 12,
+                        borderRadius: 14,
+                        borderWidth: 1,
+                        borderColor: APP.cardBorder,
+                        backgroundColor: 'rgba(0,0,0,0.22)',
+                      }}
+                    >
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 10 }}>
+                        <View style={{ flex: 1 }}>
+                          <Text style={{ color: COLORS.text.primary, fontWeight: '900' }} numberOfLines={1}>
+                            {ex.title}
+                          </Text>
+                          <Text style={{ color: COLORS.text.secondary, marginTop: 2 }} numberOfLines={1}>
+                            {ex.intensity} • {ex.category}
+                          </Text>
+                        </View>
+                        <TouchableOpacity onPress={() => removeExerciseFromSession(ex.exerciseId)} activeOpacity={0.9}>
+                          <AntDesign name="closecircle" size={18} color={COLORS.text.secondary} />
+                        </TouchableOpacity>
+                      </View>
 
-            <Text style={{ color: COLORS.text.secondary, fontWeight: '800', marginBottom: 6 }}>Notes</Text>
-            <TextInput
-              value={notes}
-              onChangeText={setNotes}
-              placeholder="How did it feel?"
-              placeholderTextColor={APP.textDim}
-              multiline
-              style={{
-                color: COLORS.text.primary,
-                borderWidth: 1,
-                borderColor: APP.cardBorder,
-                backgroundColor: 'rgba(0,0,0,0.22)',
-                borderRadius: 12,
-                paddingHorizontal: 12,
-                paddingVertical: 10,
-                minHeight: 90,
-                textAlignVertical: 'top',
-              }}
-            />
-          </View>
+                      <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
+                        <TouchableOpacity
+                          activeOpacity={0.9}
+                          onPress={() => addSet(ex.exerciseId)}
+                          style={{
+                            flex: 1,
+                            paddingVertical: 10,
+                            borderRadius: 12,
+                            backgroundColor: APP.accent,
+                            alignItems: 'center',
+                          }}
+                        >
+                          <Text style={{ color: COLORS.text.onPrimary, fontWeight: '900' }}>+ Set</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          activeOpacity={0.9}
+                          onPress={() => copyLastSet(ex.exerciseId)}
+                          style={{
+                            flex: 1,
+                            paddingVertical: 10,
+                            borderRadius: 12,
+                            borderWidth: 1,
+                            borderColor: APP.cardBorder,
+                            backgroundColor: 'rgba(255,255,255,0.06)',
+                            alignItems: 'center',
+                          }}
+                        >
+                          <Text style={{ color: COLORS.text.primary, fontWeight: '900' }}>Copy last</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          activeOpacity={0.9}
+                          onPress={() => plusTwoPointFive(ex.exerciseId)}
+                          style={{
+                            paddingVertical: 10,
+                            paddingHorizontal: 12,
+                            borderRadius: 12,
+                            borderWidth: 1,
+                            borderColor: APP.cardBorder,
+                            backgroundColor: 'rgba(255,255,255,0.06)',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          <Text style={{ color: COLORS.text.primary, fontWeight: '900' }}>+2.5</Text>
+                        </TouchableOpacity>
+                      </View>
+
+                      {ex.sets.length === 0 ? (
+                        <Text style={{ color: COLORS.text.secondary, marginTop: 10 }}>
+                          No sets yet.
+                        </Text>
+                      ) : (
+                        <>
+                          <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
+                            <Text style={{ color: COLORS.text.tertiary, width: 42 }}>#</Text>
+                            <Text style={{ color: COLORS.text.tertiary, flex: 1 }}>Reps</Text>
+                            <Text style={{ color: COLORS.text.tertiary, flex: 1 }}>Weight</Text>
+                            <Text style={{ color: COLORS.text.tertiary, flex: 1 }}>RPE</Text>
+                          </View>
+                          {ex.sets.map((s, idx) => (
+                            <View key={s.createdAt ?? idx} style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+                              <Text style={{ color: COLORS.text.secondary, width: 42, fontWeight: '800' }}>
+                                {idx + 1}
+                              </Text>
+                              <TextInput
+                                value={String(s.reps ?? '')}
+                                onChangeText={(t) => updateSet(ex.exerciseId, idx, { reps: t.replace(/[^\d]/g, '') })}
+                                keyboardType="numeric"
+                                placeholder="10"
+                                placeholderTextColor={APP.textDim}
+                                style={{
+                                  flex: 1,
+                                  color: COLORS.text.primary,
+                                  borderWidth: 1,
+                                  borderColor: APP.cardBorder,
+                                  backgroundColor: 'rgba(0,0,0,0.22)',
+                                  borderRadius: 10,
+                                  paddingHorizontal: 10,
+                                  paddingVertical: 8,
+                                }}
+                              />
+                              <TextInput
+                                value={String(s.weight ?? '')}
+                                onChangeText={(t) => updateSet(ex.exerciseId, idx, { weight: t.replace(/[^\d.]/g, '') })}
+                                keyboardType="numeric"
+                                placeholder="50"
+                                placeholderTextColor={APP.textDim}
+                                style={{
+                                  flex: 1,
+                                  color: COLORS.text.primary,
+                                  borderWidth: 1,
+                                  borderColor: APP.cardBorder,
+                                  backgroundColor: 'rgba(0,0,0,0.22)',
+                                  borderRadius: 10,
+                                  paddingHorizontal: 10,
+                                  paddingVertical: 8,
+                                }}
+                              />
+                              <TextInput
+                                value={String(s.rpe ?? '')}
+                                onChangeText={(t) => updateSet(ex.exerciseId, idx, { rpe: t.replace(/[^\d.]/g, '') })}
+                                keyboardType="numeric"
+                                placeholder="8"
+                                placeholderTextColor={APP.textDim}
+                                style={{
+                                  flex: 1,
+                                  color: COLORS.text.primary,
+                                  borderWidth: 1,
+                                  borderColor: APP.cardBorder,
+                                  backgroundColor: 'rgba(0,0,0,0.22)',
+                                  borderRadius: 10,
+                                  paddingHorizontal: 10,
+                                  paddingVertical: 8,
+                                }}
+                              />
+                            </View>
+                          ))}
+                          <Text style={{ color: COLORS.text.tertiary, marginTop: 10 }}>
+                            Default rest per set: {restTargetSeconds ? `${restTargetSeconds}s` : '—'}
+                          </Text>
+                        </>
+                      )}
+                    </View>
+                  ))
+                )}
+              </View>
+
+              <View
+                style={{
+                  borderRadius: 16,
+                  borderWidth: 1,
+                  borderColor: APP.cardBorder,
+                  backgroundColor: 'rgba(255,255,255,0.06)',
+                  padding: 14,
+                  marginBottom: 12,
+                }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 16 }}>Rest timer</Text>
+                  <Text style={{ color: COLORS.text.secondary, fontWeight: '900' }}>{displayedRest}</Text>
+                </View>
+
+                <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
+                  {[30, 60, 90].map((s) => (
+                    <TouchableOpacity
+                      key={s}
+                      activeOpacity={0.9}
+                      onPress={() => setRestPreset(s)}
+                      style={{
+                        flex: 1,
+                        paddingVertical: 10,
+                        borderRadius: 12,
+                        borderWidth: 1,
+                        borderColor: APP.cardBorder,
+                        backgroundColor: restSeconds === s ? 'rgba(45, 212, 191, 0.18)' : 'rgba(0,0,0,0.22)',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Text style={{ color: COLORS.text.primary, fontWeight: '900' }}>{s}s</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+
+                <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
+                  {!restRunning ? (
+                    <TouchableOpacity
+                      activeOpacity={0.9}
+                      onPress={startRest}
+                      disabled={restSeconds <= 0}
+                      style={{
+                        flex: 1,
+                        paddingVertical: 12,
+                        borderRadius: 999,
+                        backgroundColor: restSeconds <= 0 ? 'rgba(255,255,255,0.08)' : APP.accent,
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: restSeconds <= 0 ? COLORS.text.secondary : COLORS.text.onPrimary,
+                          fontWeight: '900',
+                        }}
+                      >
+                        Start rest
+                      </Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      activeOpacity={0.9}
+                      onPress={stopRest}
+                      style={{
+                        flex: 1,
+                        paddingVertical: 12,
+                        borderRadius: 999,
+                        backgroundColor: 'rgba(245, 158, 11, 0.95)',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Text style={{ color: COLORS.text.onPrimary, fontWeight: '900' }}>Stop rest</Text>
+                    </TouchableOpacity>
+                  )}
+
+                  <TouchableOpacity
+                    activeOpacity={0.9}
+                    onPress={() => {
+                      setRestRunning(false);
+                      setRestSeconds(0);
+                      setRestTargetSeconds(0);
+                    }}
+                    style={{
+                      paddingVertical: 12,
+                      paddingHorizontal: 14,
+                      borderRadius: 999,
+                      borderWidth: 1,
+                      borderColor: APP.cardBorder,
+                      backgroundColor: 'rgba(0,0,0,0.22)',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Text style={{ color: COLORS.text.primary, fontWeight: '900' }}>Reset</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <View
+                style={{
+                  borderRadius: 16,
+                  borderWidth: 1,
+                  borderColor: APP.cardBorder,
+                  backgroundColor: 'rgba(255,255,255,0.06)',
+                  padding: 14,
+                }}
+              >
+                <Text style={{ color: COLORS.text.secondary, fontWeight: '800', marginBottom: 6 }}>Title</Text>
+                <TextInput
+                  value={title}
+                  onChangeText={setTitle}
+                  placeholder="e.g. Upper body"
+                  placeholderTextColor={APP.textDim}
+                  style={{
+                    color: COLORS.text.primary,
+                    borderWidth: 1,
+                    borderColor: APP.cardBorder,
+                    backgroundColor: 'rgba(0,0,0,0.22)',
+                    borderRadius: 12,
+                    paddingHorizontal: 12,
+                    paddingVertical: 10,
+                    marginBottom: 12,
+                  }}
+                />
+
+                <Text style={{ color: COLORS.text.secondary, fontWeight: '800', marginBottom: 6 }}>Calories (optional)</Text>
+                <TextInput
+                  value={calories}
+                  onChangeText={setCalories}
+                  placeholder="e.g. 350"
+                  placeholderTextColor={APP.textDim}
+                  keyboardType="numeric"
+                  style={{
+                    color: COLORS.text.primary,
+                    borderWidth: 1,
+                    borderColor: APP.cardBorder,
+                    backgroundColor: 'rgba(0,0,0,0.22)',
+                    borderRadius: 12,
+                    paddingHorizontal: 12,
+                    paddingVertical: 10,
+                    marginBottom: 12,
+                  }}
+                />
+
+                <Text style={{ color: COLORS.text.secondary, fontWeight: '800', marginBottom: 6 }}>Notes</Text>
+                <TextInput
+                  value={notes}
+                  onChangeText={setNotes}
+                  placeholder="How did it feel?"
+                  placeholderTextColor={APP.textDim}
+                  multiline
+                  style={{
+                    color: COLORS.text.primary,
+                    borderWidth: 1,
+                    borderColor: APP.cardBorder,
+                    backgroundColor: 'rgba(0,0,0,0.22)',
+                    borderRadius: 12,
+                    paddingHorizontal: 12,
+                    paddingVertical: 10,
+                    minHeight: 90,
+                    textAlignVertical: 'top',
+                  }}
+                />
+              </View>
+            </ScrollView>
+          )}
         </KeyboardAvoidingView>
       </SafeAreaView>
     </LinearGradient>
   );
 }
+
+// (picker styles removed after reverting to full list)
+
+const gridStyles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginHorizontal: 2,
+    marginVertical: 8,
+  },
+  cardOuter: {
+    flex: 1,
+    marginHorizontal: 4,
+    borderRadius: 18,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: WH.cardBorder,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.3,
+        shadowRadius: 10,
+      },
+      android: {
+        elevation: 5,
+      },
+    }),
+  },
+  cardBg: {
+    height: 168,
+    width: '100%',
+    justifyContent: 'space-between',
+  },
+  cardImage: {
+    borderRadius: 18,
+  },
+  topTag: {
+    alignSelf: 'flex-start',
+    marginTop: 10,
+    marginLeft: 10,
+    maxWidth: '90%',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    borderWidth: 1,
+    borderColor: WH.cardBorder,
+  },
+  tagText: {
+    color: WH.textMuted,
+    fontSize: 11,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+  },
+  bottomBlock: {
+    padding: 12,
+  },
+  cardTitle: {
+    color: WH.text,
+    fontSize: 15,
+    fontWeight: '800',
+    lineHeight: 20,
+  },
+  tapHint: {
+    marginTop: 6,
+    fontSize: 11,
+    color: WH.accent,
+    fontWeight: '700',
+    letterSpacing: 0.4,
+  },
+});
 
