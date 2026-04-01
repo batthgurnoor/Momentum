@@ -5,6 +5,7 @@ import WorkoutScreen from "../../src/screens/WorkoutScreen";
 import CalculationScreen from "../../src/screens/CalculationScreen";
 import WorkoutOTDScreen from '../../src/screens/WorkoutOTDScreen';
 import ProfileScreen from '../../src/screens/ProfileScreen';
+import ProgressScreen from '../../src/screens/ProgressScreen';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import ExerciseScreen from '../../src/screens/ExerciseScreen';
@@ -39,10 +40,12 @@ function TabNavigator() {
       tabBarHideOnKeyboard: true,
       tabBarIcon: ({ color, size }) => {
         switch (route.name) {
-          case 'Workout':
+          case 'Today':
             return <FontAwesome6 name="dumbbell" size={size} color={color} />;
           case 'LogWorkout':
             return <AntDesign name="book" size={size} color={color} />;
+          case 'Progress':
+            return <Ionicons name="stats-chart" size={size} color={color} />;
           case 'Calculation':
             return <Ionicons name="calculator-outline" size={size} color={color} />;
           case 'Profile':
@@ -70,9 +73,10 @@ function TabNavigator() {
 
   return (
     <Tab.Navigator screenOptions={screenOptions}>
-      <Tab.Screen name="Workout" component={WorkoutScreen} />
+      <Tab.Screen name="Today" component={WorkoutScreen} />
       <Tab.Screen name="LogWorkout" component={LogWorkoutScreen} />
       <Tab.Screen name="Goals" component={GoalListScreen} />
+      <Tab.Screen name="Progress" component={ProgressScreen} />
       <Tab.Screen name="Calculation" component={CalculationScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
