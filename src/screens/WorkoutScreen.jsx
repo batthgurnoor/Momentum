@@ -116,14 +116,20 @@ const WorkoutScreen = () => {
               </View>
             </View>
 
-            <View style={styles.lastRow}>
-              <Text style={styles.lastLabel}>Last session</Text>
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onPress={() => user && navigation.navigate('ActivityMonitoring')}
+              disabled={!user}
+              style={[styles.lastRow, !user && { opacity: 0.7 }]}
+            >
+              <View style={styles.lastHeader}>
+                <Text style={styles.lastLabel}>Last session</Text>
+                {user ? <Text style={styles.viewAll}>View history</Text> : null}
+              </View>
               <Text style={styles.lastValue} numberOfLines={1}>
-                {user
-                  ? lastActivity?.title || 'No sessions yet'
-                  : 'Not signed in'}
+                {user ? lastActivity?.title || 'No sessions yet' : 'Not signed in'}
               </Text>
-            </View>
+            </TouchableOpacity>
           </View>
           <TouchableOpacity
             activeOpacity={0.9}
@@ -209,10 +215,21 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: WH.cardBorder,
   },
+  lastHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   lastLabel: {
     color: WH.textDim,
     fontSize: 12,
     fontWeight: '800',
+  },
+  viewAll: {
+    color: WH.accent,
+    fontSize: 12,
+    fontWeight: '900',
+    letterSpacing: 0.2,
   },
   lastValue: {
     color: WH.text,
