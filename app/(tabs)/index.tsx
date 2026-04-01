@@ -6,6 +6,7 @@ import CalculationScreen from "../../src/screens/CalculationScreen";
 import WorkoutOTDScreen from '../../src/screens/WorkoutOTDScreen';
 import ProfileScreen from '../../src/screens/ProfileScreen';
 import ProgressScreen from '../../src/screens/ProgressScreen';
+import TrainScreen from '../../src/screens/TrainScreen';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import ExerciseScreen from '../../src/screens/ExerciseScreen';
@@ -42,12 +43,12 @@ function TabNavigator() {
         switch (route.name) {
           case 'Today':
             return <FontAwesome6 name="dumbbell" size={size} color={color} />;
+          case 'Train':
+            return <Ionicons name="barbell" size={size} color={color} />;
           case 'LogWorkout':
             return <AntDesign name="book" size={size} color={color} />;
           case 'Progress':
             return <Ionicons name="stats-chart" size={size} color={color} />;
-          case 'Calculation':
-            return <Ionicons name="calculator-outline" size={size} color={color} />;
           case 'Profile':
             return <AntDesign name="user" size={size} color={color} />;
           case 'Goals':
@@ -74,10 +75,10 @@ function TabNavigator() {
   return (
     <Tab.Navigator screenOptions={screenOptions}>
       <Tab.Screen name="Today" component={WorkoutScreen} />
+      <Tab.Screen name="Train" component={TrainScreen} />
       <Tab.Screen name="LogWorkout" component={LogWorkoutScreen} />
       <Tab.Screen name="Goals" component={GoalListScreen} />
       <Tab.Screen name="Progress" component={ProgressScreen} />
-      <Tab.Screen name="Calculation" component={CalculationScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );
@@ -119,6 +120,7 @@ export default function App() {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Signup" component={SignupScreen} />
         <Stack.Screen name="TabNav" component={TabNavigator} />
+        <Stack.Screen name="Calculation" component={CalculationScreen} />
         <Stack.Screen name="Exercise" component={ExerciseScreen} />
         <Stack.Screen name="CategoryExercise" component={CategoryExerciseScreen} />
         <Stack.Screen name="WorkoutOTDScreen" component={WorkoutOTDScreen} />

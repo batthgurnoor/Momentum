@@ -195,6 +195,12 @@ export default function ProfileScreen() {
                     <Text className="text-momentum-bg font-bold">Notifications</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
+                    onPress={() => navigation.navigate('Calculation')}
+                    className="bg-ui-surface border border-momentum-border py-2 px-4 rounded-full"
+                  >
+                    <Text className="text-ui-text-primary font-bold">BMI</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
                     onPress={() => setEditing(true)}
                     className="bg-ui-surface border border-momentum-border py-2 px-4 rounded-full"
                   >
