@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { COLORS } from '../theme/colors';
 import { auth, db } from '../../Firebase/config';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
@@ -29,6 +29,7 @@ const exerciseCardImage = require('../../assets/images/exercise1.jpg');
 
 export default function SessionScreen() {
   const navigation = useNavigation();
+  const route = useRoute();
   const intervalRef = useRef(null);
   const restIntervalRef = useRef(null);
 
@@ -49,6 +50,40 @@ export default function SessionScreen() {
   const [mode, setMode] = useState('session'); // 'session' | 'picker'
   const [exerciseQuery, setExerciseQuery] = useState('');
   const [sessionExercises, setSessionExercises] = useState([]);
+
+  useEffect(() => {
+    const prefill = route?.params?.prefill;
+    if (!prefill) return;
+
+    if (typeof prefill.title === 'string' && prefill.title) {
+      setTitle(prefill.title);
+    }
+    if (typeof prefill.restTargetSeconds === 'number') {
+      setRestTargetSeconds(prefill.restTargetSeconds);
+      setRestSeconds(prefill.restTargetSeconds);
+      setRestRunning(false);
+    }
+    if (Array.isArray(prefill.exercises) && prefill.exercises.length) {
+      setSessionExercises(
+        prefill.exercises.map((e) => ({
+          exerciseId: e.exerciseId,
+          title: e.title,
+          intensity: e.intensity,
+          category: e.category,
+          sets: (e.sets || []).map((s) => ({
+            reps: s.reps ?? '',
+            weight: s.weight ?? '',
+            rpe: s.rpe ?? '',
+            restSeconds: typeof s.restSeconds === 'number' ? s.restSeconds : restTargetSeconds || 0,
+            createdAt: Date.now() + Math.random(),
+          })),
+        }))
+      );
+    }
+    // prevent repeated prefills on re-render
+    navigation.setParams?.({ prefill: undefined });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!restRunning) {

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ImageBackground, StyleSheet, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,6 +8,8 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../theme/colors';
 import exerciseData from '../../exercise_data.json';
+import { auth, db } from '../../Firebase/config';
+import { collection, limit, onSnapshot, orderBy, query } from 'firebase/firestore';
 
 const APP = COLORS.app;
 const WH = COLORS.workoutHome;
@@ -15,9 +17,50 @@ const exerciseImage = require('../../assets/images/exercise1.jpg');
 
 export default function TrainScreen() {
   const navigation = useNavigation();
-  const [query, setQuery] = useState('');
+  const user = auth.currentUser;
+  const [searchQuery, setSearchQuery] = useState('');
+  const [recentRoutines, setRecentRoutines] = useState([]);
+  const [lastSession, setLastSession] = useState(null);
 
-  const normalized = query.trim().toLowerCase();
+  useEffect(() => {
+    if (!user) {
+      setRecentRoutines([]);
+      setLastSession(null);
+      return;
+    }
+
+    const routinesRef = collection(db, 'users', user.uid, 'routines');
+    const routinesQ = query(routinesRef, orderBy('updatedAt', 'desc'), limit(3));
+    const unsubRoutines = onSnapshot(
+      routinesQ,
+      (snap) => setRecentRoutines(snap.docs.map((d) => ({ id: d.id, ...d.data() }))),
+      (err) => {
+        console.log('Train routines error:', err);
+        setRecentRoutines([]);
+      }
+    );
+
+    const sessionsRef = collection(db, 'users', user.uid, 'sessions');
+    const sessionsQ = query(sessionsRef, orderBy('timestamp', 'desc'), limit(1));
+    const unsubSessions = onSnapshot(
+      sessionsQ,
+      (snap) => {
+        const doc = snap.docs[0];
+        setLastSession(doc ? { id: doc.id, ...doc.data() } : null);
+      },
+      (err) => {
+        console.log('Train last session error:', err);
+        setLastSession(null);
+      }
+    );
+
+    return () => {
+      unsubRoutines();
+      unsubSessions();
+    };
+  }, [user]);
+
+  const normalized = searchQuery.trim().toLowerCase();
   const results = useMemo(() => {
     if (!normalized) return exerciseData;
     return exerciseData.filter((e) => {
@@ -44,6 +87,50 @@ export default function TrainScreen() {
           </View>
         </View>
 
+        <View style={styles.quickRow}>
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => navigation.navigate('Routines')}
+            style={styles.quickCard}
+          >
+            <Text style={styles.quickTitle}>Routines</Text>
+            <Text style={styles.quickSub} numberOfLines={1}>
+              {recentRoutines.length ? `${recentRoutines.length} recent` : 'Create templates'}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => {
+              if (!lastSession?.exercises?.length) return;
+              navigation.navigate('Session', {
+                prefill: {
+                  title: lastSession.title || 'Repeat session',
+                  restTargetSeconds: lastSession.restTargetSeconds || 0,
+                  exercises: (lastSession.exercises || []).map((e) => ({
+                    exerciseId: e.exerciseId,
+                    title: e.title,
+                    intensity: e.intensity,
+                    category: e.category,
+                    sets: (e.sets || []).map((s) => ({
+                      reps: s?.reps == null ? '' : String(s.reps),
+                      weight: s?.weight == null ? '' : String(s.weight),
+                      rpe: s?.rpe == null ? '' : String(s.rpe),
+                      restSeconds: typeof s?.restSeconds === 'number' ? s.restSeconds : null,
+                    })),
+                  })),
+                },
+              });
+            }}
+            disabled={!lastSession?.exercises?.length}
+            style={[styles.quickCard, !lastSession?.exercises?.length && { opacity: 0.6 }]}
+          >
+            <Text style={styles.quickTitle}>Repeat last</Text>
+            <Text style={styles.quickSub} numberOfLines={1}>
+              {lastSession?.title ? lastSession.title : 'No sessions yet'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
         <View
           style={{
             marginTop: 4,
@@ -60,8 +147,8 @@ export default function TrainScreen() {
         >
           <AntDesign name="search1" size={16} color={COLORS.text.secondary} />
           <TextInput
-            value={query}
-            onChangeText={setQuery}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
             placeholder="Search exercises, category, intensity…"
             placeholderTextColor={COLORS.text.tertiary}
             style={{ flex: 1, color: COLORS.text.primary, paddingVertical: 4 }}
@@ -69,8 +156,8 @@ export default function TrainScreen() {
             autoCapitalize="none"
             clearButtonMode="while-editing"
           />
-          {!!query && (
-            <TouchableOpacity onPress={() => setQuery('')} activeOpacity={0.8}>
+          {!!searchQuery && (
+            <TouchableOpacity onPress={() => setSearchQuery('')} activeOpacity={0.8}>
               <AntDesign name="closecircle" size={16} color={COLORS.text.secondary} />
             </TouchableOpacity>
           )}
@@ -164,6 +251,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
+  },
+  quickRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 10,
+  },
+  quickCard: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: WH.cardBorder,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+  },
+  quickTitle: {
+    color: WH.text,
+    fontWeight: '900',
+    fontSize: 14,
+  },
+  quickSub: {
+    color: WH.textMuted,
+    marginTop: 6,
+    fontSize: 12,
+    fontWeight: '700',
   },
   row: {
     flexDirection: 'row',
