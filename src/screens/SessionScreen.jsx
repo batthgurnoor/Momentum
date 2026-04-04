@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  ActivityIndicator,
   Alert,
   ScrollView,
   KeyboardAvoidingView,
@@ -14,14 +15,21 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { COLORS } from '../theme/colors';
-import { auth, db } from '../../Firebase/config';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { auth } from '../../Firebase/config';
 import * as Haptics from 'expo-haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FlashList } from '@shopify/flash-list';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import exerciseData from '../../exercise_data.json';
 import ExerciseGifCardMedia from '../components/ExerciseGifCardMedia';
+import {
+  buildSessionFirestoreDocuments,
+  buildSessionWriteSnapshot,
+  clearQueuedSessionWrite,
+  commitSessionWriteBatch,
+  flushQueuedSessionWrite,
+  queueFailedSessionWrite,
+} from '../utils/sessionFirestoreWrite';
 
 const APP = COLORS.app;
 const WH = COLORS.workoutHome;
@@ -90,6 +98,9 @@ export default function SessionScreen() {
   const [sessionExercises, setSessionExercises] = useState([]);
   const [lastWeightByExerciseId, setLastWeightByExerciseId] = useState({});
   const [undoRemovedSet, setUndoRemovedSet] = useState(null);
+  const [savingSession, setSavingSession] = useState(false);
+  const [pendingFinishCtx, setPendingFinishCtx] = useState(null);
+  const [saveErrorBanner, setSaveErrorBanner] = useState(false);
   /** { exerciseId, setIndex, set } */
 
   useEffect(() => {
@@ -111,6 +122,12 @@ export default function SessionScreen() {
     return () => {
       if (undoRemoveTimerRef.current) clearTimeout(undoRemoveTimerRef.current);
     };
+  }, []);
+
+  useEffect(() => {
+    const u = auth.currentUser;
+    if (!u) return;
+    flushQueuedSessionWrite(u.uid).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -345,7 +362,86 @@ export default function SessionScreen() {
     setStartTimestamp((prev) => (typeof prev === 'number' ? prev + pausedDuration : prev));
   };
 
-  const handleFinish = async () => {
+  const persistAfterFinish = async (ctx) => {
+    if (!ctx) return;
+    const user = auth.currentUser;
+    if (!user) {
+      Alert.alert('Error', 'No user is currently logged in!');
+      return;
+    }
+
+    setSavingSession(true);
+    setSaveErrorBanner(false);
+
+    const { sessionPayload, activityPayload } = buildSessionFirestoreDocuments({
+      title,
+      totalSeconds: ctx.totalSeconds,
+      calories,
+      notes,
+      startTimestamp: ctx.startTimestamp,
+      restTargetSeconds,
+      sessionExercises,
+      endTimeMs: ctx.endTimeMs,
+    });
+
+    const result = await commitSessionWriteBatch(user.uid, sessionPayload, activityPayload);
+    setSavingSession(false);
+
+    if (result.ok) {
+      await clearQueuedSessionWrite();
+      const nextWeightMap = computeLastWeightMapFromSession(lastWeightByExerciseId, sessionExercises);
+      setLastWeightByExerciseId(nextWeightMap);
+      await saveLastWeightMap(user.uid, nextWeightMap);
+
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+
+      setPendingFinishCtx(null);
+      setSaveErrorBanner(false);
+
+      Alert.alert('Session saved', `Duration: ${formatTime(ctx.totalSeconds)}`);
+
+      setElapsedTime(0);
+      setStartTimestamp(null);
+      setPauseTimestamp(null);
+      setTitle('');
+      setCalories('');
+      setNotes('');
+      setSessionExercises([]);
+      navigation.goBack();
+      return;
+    }
+
+    const snapshot = buildSessionWriteSnapshot({
+      title,
+      totalSeconds: ctx.totalSeconds,
+      calories,
+      notes,
+      startTimestamp: ctx.startTimestamp,
+      restTargetSeconds,
+      sessionExercises,
+      endTimeMs: ctx.endTimeMs,
+    });
+    await queueFailedSessionWrite(user.uid, snapshot);
+
+    const msg =
+      result.error?.code === 'unavailable' || result.error?.message?.includes('network')
+        ? 'You may be offline. We saved a copy on this device — tap Retry when you are back online.'
+        : result.error?.message ?? 'Could not save. Check your connection and try again.';
+
+    Alert.alert('Save failed', msg, [
+      {
+        text: 'Dismiss',
+        style: 'cancel',
+        onPress: () => setSaveErrorBanner(true),
+      },
+      {
+        text: 'Retry',
+        onPress: () => void persistAfterFinish(ctx),
+      },
+    ]);
+  };
+
+  const handleFinish = () => {
     if (!isRunning) return;
     setIsRunning(false);
     setIsPaused(false);
@@ -361,92 +457,13 @@ export default function SessionScreen() {
       return;
     }
 
-    try {
-      // Compute session aggregates
-      let totalSets = 0;
-      let totalReps = 0;
-      let totalVolume = 0;
-      for (const ex of sessionExercises) {
-        for (const s of ex.sets || []) {
-          const reps = parseInt(String(s.reps ?? ''), 10);
-          const weight = parseFloat(String(s.weight ?? ''));
-          if (Number.isFinite(reps)) totalReps += reps;
-          if (Number.isFinite(reps)) totalSets += 1;
-          if (Number.isFinite(reps) && Number.isFinite(weight)) totalVolume += reps * weight;
-        }
-      }
-
-      // Save full session document (v2)
-      const sessionsRef = collection(db, 'users', user.uid, 'sessions');
-      await addDoc(sessionsRef, {
-        title: title || 'Training Session',
-        timestamp: serverTimestamp(),
-        duration: totalSeconds,
-        caloriesBurned: parseFloat(calories) || 0,
-        notes: notes || '',
-        startTime: startTimestamp ? new Date(startTimestamp) : null,
-        endTime: new Date(),
-        restTargetSeconds: restTargetSeconds || 0,
-        totals: {
-          sets: totalSets,
-          reps: totalReps,
-          volume: Number(totalVolume.toFixed(2)),
-        },
-        exercises: sessionExercises.map((ex) => ({
-          exerciseId: ex.exerciseId,
-          title: ex.title,
-          intensity: ex.intensity,
-          category: ex.category,
-          sets: (ex.sets || []).map((s) => ({
-            reps: s.reps === '' ? null : Number(s.reps),
-            weight: s.weight === '' ? null : Number(s.weight),
-            rpe: s.rpe === '' ? null : Number(s.rpe),
-            restSeconds: typeof s.restSeconds === 'number' ? s.restSeconds : null,
-            timestamp: s.createdAt ? new Date(s.createdAt) : null,
-          })),
-        })),
-        source: 'session',
-        schemaVersion: 2,
-      });
-
-      // Keep writing summary to activities for backward compatibility
-      const activitiesRef = collection(db, 'users', user.uid, 'activities');
-      await addDoc(activitiesRef, {
-        title: title || 'Training Session',
-        timestamp: serverTimestamp(),
-        duration: totalSeconds,
-        caloriesBurned: parseFloat(calories) || 0,
-        notes: notes || '',
-        startTime: startTimestamp ? new Date(startTimestamp) : null,
-        endTime: new Date(),
-        totals: {
-          sets: totalSets,
-          reps: totalReps,
-          volume: Number(totalVolume.toFixed(2)),
-        },
-        source: 'session',
-      });
-
-      const nextWeightMap = computeLastWeightMapFromSession(lastWeightByExerciseId, sessionExercises);
-      setLastWeightByExerciseId(nextWeightMap);
-      await saveLastWeightMap(user.uid, nextWeightMap);
-
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
-
-      Alert.alert('Session saved', `Duration: ${formatTime(totalSeconds)}`);
-
-      setElapsedTime(0);
-      setStartTimestamp(null);
-      setPauseTimestamp(null);
-      setTitle('');
-      setCalories('');
-      setNotes('');
-      setSessionExercises([]);
-      navigation.goBack();
-    } catch (e) {
-      console.log('Error saving session:', e);
-      Alert.alert('Error', e?.message ?? 'Could not save session.');
-    }
+    const ctx = {
+      totalSeconds,
+      startTimestamp,
+      endTimeMs: end,
+    };
+    setPendingFinishCtx(ctx);
+    void persistAfterFinish(ctx);
   };
 
   const setRestPreset = (secs) => {
@@ -467,7 +484,10 @@ export default function SessionScreen() {
   return (
     <LinearGradient colors={[APP.bgTop, APP.bgMid, APP.bgBottom]} locations={[0, 0.45, 1]} style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1, paddingHorizontal: 20, paddingTop: 12 }}>
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{ flex: 1, position: 'relative' }}
+        >
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <Text style={{ color: COLORS.text.primary, fontSize: 22, fontWeight: '800' }}>
               {mode === 'picker' ? 'Pick an exercise' : 'Session'}
@@ -591,6 +611,39 @@ export default function SessionScreen() {
             </View>
           ) : (
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 28 }}>
+              {saveErrorBanner && pendingFinishCtx ? (
+                <View
+                  style={{
+                    marginBottom: 14,
+                    padding: 14,
+                    borderRadius: 14,
+                    borderWidth: 1,
+                    borderColor: COLORS.ui.error,
+                    backgroundColor: 'rgba(248, 113, 113, 0.1)',
+                  }}
+                >
+                  <Text style={{ color: COLORS.text.primary, fontWeight: '900' }}>Session not synced</Text>
+                  <Text style={{ color: COLORS.text.secondary, marginTop: 6, lineHeight: 20 }}>
+                    A copy is stored on this device. Tap Retry when you are back online.
+                  </Text>
+                  <TouchableOpacity
+                    activeOpacity={0.9}
+                    onPress={() => void persistAfterFinish(pendingFinishCtx)}
+                    disabled={savingSession}
+                    style={{
+                      marginTop: 12,
+                      alignSelf: 'flex-start',
+                      paddingVertical: 10,
+                      paddingHorizontal: 18,
+                      borderRadius: 999,
+                      backgroundColor: APP.accent,
+                      opacity: savingSession ? 0.6 : 1,
+                    }}
+                  >
+                    <Text style={{ color: COLORS.text.onPrimary, fontWeight: '900' }}>Retry save</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : null}
               <View style={{ alignItems: 'center', marginTop: 26, marginBottom: 18 }}>
                 <Text style={{ color: APP.accent, fontSize: 56, fontWeight: '900' }}>{displayedTime}</Text>
                 {!isRunning ? (
@@ -1059,6 +1112,33 @@ export default function SessionScreen() {
               </View>
             </ScrollView>
           )}
+
+          {savingSession && mode === 'session' ? (
+            <View
+              style={{
+                ...StyleSheet.absoluteFillObject,
+                zIndex: 100,
+                backgroundColor: 'rgba(0,0,0,0.45)',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <View
+                style={{
+                  paddingVertical: 28,
+                  paddingHorizontal: 32,
+                  borderRadius: 16,
+                  borderWidth: 1,
+                  borderColor: APP.cardBorder,
+                  backgroundColor: 'rgba(15,23,42,0.96)',
+                  alignItems: 'center',
+                }}
+              >
+                <ActivityIndicator size="large" color={APP.accent} />
+                <Text style={{ color: COLORS.text.primary, fontWeight: '900', marginTop: 16 }}>Saving session…</Text>
+              </View>
+            </View>
+          ) : null}
         </KeyboardAvoidingView>
 
         {mode === 'session' && undoRemovedSet ? (

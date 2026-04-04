@@ -27,8 +27,10 @@ import PlanSetupScreen from '../../src/screens/PlanSetupScreen';
 import PlanDetailScreen from '../../src/screens/PlanDetailScreen';
 import NotificationsScreen from '../../src/screens/NotificationsScreen';
 import { registerForPushNotificationsAsync } from '../../src/notifications';
+import { onAuthStateChanged } from 'firebase/auth';
 import { preloadExerciseGifUrls } from '../../src/utils/exerciseGifUrls';
-import '../../Firebase/config'; // Import firebase to ensure it's initialized
+import { flushQueuedSessionWrite } from '../../src/utils/sessionFirestoreWrite';
+import { auth } from '../../Firebase/config';
 import { COLORS } from '../../src/theme/colors';
 import ErrorBoundary from '../../src/components/ErrorBoundary';
 
@@ -113,6 +115,13 @@ export default function App() {
 
   useEffect(() => {
     preloadExerciseGifUrls({ concurrency: 6 }).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (user) => {
+      if (user?.uid) flushQueuedSessionWrite(user.uid).catch(() => {});
+    });
+    return () => unsub();
   }, []);
 
   return (
