@@ -30,6 +30,7 @@ import PlanSetupScreen from '../../src/screens/PlanSetupScreen';
 import PlanDetailScreen from '../../src/screens/PlanDetailScreen';
 import NotificationsScreen from '../../src/screens/NotificationsScreen';
 import { registerForPushNotificationsAsync } from '../../src/notifications';
+import { preloadExerciseGifUrls } from '../../src/utils/exerciseGifUrls';
 import '../../Firebase/config'; // Import firebase to ensure it's initialized
 import { COLORS } from '../../src/theme/colors';
 import ErrorBoundary from '../../src/components/ErrorBoundary';
@@ -48,7 +49,7 @@ function TabNavigator() {
           case 'Today':
             return <FontAwesome6 name="dumbbell" size={size} color={color} />;
           case 'Train':
-            return <Ionicons name="barbell" size={size} color={color} />;
+            return <FontAwesome6 name="person-running" size={size} color={color} />;
           case 'Progress':
             return <Ionicons name="stats-chart" size={size} color={color} />;
           case 'Profile':
@@ -115,6 +116,11 @@ export default function App() {
       Notifications.removeNotificationSubscription(responseListener);
     };
   }, []);
+
+  useEffect(() => {
+    preloadExerciseGifUrls({ concurrency: 6 }).catch(() => {});
+  }, []);
+
   return (
     <ErrorBoundary title="Momentum crashed on this screen">
       <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: APP.bgTop } }}>

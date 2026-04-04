@@ -1,5 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ImageBackground, StyleSheet, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ImageBackground,
+  StyleSheet,
+  Platform,
+  ActivityIndicator,
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FlashList } from '@shopify/flash-list';
@@ -10,10 +19,54 @@ import { COLORS } from '../theme/colors';
 import exerciseData from '../../exercise_data.json';
 import { auth, db } from '../../Firebase/config';
 import { collection, limit, onSnapshot, orderBy, query } from 'firebase/firestore';
+import { resolveExerciseGifUrl } from '../utils/exerciseGifUrls';
 
 const APP = COLORS.app;
 const WH = COLORS.workoutHome;
-const exerciseImage = require('../../assets/images/exercise1.jpg');
+const exerciseFallbackImage = require('../../assets/images/exercise1.jpg');
+
+function TrainExerciseCardMedia({ intensity, gifFileName, style, imageStyle, children }) {
+  const [uri, setUri] = useState(null);
+  const [resolving, setResolving] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    setResolving(true);
+    setUri(null);
+
+    (async () => {
+      const url = await resolveExerciseGifUrl(intensity, gifFileName);
+      if (cancelled) return;
+      setUri(url);
+      setResolving(false);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [intensity, gifFileName]);
+
+  return (
+    <ImageBackground
+      source={uri ? { uri } : exerciseFallbackImage}
+      style={style}
+      imageStyle={imageStyle}
+      resizeMode="cover"
+    >
+      {resolving ? (
+        <View
+          style={[
+            StyleSheet.absoluteFill,
+            { backgroundColor: 'rgba(0,0,0,0.35)', alignItems: 'center', justifyContent: 'center' },
+          ]}
+        >
+          <ActivityIndicator size="small" color={WH.accent} />
+        </View>
+      ) : null}
+      {children}
+    </ImageBackground>
+  );
+}
 
 export default function TrainScreen() {
   const navigation = useNavigation();
@@ -183,7 +236,12 @@ export default function TrainScreen() {
                   onPress={() => navigation.navigate('Exercise', { item: data })}
                   style={styles.cardOuter}
                 >
-                  <ImageBackground source={exerciseImage} style={styles.cardBg} imageStyle={styles.cardImage}>
+                  <TrainExerciseCardMedia
+                    intensity={data.intensity}
+                    gifFileName={data.gif_url}
+                    style={styles.cardBg}
+                    imageStyle={styles.cardImage}
+                  >
                     <LinearGradient
                       colors={['rgba(15,23,42,0.2)', 'rgba(0,0,0,0.82)']}
                       style={StyleSheet.absoluteFill}
@@ -201,7 +259,7 @@ export default function TrainScreen() {
                         {String(data.intensity || '').toUpperCase() || 'TAP TO START'}
                       </Text>
                     </View>
-                  </ImageBackground>
+                  </TrainExerciseCardMedia>
                 </TouchableOpacity>
               );
 
