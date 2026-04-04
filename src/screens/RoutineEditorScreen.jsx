@@ -15,6 +15,7 @@ import {
 import { FlashList } from '@shopify/flash-list';
 import { COLORS } from '../theme/colors';
 import exerciseData from '../../exercise_data.json';
+import ExerciseGifCardMedia from '../components/ExerciseGifCardMedia';
 
 const APP = COLORS.app;
 
@@ -521,31 +522,66 @@ export default function RoutineEditorScreen() {
                 <View style={{ height: 420, marginTop: 10 }}>
                   <FlashList
                     data={filteredExercises}
-                    estimatedItemSize={64}
+                    estimatedItemSize={100}
                     keyExtractor={(item) => String(item.id)}
+                    ListEmptyComponent={
+                      pickerQuery.trim() ? (
+                        <View style={{ paddingVertical: 28, paddingHorizontal: 8 }}>
+                          <Text
+                            style={{ color: COLORS.text.primary, fontWeight: '900', textAlign: 'center' }}
+                            numberOfLines={2}
+                          >
+                            No matches for &quot;{pickerQuery.trim()}&quot;
+                          </Text>
+                          <Text style={{ color: COLORS.text.secondary, textAlign: 'center', marginTop: 8 }}>
+                            Try a shorter search or clear the field.
+                          </Text>
+                        </View>
+                      ) : null
+                    }
                     renderItem={({ item }) => (
                       <TouchableOpacity
                         activeOpacity={0.9}
                         onPress={() => addExercise(item)}
                         style={{
-                          paddingVertical: 12,
-                          paddingHorizontal: 12,
+                          flexDirection: 'row',
+                          alignItems: 'stretch',
                           borderRadius: 14,
                           borderWidth: 1,
                           borderColor: APP.cardBorder,
                           backgroundColor: 'rgba(255,255,255,0.06)',
                           marginBottom: 10,
+                          overflow: 'hidden',
                         }}
                       >
-                        <Text style={{ color: COLORS.text.primary, fontWeight: '900' }} numberOfLines={1}>
-                          {item.title}
-                        </Text>
-                        <Text style={{ color: COLORS.text.secondary, marginTop: 4 }} numberOfLines={1}>
-                          {item.category}
-                        </Text>
-                        <Text style={{ color: COLORS.text.tertiary, marginTop: 2 }} numberOfLines={1}>
-                          {item.intensity}
-                        </Text>
+                        <ExerciseGifCardMedia
+                          intensity={item.intensity}
+                          gifFileName={item.gif_url}
+                          style={{ width: 96, minHeight: 96 }}
+                          imageStyle={{
+                            borderTopLeftRadius: 13,
+                            borderBottomLeftRadius: 13,
+                          }}
+                          accentColor={APP.accent}
+                        />
+                        <View
+                          style={{
+                            flex: 1,
+                            paddingVertical: 12,
+                            paddingHorizontal: 12,
+                            justifyContent: 'center',
+                          }}
+                        >
+                          <Text style={{ color: COLORS.text.primary, fontWeight: '900' }} numberOfLines={2}>
+                            {item.title}
+                          </Text>
+                          <Text style={{ color: COLORS.text.secondary, marginTop: 4 }} numberOfLines={1}>
+                            {item.category}
+                          </Text>
+                          <Text style={{ color: COLORS.text.tertiary, marginTop: 2 }} numberOfLines={1}>
+                            {item.intensity}
+                          </Text>
+                        </View>
                       </TouchableOpacity>
                     )}
                   />

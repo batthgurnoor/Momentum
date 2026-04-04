@@ -4,7 +4,6 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  ImageBackground,
   StyleSheet,
   Text,
   TextInput,
@@ -18,20 +17,59 @@ import { COLORS } from '../theme/colors';
 import { auth, db } from '../../Firebase/config';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import * as Haptics from 'expo-haptics';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FlashList } from '@shopify/flash-list';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import exerciseData from '../../exercise_data.json';
-// (picker reverted to full list; no category strip)
+import ExerciseGifCardMedia from '../components/ExerciseGifCardMedia';
 
 const APP = COLORS.app;
 const WH = COLORS.workoutHome;
-const exerciseCardImage = require('../../assets/images/exercise1.jpg');
+
+const LAST_WEIGHT_STORAGE_PREFIX = 'session:lastWeightByExercise:';
+
+function loadLastWeightMap(uid) {
+  if (!uid) return Promise.resolve({});
+  return AsyncStorage.getItem(`${LAST_WEIGHT_STORAGE_PREFIX}${uid}`)
+    .then((raw) => {
+      if (!raw) return {};
+      try {
+        const p = JSON.parse(raw);
+        return p && typeof p === 'object' ? p : {};
+      } catch {
+        return {};
+      }
+    })
+    .catch(() => ({}));
+}
+
+function saveLastWeightMap(uid, map) {
+  if (!uid) return Promise.resolve();
+  return AsyncStorage.setItem(`${LAST_WEIGHT_STORAGE_PREFIX}${uid}`, JSON.stringify(map)).catch(() => {});
+}
+
+function computeLastWeightMapFromSession(prevMap, exercises) {
+  const next = { ...prevMap };
+  for (const ex of exercises || []) {
+    const id = String(ex.exerciseId);
+    const sets = ex.sets || [];
+    for (let i = sets.length - 1; i >= 0; i--) {
+      const w = parseFloat(String(sets[i]?.weight ?? ''));
+      if (Number.isFinite(w) && w >= 0) {
+        next[id] = w;
+        break;
+      }
+    }
+  }
+  return next;
+}
 
 export default function SessionScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const intervalRef = useRef(null);
   const restIntervalRef = useRef(null);
+  const undoRemoveTimerRef = useRef(null);
 
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -50,6 +88,30 @@ export default function SessionScreen() {
   const [mode, setMode] = useState('session'); // 'session' | 'picker'
   const [exerciseQuery, setExerciseQuery] = useState('');
   const [sessionExercises, setSessionExercises] = useState([]);
+  const [lastWeightByExerciseId, setLastWeightByExerciseId] = useState({});
+  const [undoRemovedSet, setUndoRemovedSet] = useState(null);
+  /** { exerciseId, setIndex, set } */
+
+  useEffect(() => {
+    const u = auth.currentUser;
+    if (!u) {
+      setLastWeightByExerciseId({});
+      return;
+    }
+    let cancelled = false;
+    loadLastWeightMap(u.uid).then((m) => {
+      if (!cancelled) setLastWeightByExerciseId(m);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (undoRemoveTimerRef.current) clearTimeout(undoRemoveTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     const prefill = route?.params?.prefill;
@@ -158,16 +220,64 @@ export default function SessionScreen() {
   };
 
   const removeExerciseFromSession = (exerciseId) => {
+    if (undoRemovedSet?.exerciseId === exerciseId) {
+      if (undoRemoveTimerRef.current) clearTimeout(undoRemoveTimerRef.current);
+      setUndoRemovedSet(null);
+    }
     setSessionExercises((prev) => prev.filter((e) => e.exerciseId !== exerciseId));
   };
 
+  const scheduleUndoRemovedClear = () => {
+    if (undoRemoveTimerRef.current) clearTimeout(undoRemoveTimerRef.current);
+    undoRemoveTimerRef.current = setTimeout(() => setUndoRemovedSet(null), 6000);
+  };
+
+  const removeSetAt = (exerciseId, setIndex) => {
+    const ex = sessionExercises.find((e) => e.exerciseId === exerciseId);
+    const removed = ex?.sets?.[setIndex];
+    if (!removed) return;
+    if (undoRemoveTimerRef.current) clearTimeout(undoRemoveTimerRef.current);
+    setSessionExercises((prev) =>
+      prev.map((e) => {
+        if (e.exerciseId !== exerciseId) return e;
+        return { ...e, sets: e.sets.filter((_, i) => i !== setIndex) };
+      })
+    );
+    setUndoRemovedSet({ exerciseId, setIndex, set: { ...removed } });
+    scheduleUndoRemovedClear();
+  };
+
+  const undoRemoveSet = () => {
+    if (!undoRemovedSet) return;
+    if (undoRemoveTimerRef.current) clearTimeout(undoRemoveTimerRef.current);
+    const { exerciseId, setIndex, set } = undoRemovedSet;
+    setSessionExercises((prev) =>
+      prev.map((e) => {
+        if (e.exerciseId !== exerciseId) return e;
+        const sets = [...e.sets];
+        const i = Math.min(Math.max(0, setIndex), sets.length);
+        sets.splice(i, 0, { ...set });
+        return { ...e, sets };
+      })
+    );
+    setUndoRemovedSet(null);
+  };
+
   const addSet = (exerciseId, partial = {}) => {
+    const idKey = String(exerciseId);
+    const hasWeightProp = Object.prototype.hasOwnProperty.call(partial, 'weight');
+    const defaultWeight =
+      hasWeightProp && partial.weight !== undefined
+        ? partial.weight
+        : lastWeightByExerciseId[idKey] != null && Number.isFinite(Number(lastWeightByExerciseId[idKey]))
+          ? String(lastWeightByExerciseId[idKey])
+          : '';
     setSessionExercises((prev) =>
       prev.map((e) => {
         if (e.exerciseId !== exerciseId) return e;
         const next = {
           reps: '',
-          weight: '',
+          weight: defaultWeight,
           rpe: '',
           restSeconds: restTargetSeconds || 0,
           createdAt: Date.now(),
@@ -317,6 +427,12 @@ export default function SessionScreen() {
         source: 'session',
       });
 
+      const nextWeightMap = computeLastWeightMapFromSession(lastWeightByExerciseId, sessionExercises);
+      setLastWeightByExerciseId(nextWeightMap);
+      await saveLastWeightMap(user.uid, nextWeightMap);
+
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+
       Alert.alert('Session saved', `Duration: ${formatTime(totalSeconds)}`);
 
       setElapsedTime(0);
@@ -411,6 +527,20 @@ export default function SessionScreen() {
                   data={filteredExercises}
                   estimatedItemSize={200}
                   keyExtractor={(item) => String(item.id)}
+                  ListEmptyComponent={
+                    exerciseQuery.trim() ? (
+                      <View style={{ paddingVertical: 36, paddingHorizontal: 12 }}>
+                        <Text
+                          style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 16, textAlign: 'center' }}
+                        >
+                          No matches for &quot;{exerciseQuery.trim()}&quot;
+                        </Text>
+                        <Text style={{ color: COLORS.text.secondary, textAlign: 'center', marginTop: 10, lineHeight: 20 }}>
+                          Try a shorter search or clear the field to see all exercises.
+                        </Text>
+                      </View>
+                    ) : null
+                  }
                   renderItem={({ item, index }) => {
                     if (index % 2 !== 0) return null;
                     const nextItem = filteredExercises[index + 1];
@@ -421,10 +551,12 @@ export default function SessionScreen() {
                         onPress={() => addExerciseToSession(data)}
                         style={gridStyles.cardOuter}
                       >
-                        <ImageBackground
-                          source={exerciseCardImage}
+                        <ExerciseGifCardMedia
+                          intensity={data.intensity}
+                          gifFileName={data.gif_url}
                           style={gridStyles.cardBg}
                           imageStyle={gridStyles.cardImage}
+                          accentColor={WH.accent}
                         >
                           <LinearGradient
                             colors={['rgba(15,23,42,0.2)', 'rgba(0,0,0,0.82)']}
@@ -443,7 +575,7 @@ export default function SessionScreen() {
                               {String(data.intensity || '').toUpperCase() || 'TAP TO ADD'}
                             </Text>
                           </View>
-                        </ImageBackground>
+                        </ExerciseGifCardMedia>
                       </TouchableOpacity>
                     );
 
@@ -561,9 +693,23 @@ export default function SessionScreen() {
                 </View>
 
                 {sessionExercises.length === 0 ? (
-                  <Text style={{ color: COLORS.text.secondary, marginTop: 10 }}>
-                    Add an exercise to start logging sets.
-                  </Text>
+                  <View
+                    style={{
+                      marginTop: 14,
+                      padding: 16,
+                      borderRadius: 14,
+                      borderWidth: 1,
+                      borderColor: APP.cardBorder,
+                      borderStyle: 'dashed',
+                      backgroundColor: 'rgba(0,0,0,0.18)',
+                    }}
+                  >
+                    <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 15 }}>No exercises yet</Text>
+                    <Text style={{ color: COLORS.text.secondary, marginTop: 8, lineHeight: 20 }}>
+                      Tap <Text style={{ fontWeight: '800', color: COLORS.text.primary }}>+ Add</Text> to open the library,
+                      pick moves, then log sets below the timer. You can start the timer whenever you are ready.
+                    </Text>
+                  </View>
                 ) : (
                   sessionExercises.map((ex) => (
                     <View
@@ -639,19 +785,39 @@ export default function SessionScreen() {
                       </View>
 
                       {ex.sets.length === 0 ? (
-                        <Text style={{ color: COLORS.text.secondary, marginTop: 10 }}>
-                          No sets yet.
-                        </Text>
+                        <View style={{ marginTop: 12 }}>
+                          <Text style={{ color: COLORS.text.secondary, lineHeight: 20 }}>
+                            Tap <Text style={{ fontWeight: '900', color: COLORS.text.primary }}>+ Set</Text> to add a row.
+                            Use <Text style={{ fontWeight: '800' }}>Copy last</Text> or <Text style={{ fontWeight: '800' }}>+2.5</Text>{' '}
+                            after your first set.
+                          </Text>
+                          {lastWeightByExerciseId[String(ex.exerciseId)] != null &&
+                          Number.isFinite(Number(lastWeightByExerciseId[String(ex.exerciseId)])) ? (
+                            <Text style={{ color: COLORS.text.tertiary, marginTop: 8, lineHeight: 20 }}>
+                              Last weight for this lift:{' '}
+                              <Text style={{ fontWeight: '800', color: APP.accent }}>
+                                {lastWeightByExerciseId[String(ex.exerciseId)]} kg
+                              </Text>
+                              {' — it will prefill when you add a set.'}
+                            </Text>
+                          ) : null}
+                        </View>
                       ) : (
                         <>
-                          <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
+                          <View style={{ flexDirection: 'row', gap: 8, marginTop: 12, alignItems: 'center' }}>
                             <Text style={{ color: COLORS.text.tertiary, width: 42 }}>#</Text>
                             <Text style={{ color: COLORS.text.tertiary, flex: 1 }}>Reps</Text>
                             <Text style={{ color: COLORS.text.tertiary, flex: 1 }}>Weight</Text>
                             <Text style={{ color: COLORS.text.tertiary, flex: 1 }}>RPE</Text>
+                            <View style={{ width: 36, alignItems: 'center' }}>
+                              <Text style={{ color: COLORS.text.tertiary, fontSize: 10 }}> </Text>
+                            </View>
                           </View>
                           {ex.sets.map((s, idx) => (
-                            <View key={s.createdAt ?? idx} style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+                            <View
+                              key={s.createdAt ?? idx}
+                              style={{ flexDirection: 'row', gap: 8, marginTop: 8, alignItems: 'center' }}
+                            >
                               <Text style={{ color: COLORS.text.secondary, width: 42, fontWeight: '800' }}>
                                 {idx + 1}
                               </Text>
@@ -706,6 +872,15 @@ export default function SessionScreen() {
                                   paddingVertical: 8,
                                 }}
                               />
+                              <TouchableOpacity
+                                onPress={() => removeSetAt(ex.exerciseId, idx)}
+                                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                                accessibilityRole="button"
+                                accessibilityLabel="Remove set"
+                                style={{ width: 36, alignItems: 'center', justifyContent: 'center' }}
+                              >
+                                <AntDesign name="minuscircleo" size={18} color={COLORS.text.tertiary} />
+                              </TouchableOpacity>
                             </View>
                           ))}
                           <Text style={{ color: COLORS.text.tertiary, marginTop: 10 }}>
@@ -885,6 +1060,33 @@ export default function SessionScreen() {
             </ScrollView>
           )}
         </KeyboardAvoidingView>
+
+        {mode === 'session' && undoRemovedSet ? (
+          <View
+            style={{
+              position: 'absolute',
+              left: 14,
+              right: 14,
+              bottom: 18,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              paddingVertical: 12,
+              paddingHorizontal: 14,
+              borderRadius: 14,
+              borderWidth: 1,
+              borderColor: APP.cardBorder,
+              backgroundColor: 'rgba(15,23,42,0.94)',
+            }}
+          >
+            <Text style={{ color: COLORS.text.secondary, flex: 1, marginRight: 12, fontWeight: '700' }}>
+              Set removed
+            </Text>
+            <TouchableOpacity onPress={undoRemoveSet} activeOpacity={0.85}>
+              <Text style={{ color: APP.accent, fontWeight: '900', fontSize: 15 }}>Undo</Text>
+            </TouchableOpacity>
+          </View>
+        ) : null}
       </SafeAreaView>
     </LinearGradient>
   );
