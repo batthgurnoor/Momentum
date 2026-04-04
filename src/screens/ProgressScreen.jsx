@@ -701,7 +701,7 @@ export default function ProgressScreen() {
         >
           <Text style={{ color: COLORS.text.primary, fontWeight: '800', marginBottom: 6 }}>Up next</Text>
           <Text style={{ color: COLORS.text.secondary, lineHeight: 20 }}>
-            - Weekly charts + trends{'\n'}- PR tracker (best set, best time){'\n'}- Routine-based filters{'\n'}- Consistency
+            - Weekly charts + trends{'\n'}- PR tracker (best set, best time){'\n'}- Consistency
           </Text>
         </View>
         </ScrollView>

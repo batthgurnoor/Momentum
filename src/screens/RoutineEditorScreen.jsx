@@ -48,6 +48,8 @@ export default function RoutineEditorScreen() {
   const [name, setName] = useState('');
   const [days, setDays] = useState([]);
   const [exercises, setExercises] = useState([]);
+  /** Firestore doc id once created or loaded; keeps Save / Start from duplicating new routines */
+  const [routineDocId, setRoutineDocId] = useState(() => (mode === 'edit' && routineId ? routineId : null));
 
   useEffect(() => {
     if (!user || mode !== 'edit' || !routineId) return;
@@ -116,60 +118,97 @@ export default function RoutineEditorScreen() {
     );
   };
 
+  const persistRoutineSilently = async () => {
+    if (!user) {
+      const err = new Error('NO_USER');
+      throw err;
+    }
+    const trimmed = name.trim();
+    if (!trimmed) {
+      const err = new Error('MISSING_NAME');
+      throw err;
+    }
+    const routinesRef = collection(db, 'users', user.uid, 'routines');
+    const ref = routineDocId ? doc(routinesRef, routineDocId) : doc(routinesRef);
+    const payload = {
+      name: trimmed,
+      days,
+      exercises,
+      updatedAt: serverTimestamp(),
+      schemaVersion: 1,
+    };
+    if (!routineDocId) {
+      payload.createdAt = serverTimestamp();
+    }
+    await setDoc(ref, payload, { merge: true });
+    const id = ref.id;
+    setRoutineDocId((prev) => prev || id);
+    return { id, name: trimmed };
+  };
+
   const saveRoutine = async () => {
     if (!user) {
       Alert.alert('Sign in required', 'Please sign in to save routines.');
       return;
     }
-    const trimmed = name.trim();
-    if (!trimmed) {
-      Alert.alert('Missing name', 'Please name your routine.');
-      return;
-    }
     setSaving(true);
     try {
-      const routinesRef = collection(db, 'users', user.uid, 'routines');
-      const ref = mode === 'edit' && routineId ? doc(routinesRef, routineId) : doc(routinesRef);
-      await setDoc(
-        ref,
-        {
-          name: trimmed,
-          days,
-          exercises,
-          updatedAt: serverTimestamp(),
-          createdAt: mode === 'edit' ? undefined : serverTimestamp(),
-          schemaVersion: 1,
-        },
-        { merge: true }
-      );
+      await persistRoutineSilently();
       navigation.goBack();
     } catch (e) {
-      console.log('Routine save error:', e);
-      Alert.alert('Error', e?.message ?? 'Could not save routine.');
+      const code = e?.message;
+      if (code === 'MISSING_NAME') {
+        Alert.alert('Missing name', 'Please name your routine.');
+      } else if (code === 'NO_USER') {
+        Alert.alert('Sign in required', 'Please sign in to save routines.');
+      } else {
+        console.log('Routine save error:', e);
+        Alert.alert('Error', e?.message ?? 'Could not save routine.');
+      }
     } finally {
       setSaving(false);
     }
   };
 
-  const startRoutine = () => {
-    // Prefill session with routine exercises + default sets
-    const prefillExercises = exercises.map((e) => ({
-      exerciseId: e.exerciseId,
-      title: e.title,
-      intensity: e.intensity,
-      category: e.category,
-      sets: (e.defaultSets || []).map((s) => ({
-        reps: s.reps ?? '',
-        weight: s.weight ?? '',
-        rpe: s.rpe ?? '',
-      })),
-    }));
-    navigation.navigate('Session', {
-      prefill: {
-        title: name,
-        exercises: prefillExercises,
-      },
-    });
+  const startRoutine = async () => {
+    if (!user) {
+      Alert.alert('Sign in required', 'Please sign in to start a routine.');
+      return;
+    }
+    if (!exercises.length) return;
+    setSaving(true);
+    try {
+      await persistRoutineSilently();
+      const prefillExercises = exercises.map((e) => ({
+        exerciseId: e.exerciseId,
+        title: e.title,
+        intensity: e.intensity,
+        category: e.category,
+        sets: (e.defaultSets || []).map((s) => ({
+          reps: s.reps ?? '',
+          weight: s.weight ?? '',
+          rpe: s.rpe ?? '',
+        })),
+      }));
+      navigation.navigate('Session', {
+        prefill: {
+          title: name,
+          exercises: prefillExercises,
+        },
+      });
+    } catch (e) {
+      const code = e?.message;
+      if (code === 'MISSING_NAME') {
+        Alert.alert('Missing name', 'Please name your routine before starting.');
+      } else if (code === 'NO_USER') {
+        Alert.alert('Sign in required', 'Please sign in to start a routine.');
+      } else {
+        console.log('Routine start save error:', e);
+        Alert.alert('Error', e?.message ?? 'Could not save routine before starting.');
+      }
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -416,6 +455,7 @@ export default function RoutineEditorScreen() {
                 <TouchableOpacity
                   activeOpacity={0.9}
                   onPress={startRoutine}
+                  disabled={saving}
                   style={{
                     marginTop: 12,
                     paddingVertical: 12,
@@ -424,9 +464,12 @@ export default function RoutineEditorScreen() {
                     borderWidth: 1,
                     borderColor: APP.cardBorder,
                     alignItems: 'center',
+                    opacity: saving ? 0.65 : 1,
                   }}
                 >
-                  <Text style={{ color: COLORS.text.primary, fontWeight: '900' }}>Start routine</Text>
+                  <Text style={{ color: COLORS.text.primary, fontWeight: '900' }}>
+                    {saving ? 'Saving…' : 'Start routine'}
+                  </Text>
                 </TouchableOpacity>
               ) : null}
             </View>
