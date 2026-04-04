@@ -22,9 +22,6 @@ import SignupScreen from '../../src/screens/SignUpScreen';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import LogWorkoutScreen from '../../src/screens/LogWorkoutScreen';
 import * as Notifications from 'expo-notifications';
-import GoalListScreen from '../../src/screens/GoalListScreen';
-import GoalSetupScreen from '../../src/screens/GoalSetupScreen';
-import GoalDetailScreen from '../../src/screens/GoalDetailScreen';
 import PlanListScreen from '../../src/screens/PlanListScreen';
 import PlanSetupScreen from '../../src/screens/PlanSetupScreen';
 import PlanDetailScreen from '../../src/screens/PlanDetailScreen';
@@ -54,8 +51,6 @@ function TabNavigator() {
             return <Ionicons name="stats-chart" size={size} color={color} />;
           case 'Profile':
             return <AntDesign name="user" size={size} color={color} />;
-          case 'Goals':
-            return <AntDesign name="checkcircleo" size={size} color={color} />;
           default:
             return null;
         }
@@ -79,7 +74,6 @@ function TabNavigator() {
     <Tab.Navigator screenOptions={screenOptions}>
       <Tab.Screen name="Today" component={WorkoutScreen} />
       <Tab.Screen name="Train" component={TrainScreen} />
-      <Tab.Screen name="Goals" component={GoalListScreen} />
       <Tab.Screen name="Progress" component={ProgressScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
@@ -137,9 +131,6 @@ export default function App() {
         <Stack.Screen name="WorkoutOTDScreen" component={WorkoutOTDScreen} />
         <Stack.Screen name="ActivityMonitoring" component={ActivityMonitoringScreen} />
         <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />
-        <Stack.Screen name="GoalList" component={GoalListScreen} />
-        <Stack.Screen name="GoalSetup" component={GoalSetupScreen} />
-        <Stack.Screen name="GoalDetail" component={GoalDetailScreen} />
         <Stack.Screen name="PlanList" component={PlanListScreen} />
         <Stack.Screen name="PlanSetup" component={PlanSetupScreen} />
         <Stack.Screen name="PlanDetail" component={PlanDetailScreen} />
