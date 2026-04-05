@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { Image } from 'react-native';
 import { Audio } from 'expo-av';
 import BackButton from '../components/BackButton';
+import MuscleGroupsSection from '../components/MuscleGroupsSection';
 import exercisesData from '../../exercise_data.json'
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -131,6 +132,7 @@ const route = useRoute();
            <Text className='font-semibold text-primary'>Intensity:</Text>
            <Text className='text-ui-text-secondary italic text-base'>{selectedExercise.intensity}</Text>
          </View>
+         <MuscleGroupsSection muscleGroups={selectedExercise.muscleGroups} />
          <Text className='text-xl font-semibold mt-4 text-ui-text-primary'>Instructions:</Text>
          <View className='mt-2'>
            {selectedExercise.instructions.map((instruction) => (

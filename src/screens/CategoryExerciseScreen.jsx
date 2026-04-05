@@ -6,6 +6,7 @@ import {ref, listAll} from '@firebase/storage';
 import {storage} from '../../Firebase/config';
 import { Audio } from 'expo-av';
 import BackButton from '../components/BackButton';
+import MuscleGroupsSection from '../components/MuscleGroupsSection';
 import ExerciseData from '../../exercise_data'
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { COLORS } from '../theme/colors';
@@ -356,6 +357,7 @@ const CategoryExerciseScreen = () => {
                     <Text className="font-semibold text-primary">Intensity:</Text>
                     <Text className="text-ui-text-secondary italic text-base">{currentExercise.intensity}</Text>
                   </View>
+                  <MuscleGroupsSection muscleGroups={currentExercise.muscleGroups} />
                   <Text className="text-xl font-semibold mt-4 text-ui-text-primary">Instructions:</Text>
                   <View className="mt-2">
                     {currentExercise.instructions.map((instruction) => (
