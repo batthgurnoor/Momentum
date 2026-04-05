@@ -689,21 +689,6 @@ export default function ProgressScreen() {
           </>
         )}
 
-        <View
-          style={{
-            marginTop: 16,
-            padding: 14,
-            borderRadius: 16,
-            borderWidth: 1,
-            borderColor: APP.cardBorder,
-            backgroundColor: 'rgba(255,255,255,0.06)',
-          }}
-        >
-          <Text style={{ color: COLORS.text.primary, fontWeight: '800', marginBottom: 6 }}>Up next</Text>
-          <Text style={{ color: COLORS.text.secondary, lineHeight: 20 }}>
-            - Weekly charts + trends{'\n'}- PR tracker (best set, best time){'\n'}- Consistency
-          </Text>
-        </View>
         </ScrollView>
       </SafeAreaView>
     </LinearGradient>
