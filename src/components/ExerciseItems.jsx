@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, ImageBackground, StyleSheet, Platform } from 'react-native'
-import React from 'react'
+import React, { useMemo } from 'react'
 import { LinearGradient } from 'expo-linear-gradient'
-import workoutData from '../../exercise_data'
+import { EXERCISE_CATALOG } from '../utils/exerciseCatalog'
 import { FlashList } from '@shopify/flash-list'
 import { useNavigation } from '@react-navigation/native'
 import { COLORS } from '../theme/colors'
@@ -39,25 +39,17 @@ const ExerciseItems = () => {
     </TouchableOpacity>
   )
 
-  const RenderRow = ({ item, index }) => {
-    if (index % 2 === 0) {
-      const nextItem = workoutData[index + 1]
-      return (
-        <View style={styles.row}>
-          {renderWorkoutItem({ item })}
-          {nextItem && renderWorkoutItem({ item: nextItem })}
-        </View>
-      )
-    }
-    return null
-  }
-
   return (
     <View style={styles.listWrap}>
       <FlashList
-        data={workoutData}
-        renderItem={RenderRow}
-        keyExtractor={(item) => String(item.id)}
+        data={gridRows}
+        renderItem={({ item: row }) => (
+          <View style={styles.row}>
+            {renderWorkoutItem({ item: row.left })}
+            {row.right ? renderWorkoutItem({ item: row.right }) : <View style={{ flex: 1, marginHorizontal: 4 }} />}
+          </View>
+        )}
+        keyExtractor={(row) => row.key}
         showsVerticalScrollIndicator={false}
         estimatedItemSize={200}
       />

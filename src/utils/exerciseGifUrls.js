@@ -1,5 +1,5 @@
 import { Image } from 'react-native';
-import exerciseData from '../../exercise_data.json';
+import { EXERCISE_CATALOG } from './exerciseCatalog';
 import { getCachedDownloadUrl } from './storageUrlCache';
 
 /**
@@ -26,7 +26,7 @@ export async function resolveExerciseGifUrl(intensity, fileName) {
 export async function preloadExerciseGifUrls({ concurrency = 6 } = {}) {
   const seen = new Set();
   const pairs = [];
-  for (const ex of exerciseData) {
+  for (const ex of EXERCISE_CATALOG) {
     const gif = ex.gif_url;
     if (!gif) continue;
     const key = `${ex.intensity}|${gif}`;

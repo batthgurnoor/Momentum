@@ -6,7 +6,7 @@ import { COLORS } from '../theme/colors';
 import { auth, db } from '../../Firebase/config';
 import { collection, limit, onSnapshot, orderBy, query, where } from 'firebase/firestore';
 import { computeStreaks } from '../utils/streaks';
-import exerciseData from '../../exercise_data.json';
+import { EXERCISE_CATALOG } from '../utils/exerciseCatalog';
 
 const APP = COLORS.app;
 
@@ -42,14 +42,14 @@ const MUSCLE_OPTION_ORDER = [
 
 const muscleByExerciseId = (() => {
   const m = new Map();
-  for (const ex of exerciseData) {
+  for (const ex of EXERCISE_CATALOG) {
     m.set(Number(ex.id), Array.isArray(ex.muscleGroups) ? ex.muscleGroups : []);
   }
   return m;
 })();
 
 const MUSCLE_OPTIONS = MUSCLE_OPTION_ORDER.filter((key) =>
-  exerciseData.some((ex) => (ex.muscleGroups || []).includes(key))
+  EXERCISE_CATALOG.some((ex) => (ex.muscleGroups || []).includes(key))
 );
 
 export default function ProgressScreen() {

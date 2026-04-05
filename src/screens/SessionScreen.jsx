@@ -20,7 +20,7 @@ import * as Haptics from 'expo-haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FlashList } from '@shopify/flash-list';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import exerciseData from '../../exercise_data.json';
+import { EXERCISE_CATALOG } from '../utils/exerciseCatalog';
 import ExerciseGifCardMedia from '../components/ExerciseGifCardMedia';
 import {
   buildSessionFirestoreDocuments,
@@ -209,8 +209,8 @@ export default function SessionScreen() {
 
   const filteredExercises = useMemo(() => {
     const q = exerciseQuery.trim().toLowerCase();
-    if (!q) return exerciseData;
-    return exerciseData.filter((e) => {
+    if (!q) return EXERCISE_CATALOG;
+    return EXERCISE_CATALOG.filter((e) => {
       const t = String(e.title || '').toLowerCase();
       const c = String(e.category || '').toLowerCase();
       const i = String(e.intensity || '').toLowerCase();

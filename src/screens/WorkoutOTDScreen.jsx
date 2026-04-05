@@ -8,7 +8,7 @@ import { Image } from 'react-native';
 import { Audio } from 'expo-av';
 import BackButton from '../components/BackButton';
 import MuscleGroupsSection from '../components/MuscleGroupsSection';
-import exercisesData from '../../exercise_data.json'
+import { EXERCISE_CATALOG } from '../utils/exerciseCatalog'
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
@@ -21,7 +21,7 @@ const route = useRoute();
   const {name,url} = route.params;
   const initialTime = 60;
   const minTime = 10;
-  const selectedExercise = exercisesData.find(exercise => exercise.gif_url === name);
+  const selectedExercise = EXERCISE_CATALOG.find((exercise) => exercise.gif_url === name);
   const [time, setTime] = useState(initialTime);
   const [isRunning, setIsRunning] = useState(false);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);

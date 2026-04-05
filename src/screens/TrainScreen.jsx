@@ -7,7 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../theme/colors';
-import exerciseData from '../../exercise_data.json';
+import { EXERCISE_CATALOG } from '../utils/exerciseCatalog';
 import { auth, db } from '../../Firebase/config';
 import { collection, limit, onSnapshot, orderBy, query } from 'firebase/firestore';
 import ExerciseGifCardMedia from '../components/ExerciseGifCardMedia';
@@ -62,14 +62,25 @@ export default function TrainScreen() {
 
   const normalized = searchQuery.trim().toLowerCase();
   const results = useMemo(() => {
-    if (!normalized) return exerciseData;
-    return exerciseData.filter((e) => {
+    if (!normalized) return EXERCISE_CATALOG;
+    return EXERCISE_CATALOG.filter((e) => {
       const title = String(e.title || '').toLowerCase();
       const category = String(e.category || '').toLowerCase();
       const intensity = String(e.intensity || '').toLowerCase();
       return title.includes(normalized) || category.includes(normalized) || intensity.includes(normalized);
     });
   }, [normalized]);
+
+  /** Two-column grid: one FlashList row per pair (avoids null renderItem + duplicate recycling issues). */
+  const gridRows = useMemo(() => {
+    const rows = [];
+    for (let i = 0; i < results.length; i += 2) {
+      const left = results[i];
+      const right = results[i + 1] ?? null;
+      rows.push({ key: `row-${left.id}-${right?.id ?? 'x'}`, left, right });
+    }
+    return rows;
+  }, [results]);
 
   return (
     <LinearGradient colors={[APP.bgTop, APP.bgMid, APP.bgBottom]} locations={[0, 0.45, 1]} style={{ flex: 1 }}>
@@ -169,14 +180,11 @@ export default function TrainScreen() {
 
         <View style={{ flex: 1, marginTop: 10 }}>
           <FlashList
-            data={results}
+            data={gridRows}
             estimatedItemSize={200}
-            keyExtractor={(item) => String(item.id)}
+            keyExtractor={(row) => row.key}
             contentContainerStyle={{ paddingBottom: 20 }}
-            renderItem={({ item, index }) => {
-              if (index % 2 !== 0) return null;
-              const nextItem = results[index + 1];
-
+            renderItem={({ item: row }) => {
               const Card = ({ data }) => (
                 <TouchableOpacity
                   activeOpacity={0.9}
@@ -213,8 +221,12 @@ export default function TrainScreen() {
 
               return (
                 <View style={styles.row}>
-                  <Card data={item} />
-                  {nextItem ? <Card data={nextItem} /> : <View style={{ flex: 1, marginHorizontal: 4 }} />}
+                  <Card data={row.left} />
+                  {row.right ? (
+                    <Card data={row.right} />
+                  ) : (
+                    <View style={{ flex: 1, marginHorizontal: 4 }} />
+                  )}
                 </View>
               );
             }}

@@ -7,7 +7,7 @@ import {storage} from '../../Firebase/config';
 import { Audio } from 'expo-av';
 import BackButton from '../components/BackButton';
 import MuscleGroupsSection from '../components/MuscleGroupsSection';
-import ExerciseData from '../../exercise_data'
+import { EXERCISE_CATALOG } from '../utils/exerciseCatalog'
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { COLORS } from '../theme/colors';
 import { FlashList } from '@shopify/flash-list';
@@ -112,7 +112,7 @@ const CategoryExerciseScreen = () => {
       const items = [];
       res.items.forEach((it) => {
         const fileName = it.name.split('/').pop();
-        const matchingExercise = ExerciseData.find((exercise) => exercise.gif_url === fileName);
+        const matchingExercise = EXERCISE_CATALOG.find((exercise) => exercise.gif_url === fileName);
         if (matchingExercise) {
           // keep original gif_url (filename) and attach cached URL slot
           items.push({ ...matchingExercise, gifDownloadUrl: null });
