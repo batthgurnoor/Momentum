@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, ScrollView, View, Text, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, ScrollView, View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../theme/colors';
 import { auth, db } from '../../Firebase/config';
 import { collection, limit, onSnapshot, orderBy, query, where } from 'firebase/firestore';
@@ -9,6 +10,7 @@ import { computeStreaks } from '../utils/streaks';
 import { EXERCISE_CATALOG } from '../utils/exerciseCatalog';
 
 const APP = COLORS.app;
+const WH = COLORS.workoutHome;
 
 const MUSCLE_LABELS = {
   chest: 'Chest',
@@ -368,330 +370,459 @@ export default function ProgressScreen() {
     };
   }, [streakActivities]);
 
+  const pillStyle = (active) => (active ? [styles.pill, styles.pillActive] : [styles.pill]);
+
   return (
-    <LinearGradient colors={[APP.bgTop, APP.bgMid, APP.bgBottom]} locations={[0, 0.45, 1]} style={{ flex: 1 }}>
-      <SafeAreaView style={{ flex: 1, paddingHorizontal: 20, paddingTop: 12 }}>
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 28 }}>
-          <Text style={{ color: COLORS.text.primary, fontSize: 26, fontWeight: '800', marginTop: 8 }}>
-            Progress
-          </Text>
-          <Text style={{ color: COLORS.text.secondary, marginTop: 10, lineHeight: 20 }}>
-            Weekly summaries + volume + PRs (based on your logged sets).
-          </Text>
-
-          <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
-            {[4, 12, 24].map((w) => {
-              const active = timeframeWeeks === w;
-              return (
-                <TouchableOpacity
-                  key={w}
-                  activeOpacity={0.9}
-                  onPress={() => setTimeframeWeeks(w)}
-                  style={{
-                    paddingVertical: 8,
-                    paddingHorizontal: 12,
-                    borderRadius: 999,
-                    borderWidth: 1,
-                    borderColor: APP.cardBorder,
-                    backgroundColor: active ? 'rgba(45, 212, 191, 0.18)' : 'rgba(255,255,255,0.06)',
-                  }}
-                >
-                  <Text style={{ color: COLORS.text.primary, fontWeight: '900' }}>{w}w</Text>
-                </TouchableOpacity>
-              );
-            })}
+    <LinearGradient colors={[APP.bgTop, APP.bgMid, APP.bgBottom]} locations={[0, 0.45, 1]} style={styles.screen}>
+      <SafeAreaView style={styles.safe}>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
+          <View style={styles.pageHeader}>
+            <View style={{ flex: 1, paddingRight: 8 }}>
+              <Text style={[styles.eyebrow, { color: WH.accent }]}>PROGRESS</Text>
+              <Text style={[styles.pageTitle, { color: WH.text }]}>Your stats</Text>
+              <Text style={[styles.pageSub, { color: WH.textDim }]}>
+                Weekly volume, streaks, and PRs from logged sessions.
+              </Text>
+            </View>
+            <View style={[styles.iconCircle, { borderColor: WH.cardBorder, backgroundColor: WH.accentMuted }]}>
+              <Ionicons name="stats-chart-outline" size={22} color={WH.accent} />
+            </View>
           </View>
 
-          {user ? (
-            <View style={{ marginTop: 14 }}>
-              <Text style={{ color: COLORS.text.tertiary, fontWeight: '700', marginBottom: 8 }}>Muscle focus</Text>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                nestedScrollEnabled
-                contentContainerStyle={{ flexDirection: 'row', flexWrap: 'nowrap', gap: 8, paddingRight: 8 }}
-              >
-                <TouchableOpacity
-                  activeOpacity={0.9}
-                  onPress={() => setSelectedMuscleGroup(null)}
-                  style={{
-                    paddingVertical: 8,
-                    paddingHorizontal: 12,
-                    borderRadius: 999,
-                    borderWidth: 1,
-                    borderColor: APP.cardBorder,
-                    backgroundColor: !selectedMuscleGroup ? 'rgba(45, 212, 191, 0.18)' : 'rgba(255,255,255,0.06)',
-                  }}
-                >
-                  <Text style={{ color: COLORS.text.primary, fontWeight: '800' }}>All</Text>
-                </TouchableOpacity>
-                {MUSCLE_OPTIONS.map((key) => {
-                  const active = selectedMuscleGroup === key;
-                  return (
-                    <TouchableOpacity
-                      key={key}
-                      activeOpacity={0.9}
-                      onPress={() => setSelectedMuscleGroup(active ? null : key)}
-                      style={{
-                        paddingVertical: 8,
-                        paddingHorizontal: 12,
-                        borderRadius: 999,
-                        borderWidth: 1,
-                        borderColor: APP.cardBorder,
-                        backgroundColor: active ? 'rgba(45, 212, 191, 0.18)' : 'rgba(255,255,255,0.06)',
-                      }}
-                    >
-                      <Text style={{ color: COLORS.text.primary, fontWeight: '800' }}>{MUSCLE_LABELS[key]}</Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </ScrollView>
-            </View>
-          ) : null}
-
-        {!user ? (
-          <View
-            style={{
-              marginTop: 16,
-              padding: 14,
-              borderRadius: 16,
-              borderWidth: 1,
-              borderColor: APP.cardBorder,
-              backgroundColor: 'rgba(255,255,255,0.06)',
-            }}
-          >
-            <Text style={{ color: COLORS.text.primary, fontWeight: '800', marginBottom: 6 }}>Sign in to see progress</Text>
-            <Text style={{ color: COLORS.text.secondary, lineHeight: 20 }}>
-              Your workout history is tied to your account.
-            </Text>
-          </View>
-        ) : loading ? (
-          <View style={{ marginTop: 18, alignItems: 'center' }}>
-            <ActivityIndicator size="large" color={APP.accent} />
-            <Text style={{ color: COLORS.text.secondary, marginTop: 10 }}>Loading progress…</Text>
-          </View>
-        ) : (
-          <>
-            <View
-              style={{
-                marginTop: 16,
-                padding: 14,
-                borderRadius: 16,
-                borderWidth: 1,
-                borderColor: APP.cardBorder,
-                backgroundColor: 'rgba(255,255,255,0.06)',
-              }}
-            >
-              <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 16, marginBottom: 10 }}>
-                This week
-              </Text>
-
-              <View style={{ flexDirection: 'row', gap: 10 }}>
-                <View style={{ flex: 1, padding: 12, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.22)' }}>
-                  <Text style={{ color: COLORS.text.tertiary, fontWeight: '700', fontSize: 12 }}>Sessions</Text>
-                  <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 22, marginTop: 6 }}>
-                    {summary.sessions}
-                  </Text>
-                </View>
-                <View style={{ flex: 1, padding: 12, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.22)' }}>
-                  <Text style={{ color: COLORS.text.tertiary, fontWeight: '700', fontSize: 12 }}>Minutes</Text>
-                  <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 22, marginTop: 6 }}>
-                    {summary.minutes}
-                  </Text>
-                </View>
-              </View>
-
-              <View style={{ marginTop: 10, padding: 12, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.22)' }}>
-                <Text style={{ color: COLORS.text.tertiary, fontWeight: '700', fontSize: 12 }}>Calories (logged)</Text>
-                <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 22, marginTop: 6 }}>
-                  {Math.round(summary.totalCalories)}
-                </Text>
-              </View>
-
-              <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
-                <View style={{ flex: 1, padding: 12, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.22)' }}>
-                  <Text style={{ color: COLORS.text.tertiary, fontWeight: '700', fontSize: 12 }}>Current streak</Text>
-                  <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 22, marginTop: 6 }}>
-                    {streak.current}
-                  </Text>
-                </View>
-                <View style={{ flex: 1, padding: 12, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.22)' }}>
-                  <Text style={{ color: COLORS.text.tertiary, fontWeight: '700', fontSize: 12 }}>Best streak</Text>
-                  <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 22, marginTop: 6 }}>
-                    {streak.best}
-                  </Text>
-                </View>
-              </View>
-            </View>
-
-            <View
-              style={{
-                marginTop: 16,
-                padding: 14,
-                borderRadius: 16,
-                borderWidth: 1,
-                borderColor: APP.cardBorder,
-                backgroundColor: 'rgba(255,255,255,0.06)',
-              }}
-            >
-              <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 16, marginBottom: 10 }}>
-                Weekly volume (kg)
-                {selectedMuscleGroup ? ` — ${MUSCLE_LABELS[selectedMuscleGroup]}` : ''}
-              </Text>
-              <View style={{ flexDirection: 'row', alignItems: 'flex-end', height: 110, gap: 6 }}>
-                {weeklyTraining.series.map((b, idx) => {
-                  const h = Math.max(4, Math.round((b.volume / weeklyTraining.maxVolume) * 100));
-                  return (
-                    <View key={`${b.week}-${idx}`} style={{ flex: 1, alignItems: 'center', justifyContent: 'flex-end' }}>
-                      <View
-                        style={{
-                          width: '100%',
-                          height: h,
-                          borderRadius: 8,
-                          backgroundColor: 'rgba(45, 212, 191, 0.65)',
-                          borderWidth: 1,
-                          borderColor: APP.cardBorder,
-                        }}
-                      />
-                    </View>
-                  );
-                })}
-              </View>
-              <View style={{ flexDirection: 'row', gap: 10, marginTop: 12 }}>
-                <View style={{ flex: 1, padding: 12, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.22)' }}>
-                  <Text style={{ color: COLORS.text.tertiary, fontWeight: '700', fontSize: 12 }}>Sets/week</Text>
-                  <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 22, marginTop: 6 }}>
-                    {Math.round(
-                      weeklyTraining.series.reduce((a, x) => a + x.sets, 0) / Math.max(1, weeklyTraining.series.length)
-                    )}
-                  </Text>
-                </View>
-                <View style={{ flex: 1, padding: 12, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.22)' }}>
-                  <Text style={{ color: COLORS.text.tertiary, fontWeight: '700', fontSize: 12 }}>Exercises/week</Text>
-                  <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 22, marginTop: 6 }}>
-                    {Math.round(
-                      weeklyTraining.series.reduce((a, x) => a + x.exercises, 0) / Math.max(1, weeklyTraining.series.length)
-                    )}
-                  </Text>
-                </View>
-              </View>
-            </View>
-
-            <View
-              style={{
-                marginTop: 16,
-                padding: 14,
-                borderRadius: 16,
-                borderWidth: 1,
-                borderColor: APP.cardBorder,
-                backgroundColor: 'rgba(255,255,255,0.06)',
-              }}
-            >
-              <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 16, marginBottom: 10 }}>
-                PRs (estimated)
-              </Text>
-              {exercisePRs.length === 0 ? (
-                <Text style={{ color: COLORS.text.secondary, lineHeight: 20 }}>
-                  Log sets (reps + weight) in Session to see PRs here.
-                </Text>
-              ) : (
-                exercisePRs.map((p) => (
-                  <View
-                    key={String(p.exerciseId)}
-                    style={{
-                      paddingVertical: 10,
-                      borderTopWidth: 1,
-                      borderTopColor: APP.cardBorder,
-                    }}
+          <View style={styles.card}>
+            <Text style={styles.cardSectionLabel}>Time range</Text>
+            <View style={styles.pillRow}>
+              {[4, 12, 24].map((w) => {
+                const active = timeframeWeeks === w;
+                return (
+                  <TouchableOpacity
+                    key={w}
+                    activeOpacity={0.9}
+                    onPress={() => setTimeframeWeeks(w)}
+                    style={pillStyle(active)}
                   >
-                    <Text style={{ color: COLORS.text.primary, fontWeight: '900' }} numberOfLines={1}>
-                      {p.title}
-                    </Text>
-                    <Text style={{ color: COLORS.text.secondary, marginTop: 4 }}>
-                      1RM est: {p.best1rm.toFixed(1)} kg • Best set: {p.bestSetVolume.toFixed(0)} kg • Best reps @ {p.bestRepsAtWeight.weight.toFixed(1)}kg: {p.bestRepsAtWeight.reps}
+                    <Text style={[styles.pillText, active && styles.pillTextActive]}>{w}w</Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            {user ? (
+              <>
+                <Text style={[styles.cardSectionLabel, { marginTop: 14 }]}>Muscle focus</Text>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  nestedScrollEnabled
+                  contentContainerStyle={styles.muscleScroll}
+                >
+                  <TouchableOpacity
+                    activeOpacity={0.9}
+                    onPress={() => setSelectedMuscleGroup(null)}
+                    style={pillStyle(!selectedMuscleGroup)}
+                  >
+                    <Text style={[styles.pillText, !selectedMuscleGroup && styles.pillTextActive]}>All</Text>
+                  </TouchableOpacity>
+                  {MUSCLE_OPTIONS.map((key) => {
+                    const active = selectedMuscleGroup === key;
+                    return (
+                      <TouchableOpacity
+                        key={key}
+                        activeOpacity={0.9}
+                        onPress={() => setSelectedMuscleGroup(active ? null : key)}
+                        style={pillStyle(active)}
+                      >
+                        <Text style={[styles.pillText, active && styles.pillTextActive]}>{MUSCLE_LABELS[key]}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+              </>
+            ) : null}
+          </View>
+
+          {!user ? (
+            <View style={styles.card}>
+              <View style={styles.emptyIconWrap}>
+                <Ionicons name="person-outline" size={28} color={WH.accent} />
+              </View>
+              <Text style={styles.cardTitle}>Sign in to see progress</Text>
+              <Text style={styles.mutedBody}>Your workout history is tied to your account.</Text>
+            </View>
+          ) : loading ? (
+            <View style={[styles.card, styles.loadingCard]}>
+              <ActivityIndicator size="large" color={APP.accent} />
+              <Text style={styles.loadingText}>Loading progress…</Text>
+            </View>
+          ) : (
+            <>
+              <View style={styles.card}>
+                <Text style={styles.cardTitle}>This week</Text>
+                <View style={styles.statRow}>
+                  <View style={styles.statBox}>
+                    <Text style={styles.statLabel}>Sessions</Text>
+                    <Text style={styles.statValue}>{summary.sessions}</Text>
+                  </View>
+                  <View style={styles.statBox}>
+                    <Text style={styles.statLabel}>Minutes</Text>
+                    <Text style={styles.statValue}>{summary.minutes}</Text>
+                  </View>
+                </View>
+                <View style={[styles.statBox, styles.statBoxFull, { marginTop: 10 }]}>
+                  <Text style={styles.statLabel}>Calories (logged)</Text>
+                  <Text style={styles.statValue}>{Math.round(summary.totalCalories)}</Text>
+                </View>
+                <View style={[styles.statRow, { marginTop: 10 }]}>
+                  <View style={styles.statBox}>
+                    <Text style={styles.statLabel}>Current streak</Text>
+                    <Text style={styles.statValue}>{streak.current}</Text>
+                  </View>
+                  <View style={styles.statBox}>
+                    <Text style={styles.statLabel}>Best streak</Text>
+                    <Text style={styles.statValue}>{streak.best}</Text>
+                  </View>
+                </View>
+              </View>
+
+              <View style={styles.card}>
+                <Text style={styles.cardTitle}>
+                  Weekly volume (kg)
+                  {selectedMuscleGroup ? ` · ${MUSCLE_LABELS[selectedMuscleGroup]}` : ''}
+                </Text>
+                <Text style={styles.cardHint}>Each bar is one week in your selected range.</Text>
+                <View style={styles.chartWrap}>
+                  <View style={styles.chartBaseline} />
+                  <View style={styles.chartBars}>
+                    {weeklyTraining.series.map((b, idx) => {
+                      const h = Math.max(4, Math.round((b.volume / weeklyTraining.maxVolume) * 100));
+                      return (
+                        <View key={`${b.week}-${idx}`} style={styles.chartBarCol}>
+                          <LinearGradient
+                            colors={[APP.accent, 'rgba(45, 212, 191, 0.45)']}
+                            style={[styles.chartBar, { height: h }]}
+                          />
+                        </View>
+                      );
+                    })}
+                  </View>
+                </View>
+                <View style={styles.statRow}>
+                  <View style={styles.statBox}>
+                    <Text style={styles.statLabel}>Avg sets / week</Text>
+                    <Text style={styles.statValue}>
+                      {Math.round(
+                        weeklyTraining.series.reduce((a, x) => a + x.sets, 0) /
+                          Math.max(1, weeklyTraining.series.length)
+                      )}
                     </Text>
                   </View>
-                ))
-              )}
-            </View>
-
-            <View
-              style={{
-                marginTop: 16,
-                padding: 14,
-                borderRadius: 16,
-                borderWidth: 1,
-                borderColor: APP.cardBorder,
-                backgroundColor: 'rgba(255,255,255,0.06)',
-              }}
-            >
-              <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 16, marginBottom: 10 }}>
-                Body metrics
-              </Text>
-              <View style={{ flexDirection: 'row', gap: 10 }}>
-                <View style={{ flex: 1, padding: 12, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.22)' }}>
-                  <Text style={{ color: COLORS.text.tertiary, fontWeight: '700', fontSize: 12 }}>Latest weight</Text>
-                  <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 22, marginTop: 6 }}>
-                    {weightTrend.latest?.value ? `${weightTrend.latest.value} ${weightTrend.latest.unit || 'kg'}` : '—'}
-                  </Text>
-                </View>
-                <View style={{ flex: 1, padding: 12, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.22)' }}>
-                  <Text style={{ color: COLORS.text.tertiary, fontWeight: '700', fontSize: 12 }}>30‑day change</Text>
-                  <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 22, marginTop: 6 }}>
-                    {weightTrend.change === null ? '—' : `${weightTrend.change > 0 ? '+' : ''}${weightTrend.change.toFixed(1)} kg`}
-                  </Text>
-                </View>
-              </View>
-            </View>
-
-            <View
-              style={{
-                marginTop: 16,
-                padding: 14,
-                borderRadius: 16,
-                borderWidth: 1,
-                borderColor: APP.cardBorder,
-                backgroundColor: 'rgba(255,255,255,0.06)',
-              }}
-            >
-              <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 16, marginBottom: 10 }}>
-                Personal records
-              </Text>
-
-              <View style={{ flexDirection: 'row', gap: 10 }}>
-                <View style={{ flex: 1, padding: 12, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.22)' }}>
-                  <Text style={{ color: COLORS.text.tertiary, fontWeight: '700', fontSize: 12 }}>Longest session</Text>
-                  <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 20, marginTop: 6 }}>
-                    {prs.longestLabel}
-                  </Text>
-                  <Text style={{ color: COLORS.text.secondary, marginTop: 4 }} numberOfLines={1}>
-                    {prs.longestTitle}
-                  </Text>
-                </View>
-                <View style={{ flex: 1, padding: 12, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.22)' }}>
-                  <Text style={{ color: COLORS.text.tertiary, fontWeight: '700', fontSize: 12 }}>Most calories</Text>
-                  <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 20, marginTop: 6 }}>
-                    {prs.mostCalories || '—'}
-                  </Text>
-                  <Text style={{ color: COLORS.text.secondary, marginTop: 4 }} numberOfLines={1}>
-                    {prs.mostCalories ? prs.mostCaloriesTitle : '—'}
-                  </Text>
+                  <View style={styles.statBox}>
+                    <Text style={styles.statLabel}>Avg exercises / week</Text>
+                    <Text style={styles.statValue}>
+                      {Math.round(
+                        weeklyTraining.series.reduce((a, x) => a + x.exercises, 0) /
+                          Math.max(1, weeklyTraining.series.length)
+                      )}
+                    </Text>
+                  </View>
                 </View>
               </View>
 
-              <View style={{ marginTop: 10, padding: 12, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.22)' }}>
-                <Text style={{ color: COLORS.text.tertiary, fontWeight: '700', fontSize: 12 }}>Best week (sessions)</Text>
-                <Text style={{ color: COLORS.text.primary, fontWeight: '900', fontSize: 22, marginTop: 6 }}>
-                  {prs.bestWeekSessions || 0}
-                </Text>
+              <View style={styles.card}>
+                <Text style={styles.cardTitle}>PRs (estimated)</Text>
+                <Text style={styles.cardHint}>From reps + weight in Session (Epley 1RM estimate).</Text>
+                {exercisePRs.length === 0 ? (
+                  <Text style={styles.mutedBody}>Log sets with weight to see PRs here.</Text>
+                ) : (
+                  <View style={styles.prList}>
+                    {exercisePRs.map((p) => (
+                      <View key={String(p.exerciseId)} style={styles.prRow}>
+                        <Text style={styles.prTitle} numberOfLines={1}>
+                          {p.title}
+                        </Text>
+                        <Text style={styles.prLine}>
+                          1RM est <Text style={styles.prEm}>{p.best1rm.toFixed(1)} kg</Text>
+                        </Text>
+                        <Text style={styles.prSub}>
+                          Best set {p.bestSetVolume.toFixed(0)} kg·reps · Best @ {p.bestRepsAtWeight.weight.toFixed(1)} kg:{' '}
+                          {p.bestRepsAtWeight.reps} reps
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
               </View>
-            </View>
-          </>
-        )}
 
+              <View style={styles.card}>
+                <Text style={styles.cardTitle}>Body metrics</Text>
+                <View style={styles.statRow}>
+                  <View style={styles.statBox}>
+                    <Text style={styles.statLabel}>Latest weight</Text>
+                    <Text style={styles.statValue}>
+                      {weightTrend.latest?.value
+                        ? `${weightTrend.latest.value} ${weightTrend.latest.unit || 'kg'}`
+                        : '—'}
+                    </Text>
+                  </View>
+                  <View style={styles.statBox}>
+                    <Text style={styles.statLabel}>30-day change</Text>
+                    <Text style={styles.statValue}>
+                      {weightTrend.change === null
+                        ? '—'
+                        : `${weightTrend.change > 0 ? '+' : ''}${weightTrend.change.toFixed(1)} kg`}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+
+              <View style={styles.card}>
+                <Text style={styles.cardTitle}>Activity records</Text>
+                <View style={styles.statRow}>
+                  <View style={styles.statBox}>
+                    <Text style={styles.statLabel}>Longest session</Text>
+                    <Text style={[styles.statValue, { fontSize: 20 }]}>{prs.longestLabel}</Text>
+                    <Text style={styles.prSub} numberOfLines={1}>
+                      {prs.longestTitle}
+                    </Text>
+                  </View>
+                  <View style={styles.statBox}>
+                    <Text style={styles.statLabel}>Most calories</Text>
+                    <Text style={[styles.statValue, { fontSize: 20 }]}>{prs.mostCalories || '—'}</Text>
+                    <Text style={styles.prSub} numberOfLines={1}>
+                      {prs.mostCalories ? prs.mostCaloriesTitle : '—'}
+                    </Text>
+                  </View>
+                </View>
+                <View style={[styles.statBox, styles.statBoxFull, { marginTop: 10 }]}>
+                  <Text style={styles.statLabel}>Best week (sessions)</Text>
+                  <Text style={styles.statValue}>{prs.bestWeekSessions || 0}</Text>
+                </View>
+              </View>
+            </>
+          )}
         </ScrollView>
       </SafeAreaView>
     </LinearGradient>
   );
 }
+
+const styles = StyleSheet.create({
+  screen: { flex: 1 },
+  safe: { flex: 1, paddingHorizontal: 20, paddingTop: 12 },
+  scroll: { paddingBottom: 32 },
+  pageHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    marginTop: 8,
+    marginBottom: 14,
+    paddingHorizontal: 2,
+  },
+  eyebrow: {
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 2,
+    marginBottom: 4,
+  },
+  pageTitle: {
+    fontSize: 22,
+    fontWeight: '800',
+    letterSpacing: -0.3,
+  },
+  pageSub: {
+    fontSize: 13,
+    marginTop: 4,
+    maxWidth: 260,
+    lineHeight: 18,
+  },
+  iconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+  },
+  card: {
+    marginTop: 12,
+    padding: 16,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: APP.cardBorder,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.2,
+        shadowRadius: 10,
+      },
+      android: { elevation: 3 },
+    }),
+  },
+  cardTitle: {
+    color: COLORS.text.primary,
+    fontWeight: '900',
+    fontSize: 16,
+    marginBottom: 4,
+  },
+  cardSectionLabel: {
+    color: COLORS.text.tertiary,
+    fontWeight: '800',
+    fontSize: 11,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    marginBottom: 10,
+  },
+  cardHint: {
+    color: COLORS.text.secondary,
+    fontSize: 12,
+    marginBottom: 12,
+    lineHeight: 17,
+  },
+  mutedBody: {
+    color: COLORS.text.secondary,
+    lineHeight: 20,
+    fontSize: 14,
+  },
+  pillRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  muscleScroll: {
+    flexDirection: 'row',
+    flexWrap: 'nowrap',
+    gap: 8,
+    paddingRight: 8,
+    paddingBottom: 2,
+  },
+  pill: {
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: APP.cardBorder,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+  },
+  pillActive: {
+    backgroundColor: 'rgba(45, 212, 191, 0.18)',
+    borderColor: 'rgba(45, 212, 191, 0.45)',
+  },
+  pillText: {
+    color: COLORS.text.primary,
+    fontWeight: '800',
+    fontSize: 13,
+  },
+  pillTextActive: {
+    color: APP.accent,
+  },
+  statRow: { flexDirection: 'row', gap: 10 },
+  statBox: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 14,
+    backgroundColor: 'rgba(0,0,0,0.22)',
+    borderWidth: 1,
+    borderColor: APP.cardBorder,
+  },
+  statBoxFull: {
+    flex: undefined,
+    width: '100%',
+  },
+  statLabel: {
+    color: COLORS.text.tertiary,
+    fontWeight: '700',
+    fontSize: 11,
+    letterSpacing: 0.3,
+    textTransform: 'uppercase',
+  },
+  statValue: {
+    color: COLORS.text.primary,
+    fontWeight: '900',
+    fontSize: 22,
+    marginTop: 6,
+    fontVariant: ['tabular-nums'],
+  },
+  chartWrap: {
+    marginTop: 4,
+    marginBottom: 14,
+    position: 'relative',
+    minHeight: 112,
+  },
+  chartBaseline: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 1,
+    height: 1,
+    backgroundColor: APP.cardBorder,
+    zIndex: 0,
+  },
+  chartBars: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    height: 112,
+    gap: 5,
+    paddingBottom: 1,
+  },
+  chartBarCol: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    height: '100%',
+  },
+  chartBar: {
+    width: '100%',
+    borderTopLeftRadius: 6,
+    borderTopRightRadius: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(45, 212, 191, 0.35)',
+    minHeight: 4,
+  },
+  prList: { gap: 10, marginTop: 8 },
+  prRow: {
+    padding: 12,
+    borderRadius: 14,
+    backgroundColor: 'rgba(0,0,0,0.22)',
+    borderWidth: 1,
+    borderColor: APP.cardBorder,
+  },
+  prTitle: {
+    color: COLORS.text.primary,
+    fontWeight: '900',
+    fontSize: 15,
+  },
+  prLine: {
+    color: COLORS.text.secondary,
+    marginTop: 6,
+    fontSize: 14,
+  },
+  prEm: {
+    color: APP.accent,
+    fontWeight: '900',
+  },
+  prSub: {
+    color: COLORS.text.tertiary,
+    marginTop: 4,
+    fontSize: 12,
+    lineHeight: 16,
+  },
+  emptyIconWrap: {
+    width: 52,
+    height: 52,
+    borderRadius: 16,
+    backgroundColor: WH.accentMuted,
+    borderWidth: 1,
+    borderColor: APP.cardBorder,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  loadingCard: {
+    alignItems: 'center',
+    paddingVertical: 28,
+  },
+  loadingText: {
+    color: COLORS.text.secondary,
+    marginTop: 12,
+    fontWeight: '600',
+  },
+});
 
