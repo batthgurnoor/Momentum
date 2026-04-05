@@ -1,8 +1,9 @@
 // ActivityMonitoringScreen.jsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, ActivityIndicator, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { collection, query, orderBy, onSnapshot, doc, deleteDoc } from 'firebase/firestore';
+import { doc, deleteDoc } from 'firebase/firestore';
 import { auth, db } from '../../Firebase/config';
+import { attachActivityHistoryPreload, addActivityHistoryListener } from '../utils/activityHistoryPreload';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { AntDesign } from '@expo/vector-icons';
@@ -20,26 +21,21 @@ export default function ActivityMonitoringScreen() {
   useEffect(() => {
     const user = auth.currentUser;
     if (!user) {
+      setActivities([]);
       setLoading(false);
       return;
     }
 
-    const ref = collection(db, 'users', user.uid, 'activities');
-    const q = query(ref, orderBy('timestamp', 'desc'));
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const list = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setActivities(list);
-      setLoading(false);
-    }, (error) => {
-      console.log('ActivityMonitoring Error:', error);
-      setLoading(false);
+    const detachPreload = attachActivityHistoryPreload(user.uid);
+    const removeListener = addActivityHistoryListener(({ activities: next, ready }) => {
+      setActivities(next);
+      setLoading(!ready);
     });
 
-    return () => unsubscribe();
+    return () => {
+      removeListener();
+      detachPreload();
+    };
   }, []);
 
   const formatDuration = (seconds) => {

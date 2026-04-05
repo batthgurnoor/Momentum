@@ -9,9 +9,11 @@ import Separator from '../components/Separator'
 import Category from '../components/Category'
 import { COLORS } from '../theme/colors'
 import { useNavigation } from '@react-navigation/native';
-import { auth, db } from '../../Firebase/config';
+import { auth, db, storage } from '../../Firebase/config';
 import { collection, limit, onSnapshot, orderBy, query, where } from 'firebase/firestore';
+import { getDownloadURL, listAll, ref as storageRef } from 'firebase/storage';
 import { computeStreaks } from '../utils/streaks';
+import { attachActivityHistoryPreload } from '../utils/activityHistoryPreload';
 
 const WH = COLORS.workoutHome
 
@@ -22,6 +24,12 @@ const WorkoutScreen = () => {
   const [weekActivities, setWeekActivities] = useState([]);
   const [lastActivity, setLastActivity] = useState(null);
   const [streakActivities, setStreakActivities] = useState([]);
+  const [otdPreload, setOtdPreload] = useState({
+    loading: false,
+    name: null,
+    url: null,
+    error: null,
+  });
 
   const weekStart = useMemo(() => {
     const d = new Date();
@@ -91,6 +99,57 @@ const WorkoutScreen = () => {
       unsubStreak();
     };
   }, [user, weekStart]);
+
+  useEffect(() => {
+    if (!user?.uid) return () => {};
+    return attachActivityHistoryPreload(user.uid);
+  }, [user?.uid]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setOtdPreload({ loading: true, name: null, url: null, error: null });
+
+    const slowMs = 25000;
+    const timeoutId = setTimeout(() => {
+      if (cancelled) return;
+      setOtdPreload((prev) =>
+        prev.loading && !prev.url
+          ? { loading: false, name: null, url: null, error: new Error('timeout') }
+          : prev
+      );
+    }, slowMs);
+
+    (async () => {
+      try {
+        const day = new Date().getDate();
+        const folderRef = storageRef(storage, 'AllExercises/');
+        const res = await listAll(folderRef);
+        if (cancelled) return;
+        clearTimeout(timeoutId);
+        if (!res.items.length) {
+          setOtdPreload({ loading: false, name: null, url: null, error: null });
+          return;
+        }
+        const idx = day % res.items.length;
+        const exercisePath = res.items[idx].fullPath;
+        const url = await getDownloadURL(storageRef(storage, exercisePath));
+        const exerciseName = exercisePath.split('/').pop();
+        if (!cancelled) {
+          setOtdPreload({ loading: false, name: exerciseName, url, error: null });
+        }
+      } catch (e) {
+        if (!cancelled) {
+          clearTimeout(timeoutId);
+          setOtdPreload({ loading: false, name: null, url: null, error: e });
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+    };
+  }, []);
 
   const summary = useMemo(() => {
     const sessions = weekActivities.length;
@@ -167,7 +226,7 @@ const WorkoutScreen = () => {
             </View>
             <Text style={styles.startCta}>Start</Text>
           </TouchableOpacity>
-          <WorkoutOTD />
+          <WorkoutOTD prefetched={otdPreload} />
           <Separator />
           <Category />
         </SafeAreaView>

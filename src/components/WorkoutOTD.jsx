@@ -15,7 +15,7 @@ import { COLORS } from '../theme/colors'
 
 const WH = COLORS.workoutHome
 
-const WorkoutOTD = () => {
+const WorkoutOTD = ({ prefetched }) => {
   const navigation = useNavigation();
   const [fontsLoaded] = useFonts({
     Lato_400Regular,
@@ -26,10 +26,14 @@ const WorkoutOTD = () => {
   }
 
   const getExerciseOTD = async () => {
+    if (prefetched?.name && prefetched?.url) {
+      navigation.navigate('WorkoutOTDScreen', { name: prefetched.name, url: prefetched.url });
+      return;
+    }
     try {
       const date = new Date().getDate();
-      const storageRef = ref(storage, `AllExercises/`);
-      const res = await listAll(storageRef);
+      const rootRef = ref(storage, `AllExercises/`);
+      const res = await listAll(rootRef);
 
       if (!res.items.length) {
         Alert.alert('No exercises', 'No exercises found in storage.');
@@ -74,7 +78,11 @@ const WorkoutOTD = () => {
               Workout of the day
             </Text>
             <Text style={[styles.hint, { fontFamily: 'Lato_400Regular', color: WH.textMuted }]}>
-              {`Tap to open today's exercise`}
+              {prefetched?.error && !prefetched?.url
+                ? 'Tap to try again'
+                : prefetched?.loading && !prefetched?.url
+                  ? `Tap to open — loading today's exercise...`
+                  : `Tap to open today's exercise`}
             </Text>
             <View style={[styles.ctaRow, { borderColor: WH.cardBorder }]}>
               <Text style={[styles.cta, { fontFamily: 'Lato_700Bold', color: WH.accent }]}>

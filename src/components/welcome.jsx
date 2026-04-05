@@ -22,9 +22,6 @@ const Welcome = () => {
       <Text style={[styles.title, { fontFamily: 'Caveat_700Bold', color: WH.text }]}>
         Welcome back
       </Text>
-      <Text style={[styles.sub, { color: WH.textMuted }]}>
-        Pick your focus — categories by intensity or browse all exercises.
-      </Text>
     </View>
   )
 }
@@ -45,14 +42,6 @@ const styles = StyleSheet.create({
     fontSize: 36,
     lineHeight: 42,
     textAlign: 'center',
-  },
-  sub: {
-    fontSize: 14,
-    lineHeight: 20,
-    textAlign: 'center',
-    marginTop: 10,
-    paddingHorizontal: 12,
-    maxWidth: 340,
   },
 })
 
