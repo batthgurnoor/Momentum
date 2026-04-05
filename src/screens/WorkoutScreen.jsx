@@ -2,7 +2,7 @@ import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler
 import { ActivityIndicator, View, StyleSheet, Text, TouchableOpacity } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useMemo, useState } from 'react'
-import Welcome from '../components/welcome'
+import { Ionicons } from '@expo/vector-icons'
 import WorkoutOTD from '../components/WorkoutOTD';
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Separator from '../components/Separator'
@@ -172,7 +172,18 @@ const WorkoutScreen = () => {
         contentContainerStyle={styles.scrollContent}
       >
         <SafeAreaView style={styles.safe}>
-          <Welcome />
+          <View style={styles.pageHeader}>
+            <View style={{ flex: 1, paddingRight: 8 }}>
+              <Text style={[styles.eyebrow, { color: WH.accent }]}>TODAY</Text>
+              <Text style={[styles.pageTitle, { color: WH.text }]}>Welcome back</Text>
+              <Text style={[styles.pageSub, { color: WH.textDim }]}>
+                Session, daily pick, or browse by category.
+              </Text>
+            </View>
+            <View style={[styles.iconCircle, { borderColor: WH.cardBorder, backgroundColor: WH.accentMuted }]}>
+              <Ionicons name="home-outline" size={22} color={WH.accent} />
+            </View>
+          </View>
           <View style={styles.statsCard}>
             <View style={styles.statsHeaderRow}>
               <Text style={styles.statsTitle}>This week</Text>
@@ -241,6 +252,40 @@ const styles = StyleSheet.create({
   },
   safe: {
     paddingHorizontal: 20,
+    paddingTop: 12,
+  },
+  pageHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    marginTop: 8,
+    marginBottom: 14,
+    paddingHorizontal: 2,
+  },
+  eyebrow: {
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 2,
+    marginBottom: 4,
+  },
+  pageTitle: {
+    fontSize: 22,
+    fontWeight: '800',
+    letterSpacing: -0.3,
+  },
+  pageSub: {
+    fontSize: 13,
+    marginTop: 4,
+    maxWidth: 260,
+    lineHeight: 18,
+  },
+  iconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
   },
   statsCard: {
     width: '100%',
