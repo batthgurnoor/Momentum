@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { authStyles } from '../theme/authStyles';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../theme/colors';
+import { isOnboardingComplete } from '../utils/onboardingStorage';
 
 export default function ProfileSetupScreen() {
   const navigation = useNavigation();
@@ -59,10 +60,8 @@ export default function ProfileSetupScreen() {
         weight: parseFloat(weight) || 0,
       });
 
-      Alert.alert('Profile saved', 'Your profile has been updated.');
-      // Navigate to your main app or profile tab
-      navigation.replace('TabNav'); 
-      // or if you want them to see their new profile in a tab
+      const done = await isOnboardingComplete(user.uid);
+      navigation.replace(done ? 'TabNav' : 'Onboarding');
     } catch (error) {
       Alert.alert('Error', error.message);
     }

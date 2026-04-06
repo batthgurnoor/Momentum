@@ -26,6 +26,7 @@ import PlanListScreen from '../../src/screens/PlanListScreen';
 import PlanSetupScreen from '../../src/screens/PlanSetupScreen';
 import PlanDetailScreen from '../../src/screens/PlanDetailScreen';
 import NotificationsScreen from '../../src/screens/NotificationsScreen';
+import OnboardingScreen from '../../src/screens/OnboardingScreen';
 import { registerForPushNotificationsAsync } from '../../src/notifications';
 import { onAuthStateChanged } from 'firebase/auth';
 import { preloadExerciseGifUrls } from '../../src/utils/exerciseGifUrls';
@@ -130,6 +131,7 @@ export default function App() {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Signup" component={SignupScreen} />
         <Stack.Screen name="TabNav" component={TabNavigator} />
+        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         <Stack.Screen name="Session" component={SessionScreen} />
         <Stack.Screen name="Calculation" component={CalculationScreen} />
         <Stack.Screen name="Metrics" component={MetricsScreen} />

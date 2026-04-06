@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "597721173761",
+    "project_id": "momentum-9211",
+    "storage_bucket": "momentum-9211.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:597721173761:android:a54ab3e94fcf02d6e85500",
+        "android_client_info": {
+          "package_name": "com.batth.gurnoor.momentum"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "597721173761-uaqv1cbfqvga88kp5davt7a0uvuo6irc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAdkUbnbn8Zj_uAgBIEtVFfQa4nSINr7Tk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "597721173761-uaqv1cbfqvga88kp5davt7a0uvuo6irc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

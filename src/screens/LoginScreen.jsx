@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { authStyles } from '../theme/authStyles';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../theme/colors';
+import { isOnboardingComplete } from '../utils/onboardingStorage';
 
 // Memoized components for better performance
 const LogoSection = memo(() => (
@@ -61,7 +62,9 @@ export default function LoginScreen() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigation.replace('TabNav'); 
+      const uid = auth.currentUser?.uid;
+      const done = await isOnboardingComplete(uid);
+      navigation.replace(done ? 'TabNav' : 'Onboarding');
     } catch (error) {
       Alert.alert('Login Error', error.message);
     }

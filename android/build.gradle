@@ -18,10 +18,28 @@ buildscript {
         classpath('com.android.tools.build:gradle')
         classpath('com.facebook.react:react-native-gradle-plugin')
         classpath('org.jetbrains.kotlin:kotlin-gradle-plugin')
+        // Firebase / FCM — reads google-services.json at build time (Expo push notifications on Android)
+        classpath('com.google.gms:google-services:4.4.4')
     }
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+// Align autolinked com.android.library modules with root SDK levels (mitigates "No matching variant" / "No variants exist" on EAS + AGP 8.6).
+subprojects { subproject ->
+    subproject.plugins.withId('com.android.library') {
+        subproject.android {
+            compileSdkVersion rootProject.ext.compileSdkVersion
+            defaultConfig {
+                minSdkVersion rootProject.ext.minSdkVersion
+                targetSdkVersion rootProject.ext.targetSdkVersion
+            }
+            if (rootProject.ext.has('ndkVersion')) {
+                ndkVersion rootProject.ext.ndkVersion
+            }
+        }
+    }
+}
 
 allprojects {
     repositories {
@@ -39,3 +57,5 @@ allprojects {
         maven { url 'https://www.jitpack.io' }
     }
 }
+
+

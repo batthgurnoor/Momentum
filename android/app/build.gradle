@@ -147,6 +147,11 @@ android {
 }
 
 dependencies {
+    // Firebase BoM — aligned versions for Firebase Android libraries (FCM / push)
+    implementation platform('com.google.firebase:firebase-bom:34.11.0')
+    // FCM; required for native FirebaseApp + device push token used by Expo notifications on Android
+    implementation 'com.google.firebase:firebase-messaging'
+
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
 
@@ -174,3 +179,9 @@ dependencies {
         implementation jscFlavor
     }
 }
+
+// Same as Firebase docs: plugins { id 'com.google.gms.google-services' } — must be last.
+// Processes android/app/google-services.json for Firebase (FCM / Expo push token).
+apply plugin: 'com.google.gms.google-services'
+
+

@@ -21,6 +21,7 @@
       }
     },
     "android": {
+      "googleServicesFile": "./android/app/google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/momentum.png",
         "backgroundColor": "#ffffff"
