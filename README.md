@@ -1,12 +1,11 @@
 # Momentum
 
-Momentum is a cross-platform fitness application for people who want to plan workouts, run guided sessions, and see progress in one place. It is built as a production-oriented Expo app with a custom development client, backed by Firebase for authentication and user data. The interface emphasises a dark, minimal aesthetic with teal accents and clear hierarchy across training, analytics, and account management.
+Momentum is a Android fitness application for people who want to plan workouts, run guided sessions, and see progress in one place. It is built as a production-oriented Expo app with a custom development client, backed by Firebase for authentication and user data. The interface emphasises a dark, minimal aesthetic with teal accents and clear hierarchy across training, analytics, and account management.
 
-This document summarises what the project contains, how it is structured, and how to run and build it locally or with EAS.
 
 ---
 
-## Purpose and audience
+## Audience
 
 The app targets users who train on their own schedule: they can browse exercises with visual references, assemble routines by day, start a timed session with sets and rest periods, and review history alongside simple body metrics. Account creation is email-based; profile details, workouts, and media preferences stay tied to the signed-in user in the cloud.
 
@@ -40,13 +39,13 @@ Users sign in or sign up with email and password. After registration, profile se
 - **Progress** — Aggregated activity and metrics over time (sessions, activities, and weight entries where implemented).
 - **Profile** — Editable profile (including optional profile photo stored in Firebase Storage), vitals, shortcuts to notifications, BMI calculator, metrics history, recent activity preview, and account controls (logout, delete account in edit mode).
 
-### Stack screens (selected)
+### Stack screens 
 
 Beyond the tab bar, a native stack provides modal-style flows: live **Session** with exercise picker and completion, **Exercise** and **Category** browsers, **Workout of the Day**, **Activity monitoring** (full history with actions such as delete where supported), **Metrics** and **Calculation** (BMI), **Plans** (list, setup, detail), **Routine** list and **Routine editor**, **Log workout**, **Notifications** settings, **Profile setup**, and **Login** / **Signup**.
 
 Navigation is declared in `app/(tabs)/index.tsx`, which composes the tab navigator and stack screens around the shared `Firebase/config` auth instance.
 
-### Data model (high level)
+### Data model 
 
 Firestore data is organised per user under `users/{uid}`:
 
@@ -70,7 +69,7 @@ Client-side helpers (for example `src/utils/sessionFirestoreWrite.js`) coordinat
 
 ---
 
-## Repository layout (abbreviated)
+## Repository layout 
 
 ```
 app/                 Expo Router entry and navigation shell
