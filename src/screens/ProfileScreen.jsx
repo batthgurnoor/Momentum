@@ -28,8 +28,9 @@ import {
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import * as ImagePicker from 'expo-image-picker';
+import { signOut } from 'firebase/auth';
 import { auth, db, storage } from '../../Firebase/config';
-import { useNavigation } from '@react-navigation/native';
+import { CommonActions, useNavigation } from '@react-navigation/native';
 import { COLORS } from '../theme/colors';
 
 const APP = COLORS.app;
@@ -236,6 +237,38 @@ export default function ProfileScreen() {
   const displayName =
     [profile?.firstName, profile?.lastName].filter(Boolean).join(' ').trim() || 'Your profile';
 
+  const handleLogout = () => {
+    Alert.alert('Log out', 'Are you sure you want to log out?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Log out',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await signOut(auth);
+            const reset = CommonActions.reset({
+              index: 0,
+              routes: [{ name: 'Login' }],
+            });
+            let nav = navigation;
+            for (let i = 0; i < 5 && nav; i++) {
+              const state = nav.getState?.();
+              if (state?.routeNames?.includes('Login')) {
+                nav.dispatch(reset);
+                return;
+              }
+              nav = nav.getParent();
+            }
+            navigation.dispatch(reset);
+          } catch (error) {
+            console.log('Logout error:', error);
+            Alert.alert('Could not log out', error?.message ?? 'Try again.');
+          }
+        },
+      },
+    ]);
+  };
+
   if (!user) {
     return (
       <LinearGradient colors={[APP.bgTop, APP.bgMid, APP.bgBottom]} locations={[0, 0.45, 1]} style={styles.screen}>
@@ -289,9 +322,16 @@ export default function ProfileScreen() {
               <View style={{ flex: 1, paddingRight: 8 }}>
                 <Text style={styles.profileHeaderTitle}>Profile</Text>
               </View>
-              <View style={[styles.iconCircle, { borderColor: WH.cardBorder, backgroundColor: WH.accentMuted }]}>
-                <Ionicons name="person-circle-outline" size={24} color={WH.accent} />
-              </View>
+              <TouchableOpacity
+                style={[styles.logoutHeaderBtn, { borderColor: WH.cardBorder, backgroundColor: WH.accentMuted }]}
+                onPress={handleLogout}
+                activeOpacity={0.85}
+                accessibilityRole="button"
+                accessibilityLabel="Log out"
+              >
+                <Ionicons name="log-out-outline" size={20} color={WH.accent} />
+                <Text style={[styles.logoutHeaderText, { color: WH.accent }]}>Log out</Text>
+              </TouchableOpacity>
             </View>
 
             <View style={styles.card}>
@@ -529,6 +569,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
+  },
+  logoutHeaderBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 9,
+    paddingHorizontal: 12,
+    borderRadius: 14,
+    borderWidth: 1,
+  },
+  logoutHeaderText: {
+    fontWeight: '800',
+    fontSize: 13,
   },
   card: {
     marginBottom: 14,

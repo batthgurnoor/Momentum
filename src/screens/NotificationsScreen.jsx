@@ -12,6 +12,9 @@ import {
   Linking,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
@@ -51,6 +54,7 @@ function alertNotificationPermissionDenied() {
 }
 
 export default function NotificationsScreen() {
+  const navigation = useNavigation();
   const [workoutReminderEnabled, setWorkoutReminderEnabled] = useState(false);
   const [waterReminderEnabled, setWaterReminderEnabled] = useState(false);
   const [workoutHour, setWorkoutHour] = useState(8);
@@ -228,9 +232,24 @@ export default function NotificationsScreen() {
 
   return (
     <LinearGradient colors={[APP.bgTop, APP.bgMid, APP.bgBottom]} locations={[0, 0.5, 1]} style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.headerTitle}>Notification Settings</Text>
-        
+      <SafeAreaView style={styles.safe} edges={['top']}>
+        <View style={styles.navHeader}>
+          <TouchableOpacity
+            style={styles.navBack}
+            onPress={() => navigation.goBack()}
+            activeOpacity={0.85}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+          >
+            <Ionicons name="arrow-back" size={24} color={APP.text} />
+          </TouchableOpacity>
+          <Text style={styles.navTitle} numberOfLines={1}>
+            Notification settings
+          </Text>
+          <View style={styles.navHeaderSpacer} />
+        </View>
+
+        <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Workout Reminders</Text>
           
@@ -310,6 +329,7 @@ export default function NotificationsScreen() {
           <Text style={styles.cancelButtonText}>Cancel All Notifications</Text>
         </TouchableOpacity>
       </ScrollView>
+      </SafeAreaView>
 
       <Modal
         visible={workoutTimeModalVisible}
@@ -395,16 +415,39 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  safe: {
+    flex: 1,
+    backgroundColor: 'transparent',
+  },
+  navHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: APP.cardBorder,
+  },
+  navBack: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  navHeaderSpacer: {
+    width: 40,
+  },
+  navTitle: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: '800',
+    color: APP.text,
+  },
   scrollContent: {
     padding: 20,
-    paddingTop: 60,
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 30,
-    textAlign: 'center',
+    paddingTop: 16,
+    paddingBottom: 32,
   },
   section: {
     marginBottom: 30,
