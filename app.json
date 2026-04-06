@@ -4,7 +4,7 @@
     "slug": "momentum",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/momentum.jpg",
+    "icon": "./assets/images/momentum.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -14,11 +14,15 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Momentum uses your photo library so you can set a profile picture.",
+        "NSCameraUsageDescription": "Momentum uses the camera so you can take a profile picture."
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/momentum.jpg",
+        "foregroundImage": "./assets/images/momentum.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.batth.gurnoor.momentum",
@@ -43,6 +47,13 @@
         "expo-notifications",
         {
           "defaultChannel": "default"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Momentum uses your photo library so you can set a profile picture.",
+          "cameraPermission": "Momentum uses the camera so you can take a profile picture."
         }
       ]
     ],
