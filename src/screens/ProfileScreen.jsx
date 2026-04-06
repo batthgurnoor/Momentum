@@ -23,14 +23,18 @@ import {
   updateDoc,
   setDoc,
   deleteField,
+  deleteDoc,
   collection,
   query,
   orderBy,
   onSnapshot,
+  getDocs,
+  writeBatch,
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import * as ImagePicker from 'expo-image-picker';
-import { signOut } from 'firebase/auth';
+import { signOut, deleteUser } from 'firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth, db, storage } from '../../Firebase/config';
 import { CommonActions, useNavigation } from '@react-navigation/native';
 import { COLORS } from '../theme/colors';
@@ -39,6 +43,28 @@ const APP = COLORS.app;
 const WH = COLORS.workoutHome;
 
 const defaultAvatar = require('../../assets/images/avatar.png');
+
+/** Top-level collections under users/{uid} that should be removed when deleting an account. */
+const USER_DATA_SUBCOLLECTIONS = ['activities', 'sessions', 'metrics', 'routines', 'workoutPlans'];
+
+async function deleteFirestoreCollectionDocs(db, collectionRef) {
+  const snapshot = await getDocs(collectionRef);
+  if (snapshot.empty) return;
+  let batch = writeBatch(db);
+  let count = 0;
+  const commits = [];
+  for (const d of snapshot.docs) {
+    batch.delete(d.ref);
+    count += 1;
+    if (count >= 500) {
+      commits.push(batch.commit());
+      batch = writeBatch(db);
+      count = 0;
+    }
+  }
+  if (count > 0) commits.push(batch.commit());
+  await Promise.all(commits);
+}
 
 function formatActivityDuration(seconds) {
   if (seconds == null || seconds === '') return null;
@@ -77,6 +103,7 @@ export default function ProfileScreen() {
   const [saving, setSaving] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [photoPickerVisible, setPhotoPickerVisible] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
 
   const user = auth.currentUser;
 
@@ -271,6 +298,82 @@ export default function ProfileScreen() {
   const displayName =
     [profile?.firstName, profile?.lastName].filter(Boolean).join(' ').trim() || 'Your profile';
 
+  const resetNavigationToLogin = () => {
+    const reset = CommonActions.reset({
+      index: 0,
+      routes: [{ name: 'Login' }],
+    });
+    let nav = navigation;
+    for (let i = 0; i < 5 && nav; i++) {
+      const state = nav.getState?.();
+      if (state?.routeNames?.includes('Login')) {
+        nav.dispatch(reset);
+        return;
+      }
+      nav = nav.getParent();
+    }
+    navigation.dispatch(reset);
+  };
+
+  const performDeleteAccount = async () => {
+    const u = auth.currentUser;
+    if (!u) return;
+    setDeletingAccount(true);
+    try {
+      for (const name of USER_DATA_SUBCOLLECTIONS) {
+        const colRef = collection(db, 'users', u.uid, name);
+        await deleteFirestoreCollectionDocs(db, colRef);
+      }
+      try {
+        await deleteObject(ref(storage, `profilePictures/${u.uid}.jpg`));
+      } catch {
+        /* no profile image */
+      }
+      await deleteDoc(doc(db, 'users', u.uid));
+      await AsyncStorage.removeItem('notificationPreferences');
+      await deleteUser(u);
+      resetNavigationToLogin();
+    } catch (error) {
+      console.log('Delete account error:', error);
+      const code = error?.code;
+      if (code === 'auth/requires-recent-login') {
+        Alert.alert(
+          'Sign in again',
+          'For security, please log out, log back in, and try deleting your account again.'
+        );
+      } else {
+        Alert.alert('Could not delete account', error?.message ?? 'Try again later.');
+      }
+    } finally {
+      setDeletingAccount(false);
+    }
+  };
+
+  const confirmDeleteAccount = () => {
+    if (!user || saving || deletingAccount) return;
+    Alert.alert(
+      'Delete account?',
+      'This permanently removes your profile, workouts, plans, and metrics. This cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            Alert.alert(
+              'Are you absolutely sure?',
+              'All your data in Momentum will be erased.',
+              [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Delete my account', style: 'destructive', onPress: performDeleteAccount },
+              ]
+            );
+          },
+        },
+      ]
+    );
+  };
+
   const handleLogout = () => {
     Alert.alert('Log out', 'Are you sure you want to log out?', [
       { text: 'Cancel', style: 'cancel' },
@@ -280,20 +383,7 @@ export default function ProfileScreen() {
         onPress: async () => {
           try {
             await signOut(auth);
-            const reset = CommonActions.reset({
-              index: 0,
-              routes: [{ name: 'Login' }],
-            });
-            let nav = navigation;
-            for (let i = 0; i < 5 && nav; i++) {
-              const state = nav.getState?.();
-              if (state?.routeNames?.includes('Login')) {
-                nav.dispatch(reset);
-                return;
-              }
-              nav = nav.getParent();
-            }
-            navigation.dispatch(reset);
+            resetNavigationToLogin();
           } catch (error) {
             console.log('Logout error:', error);
             Alert.alert('Could not log out', error?.message ?? 'Try again.');
@@ -522,6 +612,28 @@ export default function ProfileScreen() {
                   value={String(profile.weight)}
                   onChangeText={(t) => setProfile({ ...profile, weight: t })}
                 />
+
+                <View style={styles.deleteAccountBlock}>
+                  <Text style={styles.deleteAccountTitle}>Danger zone</Text>
+                  <Text style={styles.deleteAccountCopy}>
+                    Permanently delete your account and all workouts, routines, plans, and metrics stored in Momentum.
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.deleteAccountBtn}
+                    activeOpacity={0.88}
+                    onPress={confirmDeleteAccount}
+                    disabled={saving || deletingAccount}
+                  >
+                    {deletingAccount ? (
+                      <ActivityIndicator color="#fff" size="small" />
+                    ) : (
+                      <>
+                        <Ionicons name="trash-outline" size={18} color="#fff" />
+                        <Text style={styles.deleteAccountBtnText}>Delete account</Text>
+                      </>
+                    )}
+                  </TouchableOpacity>
+                </View>
               </View>
             ) : null}
 
@@ -1152,5 +1264,39 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     color: COLORS.text.primary,
+  },
+  deleteAccountBlock: {
+    marginTop: 28,
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: APP.cardBorder,
+  },
+  deleteAccountTitle: {
+    color: COLORS.ui.error,
+    fontWeight: '900',
+    fontSize: 13,
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+    marginBottom: 8,
+  },
+  deleteAccountCopy: {
+    color: COLORS.text.secondary,
+    fontSize: 13,
+    lineHeight: 19,
+    marginBottom: 14,
+  },
+  deleteAccountBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: COLORS.ui.error,
+    paddingVertical: 12,
+    borderRadius: 14,
+  },
+  deleteAccountBtnText: {
+    color: '#fff',
+    fontWeight: '800',
+    fontSize: 15,
   },
 });
