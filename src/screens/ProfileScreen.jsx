@@ -11,6 +11,8 @@ import {
   StyleSheet,
   Platform,
   Alert,
+  Modal,
+  Pressable,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -38,6 +40,32 @@ const WH = COLORS.workoutHome;
 
 const defaultAvatar = require('../../assets/images/avatar.png');
 
+function formatActivityDuration(seconds) {
+  if (seconds == null || seconds === '') return null;
+  const s = Number(seconds);
+  if (!Number.isFinite(s) || s <= 0) return null;
+  if (s < 60) return `${Math.round(s)}s`;
+  const minutes = Math.floor(s / 60);
+  const remainingSeconds = Math.round(s % 60);
+  return remainingSeconds > 0 ? `${minutes}m ${remainingSeconds}s` : `${minutes}m`;
+}
+
+function formatActivityWhen(timestamp) {
+  const date = timestamp?.toDate ? timestamp.toDate() : null;
+  if (!date || !(date instanceof Date) || Number.isNaN(date.getTime())) return '—';
+  const now = new Date();
+  const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startThat = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const dayDiff = Math.round((startToday - startThat) / 86400000);
+  const timeStr = date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  if (dayDiff === 0) return `Today · ${timeStr}`;
+  if (dayDiff === 1) return `Yesterday · ${timeStr}`;
+  if (dayDiff > 1 && dayDiff < 7) {
+    return `${date.toLocaleDateString(undefined, { weekday: 'short' })} · ${timeStr}`;
+  }
+  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ` · ${timeStr}`;
+}
+
 export default function ProfileScreen() {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
@@ -48,6 +76,7 @@ export default function ProfileScreen() {
   const [loadingActivities, setLoadingActivities] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [photoPickerVisible, setPhotoPickerVisible] = useState(false);
 
   const user = auth.currentUser;
 
@@ -205,33 +234,38 @@ export default function ProfileScreen() {
     }
   };
 
+  const closePhotoPicker = () => setPhotoPickerVisible(false);
+
   const openPhotoOptions = () => {
     if (!user || uploadingPhoto) return;
-    const buttons = [
-      {
-        text: 'Photo library',
-        onPress: async () => {
-          const asset = await pickProfileImage('library');
-          if (asset) await uploadProfilePhoto(asset);
-        },
-      },
-      {
-        text: 'Camera',
-        onPress: async () => {
-          const asset = await pickProfileImage('camera');
-          if (asset) await uploadProfilePhoto(asset);
-        },
-      },
-    ];
-    if (profile?.photoURL) {
-      buttons.push({
-        text: 'Remove photo',
-        style: 'destructive',
-        onPress: removeProfilePhoto,
-      });
-    }
-    buttons.push({ text: 'Cancel', style: 'cancel' });
-    Alert.alert('Profile photo', 'Choose a source', buttons);
+    setPhotoPickerVisible(true);
+  };
+
+  /** Close themed sheet first so the native image UI can open cleanly on iOS/Android. */
+  const runAfterPhotoSheetClose = (fn) => {
+    closePhotoPicker();
+    setTimeout(fn, 320);
+  };
+
+  const handlePhotoLibraryPick = () => {
+    if (uploadingPhoto) return;
+    runAfterPhotoSheetClose(async () => {
+      const asset = await pickProfileImage('library');
+      if (asset) await uploadProfilePhoto(asset);
+    });
+  };
+
+  const handlePhotoCameraPick = () => {
+    if (uploadingPhoto) return;
+    runAfterPhotoSheetClose(async () => {
+      const asset = await pickProfileImage('camera');
+      if (asset) await uploadProfilePhoto(asset);
+    });
+  };
+
+  const handleRemovePhotoFromSheet = () => {
+    closePhotoPicker();
+    removeProfilePhoto();
   };
 
   const displayName =
@@ -492,42 +526,169 @@ export default function ProfileScreen() {
             ) : null}
 
             <View style={styles.card}>
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionHeading}>Recent activity</Text>
-                <TouchableOpacity activeOpacity={0.85} onPress={() => navigation.navigate('ActivityMonitoring')}>
+              <View style={styles.activityCardHeader}>
+                <View style={{ flex: 1, paddingRight: 8 }}>
+                  <Text style={styles.activityEyebrow}>Your training</Text>
+                  <Text style={styles.activitySectionTitle}>Recent activity</Text>
+                  {!loadingActivities && recent.length > 0 ? (
+                    <Text style={styles.activitySectionHint}>Last {recent.length} sessions</Text>
+                  ) : null}
+                </View>
+                <TouchableOpacity
+                  style={styles.activityViewAllBtn}
+                  activeOpacity={0.85}
+                  onPress={() => navigation.navigate('ActivityMonitoring')}
+                >
                   <Text style={styles.linkText}>View all</Text>
+                  <Ionicons name="chevron-forward" size={16} color={APP.accent} />
                 </TouchableOpacity>
               </View>
+
               {loadingActivities ? (
-                <ActivityIndicator color={APP.accent} style={{ marginVertical: 16 }} />
+                <View style={styles.activityLoadingWrap}>
+                  <ActivityIndicator color={APP.accent} />
+                  <Text style={styles.activityLoadingText}>Loading activity…</Text>
+                </View>
               ) : recent.length === 0 ? (
-                <Text style={styles.mutedBody}>No sessions logged yet.</Text>
+                <View style={styles.activityEmpty}>
+                  <View style={[styles.activityEmptyIcon, { borderColor: WH.cardBorder, backgroundColor: WH.accentMuted }]}>
+                    <Ionicons name="barbell-outline" size={28} color={WH.accent} />
+                  </View>
+                  <Text style={styles.activityEmptyTitle}>No sessions yet</Text>
+                  <Text style={styles.activityEmptySub}>Finish a workout and it will show up here.</Text>
+                  <TouchableOpacity
+                    style={[styles.activityEmptyCta, { borderColor: APP.cardBorder, backgroundColor: 'rgba(0,0,0,0.22)' }]}
+                    activeOpacity={0.88}
+                    onPress={() => navigation.navigate('Train')}
+                  >
+                    <Ionicons name="flash-outline" size={18} color={APP.accent} />
+                    <Text style={styles.activityEmptyCtaText}>Go to Train</Text>
+                  </TouchableOpacity>
+                </View>
               ) : (
-                recent.map((item, idx) => {
-                  const dateStr = item.timestamp?.toDate ? item.timestamp.toDate().toLocaleString() : '—';
-                  return (
-                    <View
-                      key={item.id}
-                      style={[styles.activityRow, idx === 0 && styles.activityRowFirst]}
-                    >
-                      <View style={styles.activityDot} />
-                      <View style={{ flex: 1 }}>
-                        <Text style={styles.activityTitle} numberOfLines={1}>
-                          {item.title || 'Session'}
-                        </Text>
-                        <Text style={styles.activityMeta}>{dateStr}</Text>
-                        {item.duration != null ? (
-                          <Text style={styles.activityMeta}>Duration: {item.duration} min</Text>
-                        ) : null}
-                      </View>
-                    </View>
-                  );
-                })
+                <View style={styles.activityList}>
+                  {recent.map((item, idx) => {
+                    const dur = formatActivityDuration(item.duration);
+                    const cals = Number(item.caloriesBurned);
+                    const hasCals = Number.isFinite(cals) && cals > 0;
+                    return (
+                      <TouchableOpacity
+                        key={item.id}
+                        style={[
+                          styles.activityItem,
+                          { borderColor: APP.cardBorder },
+                          idx === recent.length - 1 && styles.activityItemLast,
+                        ]}
+                        onPress={() => navigation.navigate('ActivityMonitoring')}
+                        activeOpacity={0.88}
+                      >
+                        <View style={[styles.activityItemIcon, { backgroundColor: WH.accentMuted }]}>
+                          <Ionicons name="fitness-outline" size={20} color={WH.accent} />
+                        </View>
+                        <View style={styles.activityItemBody}>
+                          <Text style={styles.activityItemTitle} numberOfLines={1}>
+                            {item.title || 'Session'}
+                          </Text>
+                          <Text style={styles.activityItemWhen}>{formatActivityWhen(item.timestamp)}</Text>
+                          {(dur || hasCals) ? (
+                            <View style={styles.activityItemMetaRow}>
+                              {dur ? (
+                                <View style={[styles.activityPill, { borderColor: APP.cardBorder }]}>
+                                  <Ionicons name="time-outline" size={13} color={APP.textMuted} />
+                                  <Text style={styles.activityPillText}>{dur}</Text>
+                                </View>
+                              ) : null}
+                              {hasCals ? (
+                                <View style={[styles.activityPill, { borderColor: APP.cardBorder }]}>
+                                  <Ionicons name="flame-outline" size={13} color={APP.textMuted} />
+                                  <Text style={styles.activityPillText}>{Math.round(cals)} kcal</Text>
+                                </View>
+                              ) : null}
+                            </View>
+                          ) : null}
+                        </View>
+                        <Ionicons name="chevron-forward" size={18} color={APP.textDim} />
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
               )}
             </View>
           </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
+
+      <Modal
+        visible={photoPickerVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={closePhotoPicker}
+      >
+        <Pressable style={styles.photoPickerBackdrop} onPress={closePhotoPicker}>
+          <Pressable style={styles.photoPickerCardWrap} onPress={(e) => e.stopPropagation()}>
+            <LinearGradient
+              colors={[APP.bgTop, APP.bgMid, APP.bgBottom]}
+              locations={[0, 0.45, 1]}
+              style={styles.photoPickerGradient}
+            >
+              <View style={styles.photoPickerHeader}>
+                <Text style={styles.photoPickerTitle}>Choose a profile picture</Text>
+                <TouchableOpacity
+                  onPress={closePhotoPicker}
+                  style={styles.photoPickerClose}
+                  hitSlop={{ top: 14, bottom: 14, left: 14, right: 14 }}
+                  accessibilityRole="button"
+                  accessibilityLabel="Close"
+                >
+                  <Ionicons name="close" size={26} color={APP.text} />
+                </TouchableOpacity>
+              </View>
+              <Text style={styles.photoPickerSubtitle}>Pick a source for your photo</Text>
+
+              <TouchableOpacity
+                style={[styles.photoPickerRow, { borderColor: APP.cardBorder }]}
+                onPress={handlePhotoLibraryPick}
+                activeOpacity={0.88}
+                disabled={uploadingPhoto}
+              >
+                <View style={[styles.photoPickerRowIcon, { backgroundColor: WH.accentMuted }]}>
+                  <Ionicons name="images-outline" size={22} color={WH.accent} />
+                </View>
+                <Text style={styles.photoPickerRowLabel}>Photo library</Text>
+                <Ionicons name="chevron-forward" size={20} color={APP.textDim} />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.photoPickerRow, { borderColor: APP.cardBorder }]}
+                onPress={handlePhotoCameraPick}
+                activeOpacity={0.88}
+                disabled={uploadingPhoto}
+              >
+                <View style={[styles.photoPickerRowIcon, { backgroundColor: WH.accentMuted }]}>
+                  <Ionicons name="camera-outline" size={22} color={WH.accent} />
+                </View>
+                <Text style={styles.photoPickerRowLabel}>Camera</Text>
+                <Ionicons name="chevron-forward" size={20} color={APP.textDim} />
+              </TouchableOpacity>
+
+              {profile?.photoURL ? (
+                <TouchableOpacity
+                  style={[styles.photoPickerRow, styles.photoPickerRowDanger, { borderColor: APP.cardBorder }]}
+                  onPress={handleRemovePhotoFromSheet}
+                  activeOpacity={0.88}
+                  disabled={uploadingPhoto}
+                >
+                  <View style={[styles.photoPickerRowIcon, { backgroundColor: 'rgba(248,113,113,0.18)' }]}>
+                    <Ionicons name="trash-outline" size={22} color={COLORS.ui.error} />
+                  </View>
+                  <Text style={[styles.photoPickerRowLabel, { color: COLORS.ui.error }]}>Remove photo</Text>
+                  <Ionicons name="chevron-forward" size={20} color={APP.textDim} />
+                </TouchableOpacity>
+              ) : null}
+            </LinearGradient>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </LinearGradient>
   );
 }
@@ -767,34 +928,229 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginBottom: 8,
   },
-  activityRow: {
+  activityCardHeader: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderTopColor: APP.cardBorder,
+    justifyContent: 'space-between',
+    marginBottom: 14,
   },
-  activityRowFirst: {
-    borderTopWidth: 0,
-    paddingTop: 0,
+  activityEyebrow: {
+    color: COLORS.text.tertiary,
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    marginBottom: 4,
   },
-  activityDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: APP.accent,
-    marginTop: 6,
+  activitySectionTitle: {
+    color: COLORS.text.primary,
+    fontWeight: '900',
+    fontSize: 18,
+    letterSpacing: -0.3,
+  },
+  activitySectionHint: {
+    color: COLORS.text.secondary,
+    fontSize: 12,
+    marginTop: 4,
+    fontWeight: '600',
+  },
+  activityViewAllBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    paddingTop: 18,
+  },
+  activityLoadingWrap: {
+    alignItems: 'center',
+    paddingVertical: 28,
+    gap: 10,
+  },
+  activityLoadingText: {
+    color: COLORS.text.secondary,
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  activityEmpty: {
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 8,
+  },
+  activityEmptyIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    marginBottom: 14,
+  },
+  activityEmptyTitle: {
+    color: COLORS.text.primary,
+    fontWeight: '900',
+    fontSize: 17,
+    marginBottom: 6,
+  },
+  activityEmptySub: {
+    color: COLORS.text.secondary,
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 16,
+    maxWidth: 260,
+  },
+  activityEmptyCta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 11,
+    paddingHorizontal: 18,
+    borderRadius: 14,
+    borderWidth: 1,
+  },
+  activityEmptyCtaText: {
+    color: APP.accent,
+    fontWeight: '800',
+    fontSize: 14,
+  },
+  activityList: {
+    gap: 0,
+  },
+  activityItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    borderRadius: 14,
+    borderWidth: 1,
+    backgroundColor: 'rgba(0,0,0,0.22)',
+    marginBottom: 10,
+  },
+  activityItemLast: {
+    marginBottom: 0,
+  },
+  activityItemIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginRight: 12,
-    opacity: 0.85,
   },
-  activityTitle: {
+  activityItemBody: {
+    flex: 1,
+    minWidth: 0,
+  },
+  activityItemTitle: {
     color: COLORS.text.primary,
     fontWeight: '800',
     fontSize: 15,
   },
-  activityMeta: {
-    color: COLORS.text.tertiary,
+  activityItemWhen: {
+    color: COLORS.text.secondary,
     fontSize: 12,
-    marginTop: 2,
+    marginTop: 3,
+    fontWeight: '600',
+  },
+  activityItemMetaRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 8,
+  },
+  activityPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+  },
+  activityPillText: {
+    color: APP.textMuted,
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  photoPickerBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.65)',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  photoPickerCardWrap: {
+    borderRadius: 20,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: APP.cardBorder,
+    maxWidth: 400,
+    width: '100%',
+    alignSelf: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.35,
+        shadowRadius: 16,
+      },
+      android: { elevation: 8 },
+    }),
+  },
+  photoPickerGradient: {
+    padding: 18,
+    paddingTop: 16,
+  },
+  photoPickerHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: 12,
+    marginBottom: 6,
+  },
+  photoPickerTitle: {
+    flex: 1,
+    fontSize: 20,
+    fontWeight: '800',
+    color: WH.accent,
+    letterSpacing: -0.3,
+    paddingTop: 2,
+  },
+  photoPickerClose: {
+    marginTop: -4,
+    marginRight: -4,
+    padding: 4,
+  },
+  photoPickerSubtitle: {
+    fontSize: 14,
+    color: COLORS.text.secondary,
+    marginBottom: 16,
+    lineHeight: 20,
+  },
+  photoPickerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    borderRadius: 14,
+    borderWidth: 1,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    marginBottom: 10,
+    gap: 12,
+  },
+  photoPickerRowDanger: {
+    backgroundColor: 'rgba(0,0,0,0.22)',
+  },
+  photoPickerRowIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  photoPickerRowLabel: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.text.primary,
   },
 });
