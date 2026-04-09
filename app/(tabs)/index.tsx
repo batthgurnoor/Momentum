@@ -1,5 +1,10 @@
 import React, { useCallback, useEffect } from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Platform, Pressable } from 'react-native';
+import { useFonts } from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
+import { StatusBar } from 'expo-status-bar';
+import { createBottomTabNavigator, type BottomTabBarButtonProps } from '@react-navigation/bottom-tabs';
+import * as Haptics from 'expo-haptics';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import WorkoutScreen from "../../src/screens/WorkoutScreen";
 import CalculationScreen from "../../src/screens/CalculationScreen";
@@ -11,7 +16,6 @@ import SessionScreen from '../../src/screens/SessionScreen';
 import MetricsScreen from '../../src/screens/MetricsScreen';
 import RoutinesScreen from '../../src/screens/RoutinesScreen';
 import RoutineEditorScreen from '../../src/screens/RoutineEditorScreen';
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import ExerciseScreen from '../../src/screens/ExerciseScreen';
 import ActivityMonitoringScreen from '../../src/screens/ActivityMonitoringScreen';
@@ -19,8 +23,6 @@ import CategoryExerciseScreen from '@/src/screens/CategoryExerciseScreen';
 import ProfileSetupScreen from '../../src/screens/ProfileSetupScreen';
 import LoginScreen from '../../src/screens/LoginScreen';
 import SignupScreen from '../../src/screens/SignUpScreen';
-import AntDesign from '@expo/vector-icons/AntDesign';
-import LogWorkoutScreen from '../../src/screens/LogWorkoutScreen';
 import * as Notifications from 'expo-notifications';
 import PlanListScreen from '../../src/screens/PlanListScreen';
 import PlanSetupScreen from '../../src/screens/PlanSetupScreen';
@@ -37,35 +39,69 @@ import ErrorBoundary from '../../src/components/ErrorBoundary';
 
 const APP = COLORS.app;
 
+SplashScreen.preventAutoHideAsync().catch(() => {});
+
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
+function TabBarButton(props: BottomTabBarButtonProps) {
+  const { children, onPress, onLongPress, accessibilityState, style, ...rest } = props;
+  return (
+    <Pressable
+      {...rest}
+      accessibilityRole="button"
+      accessibilityState={accessibilityState}
+      onLongPress={onLongPress}
+      onPress={(e) => {
+        if (Platform.OS !== 'web') {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+        }
+        onPress?.(e);
+      }}
+      style={({ pressed }) => [style, pressed && { opacity: 0.9 }]}
+    >
+      {children}
+    </Pressable>
+  );
+}
+
 function TabNavigator() {
   const screenOptions = useCallback(
-    ({ route }) => ({
+    ({ route }: { route: { name: string } }) => ({
       tabBarHideOnKeyboard: true,
-      tabBarIcon: ({ color, size }) => {
+      headerShown: false,
+      tabBarShowLabel: false,
+      tabBarButton: (p: BottomTabBarButtonProps) => <TabBarButton {...p} />,
+      tabBarIcon: ({
+        color,
+        size,
+        focused,
+      }: {
+        color: string;
+        size: number;
+        focused: boolean;
+      }) => {
+        const s = size ?? 24;
         switch (route.name) {
           case 'Today':
-            return <FontAwesome6 name="dumbbell" size={size} color={color} />;
+            return <Ionicons name={focused ? 'barbell' : 'barbell-outline'} size={s} color={color} />;
           case 'Train':
-            return <FontAwesome6 name="person-running" size={size} color={color} />;
+            return <Ionicons name={focused ? 'fitness' : 'fitness-outline'} size={s} color={color} />;
           case 'Progress':
-            return <Ionicons name="stats-chart" size={size} color={color} />;
+            return <Ionicons name={focused ? 'stats-chart' : 'stats-chart-outline'} size={s} color={color} />;
           case 'Profile':
-            return <AntDesign name="user" size={size} color={color} />;
+            return <Ionicons name={focused ? 'person' : 'person-outline'} size={s} color={color} />;
           default:
             return null;
         }
       },
-      tabBarShowLabel: false,
-      headerShown: false,
       tabBarStyle: {
         backgroundColor: APP.bgMid,
-        paddingVertical: 6,
-        paddingTop: 6,
-        borderTopWidth: 1,
-        borderTopColor: APP.cardBorder,
+        paddingVertical: 8,
+        paddingTop: 8,
+        borderTopWidth: 0,
+        elevation: 0,
+        shadowOpacity: 0,
       },
       tabBarActiveTintColor: APP.accent,
       tabBarInactiveTintColor: APP.textDim,
@@ -84,6 +120,14 @@ function TabNavigator() {
 }
 
 export default function App() {
+  const [ioniconsLoaded, ioniconsError] = useFonts(Ionicons.font);
+
+  useEffect(() => {
+    if (ioniconsLoaded || ioniconsError) {
+      SplashScreen.hideAsync().catch(() => {});
+    }
+  }, [ioniconsLoaded, ioniconsError]);
+
   // Set up notifications when app loads
   useEffect(() => {
     // Configure how the notification will appear
@@ -125,8 +169,13 @@ export default function App() {
     return () => unsub();
   }, []);
 
+  if (!ioniconsLoaded && !ioniconsError) {
+    return null;
+  }
+
   return (
     <ErrorBoundary title="Momentum crashed on this screen">
+      <StatusBar style="light" backgroundColor={APP.bgTop} />
       <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: APP.bgTop } }}>
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Signup" component={SignupScreen} />
