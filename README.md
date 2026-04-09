@@ -22,7 +22,7 @@ The app targets users who train on their own schedule: they can browse exercises
 | Media | Exercise GIFs and images under `assets/`; optional audio for timers / feedback where used |
 | Notifications | `expo-notifications` for local scheduling and push token registration (Android FCM requires `google-services.json` and native Gradle setup as in Expo’s push documentation) |
 
-The repository includes generated **Android** native sources (`android/`). iOS may be generated or maintained similarly depending on your workflow. **New Architecture** is enabled in app configuration (`newArchEnabled`).
+The repository includes generated **Android** native sources (`android/`). **New Architecture** is enabled in app configuration (`newArchEnabled`).
 
 ---
 
@@ -172,4 +172,4 @@ This project is licensed under the **0BSD** license (see `package.json`). Third-
 
 ## Contributing
 
-Contributions are welcome. Please use focused pull requests with clear descriptions of behaviour changes and any impacts on Firebase rules or native projects. If you introduce a formal contributing guide, you may link it here in place of this paragraph.
+See **[CONTRIBUTING.md](./CONTRIBUTING.md)** for setup, required Firebase/Android credentials, and pull request expectations. In short: use focused PRs and document any Firestore/Storage rule or native project changes.
